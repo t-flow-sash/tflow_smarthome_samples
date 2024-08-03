@@ -1,0 +1,3904 @@
+kiosk_mode:
+  user_settings:
+    - users:
+        - wall-unit
+      kiosk: true
+      hide_header: true
+      hide_sidebar: true
+      hide_menu_button: true
+      hide_overflow: true
+button_card_templates:
+  inkwell:
+    show_name: false
+    show_state: true
+    extra_styles: |
+      [[[ return `
+        @keyframes pulse {
+          5% {
+            background-color: ${variables.color};
+          }
+        }
+      `]]]
+    styles:
+      icon:
+        - opacity: 0.7
+        - color: '[[[ return variables.color ]]]'
+        - filter: drop-shadow( 0 0 2px rgba(0, 0, 0, .7))
+      state:
+        - font-size: 1.5em
+        - font-weight: bold
+        - text-shadow: 0 0 6px black
+        - overflow: visible
+      card:
+        - border: solid 3px gray
+        - border-top: none
+        - background: |
+            [[[
+              var level = entity.state;
+              var color = variables.color;
+              return `linear-gradient(to top, ${color}, ${color} ${level}%, rgba(255,255,255,0.12) ${level}%)`
+            ]]]
+        - animation: |
+            [[[
+              return (0 + entity.state) < 10
+                ? 'pulse ease-in-out 1s infinite'
+                : 'none'
+            ]]]
+views:
+  - theme: Caule Black Blue
+    title: Home
+    path: grid
+    type: custom:grid-layout
+    layout:
+      grid-template-columns: 25% 40% 35%
+      grid-template-rows: auto
+      grid-template-areas: |
+        "messages messages messages"
+        "headerl headerm headerr"
+        "headerlu headerm headerru"
+        "divider divider divider"
+        "left middle right"
+        "footer1 footer2 footer3"
+        "footer4 footer5 footer6"        
+      mediaquery:
+        '(max-width: 932px)':
+          grid-template-columns: 100%
+          grid-template-areas: |
+            "messages"
+            "headerl"
+            "headerm"
+            "headermu"
+            "headerr"
+            "headerlu"
+            "headerru"
+            "divider"
+            "left"            
+            "middle"
+            "right"
+            "footer1"
+            "footer2"
+            "footer3"          
+            "footer4"
+            "footer5"
+            "footer6"
+    icon: mdi:home-assistant
+    badges: []
+    cards:
+      - type: custom:gap-card
+        height: 20
+        view_layout:
+          grid-area: divider
+      - type: vertical-stack
+        cards:
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: sensor.stadt_leverkusen_aktuelle_warnstufe
+                state_not: '0'
+            card:
+              type: markdown
+              content: >-
+                <center>{{
+                states.sensor.stadt_leverkusen_aktuelle_warnstufe.attributes.warning_1_headline
+                }}</center>
+              card_mod:
+                style: |
+                  ha-markdown {
+                    background: {{ state_attr('sensor.stadt_leverkusen_aktuelle_warnstufe', 'warning_1_color') }};
+                    padding: 2px 2px 2px 2px !important;
+                    color: black;
+                    }
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: sensor.stadt_leverkusen_vorwarnstufe
+                state_not: '0'
+              - condition: state
+                entity: sensor.stadt_leverkusen_aktuelle_warnstufe
+                state: '0'
+            card:
+              type: markdown
+              content: >-
+                <center>{{
+                states.sensor.stadt_leverkusen_vorwarnstufe.attributes.warning_1_headline
+                }} --- {{
+                (as_timestamp(states.sensor.stadt_leverkusen_vorwarnstufe.attributes.warning_1_start)
+                | timestamp_custom('%d.%m.%Y %H:%M', true, 'Europe/Berlin'))
+                }}-{{
+                (as_timestamp(states.sensor.stadt_leverkusen_vorwarnstufe.attributes.warning_1_end)
+                | timestamp_custom('%H:%M', true, 'Europe/Berlin')) }}</center>
+              card_mod:
+                style: |
+                  ha-markdown {
+                    background: {{ state_attr('sensor.stadt_leverkusen_vorwarnstufe', 'warning_1_color') }};
+                    padding: 2px 2px 2px 2px !important;
+                    color: black;
+                    }
+        view_layout:
+          grid-area: messages
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.helligkeit_innen
+                    state: Hell
+                  - condition: state
+                    entity: input_boolean.light_automation
+                    state: 'off'
+                chip:
+                  type: template
+                  entity: input_boolean.light_automation
+                  icon: mdi:lightbulb-auto-outline
+                  icon_color: grey
+                  tap_action:
+                    action: more-info
+              - type: conditional
+                conditions:
+                  - entity: sensor.helligkeit_innen
+                    state: Hell
+                  - condition: state
+                    entity: input_boolean.light_automation
+                    state: 'on'
+                chip:
+                  type: template
+                  entity: input_boolean.light_automation
+                  icon: mdi:lightbulb-auto-outline
+                  icon_color: grey
+                  tap_action:
+                    action: more-info
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.helligkeit_innen
+                    state: Dunkel
+                  - condition: state
+                    entity: input_boolean.light_automation
+                    state: 'on'
+                chip:
+                  type: entity
+                  entity: input_boolean.light_automation
+                  icon_color: green
+                  content_info: none
+                  icon: mdi:lightbulb-auto
+                  tap_action:
+                    action: more-info
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.helligkeit_innen
+                    state: Dunkel
+                  - condition: state
+                    entity: input_boolean.light_automation
+                    state: 'off'
+                chip:
+                  type: template
+                  entity: input_boolean.light_automation
+                  icon: mdi:lightbulb-auto-outline
+                  icon_color: grey
+                  tap_action:
+                    action: more-info
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.lights_turned_on
+                    state_not: '0'
+                chip:
+                  type: template
+                  tap_action:
+                    action: fire-dom-event
+                    browser_mod:
+                      service: browser_mod.popup
+                      data:
+                        title: Angeschaltete Lichter
+                        content:
+                          type: custom:auto-entities
+                          card:
+                            type: entities
+                          filter:
+                            include:
+                              - domain: light
+                                state: 'on'
+                            exclude:
+                              - domain: group
+                              - name: Arbeitsplatte
+                              - name: Alle Lampen
+                              - name: Wohnzimmer und Highboard
+                              - name: Abzugshaube
+                              - name: Küche
+                              - name: '*creen'
+                              - name: '*egment*'
+                              - attributes:
+                                  is_hue_group: true
+                  entity: sensor.lights_turned_on
+                  icon: mdi:lightbulb-alert
+                  content: '{{states(entity)}}'
+                  icon_color: orange
+              - type: conditional
+                conditions:
+                  - entity: input_boolean.vacuum_schedule
+                    state: 'on'
+                chip:
+                  type: entity
+                  entity: input_boolean.vacuum_schedule
+                  icon: mdi:robot-vacuum
+                  icon_color: green
+                  content_info: none
+              - type: conditional
+                conditions:
+                  - entity: input_boolean.vacuum_schedule
+                    state: 'off'
+                chip:
+                  type: entity
+                  entity: input_boolean.vacuum_schedule
+                  icon: mdi:robot-vacuum-off
+                  content_info: none
+                  use_entity_picture: false
+                  icon_color: red
+              - type: conditional
+                conditions:
+                  - entity: fan.xiaomi_smart_fan
+                    state: 'on'
+                chip:
+                  type: entity
+                  entity: fan.xiaomi_smart_fan
+                  icon_color: accent
+                  use_entity_picture: false
+                  content_info: none
+                  tap_action:
+                    action: fire-dom-event
+                    browser_mod:
+                      service: browser_mod.popup
+                      data:
+                        title: Ventilator
+                        content:
+                          type: custom:fan-xiaomi
+                          name: Xiaomi Fan
+                          entity: fan.xiaomi_smart_fan
+                          disable_animation: false
+                          force_sleep_mode_support: true
+                          hide_led_button: true
+                          platform: xiaomi_miio_fan
+                  hold_action:
+                    action: more-info
+                  double_tap_action:
+                    action: more-info
+              - type: conditional
+                conditions:
+                  - entity: fan.xiaomi_smart_fan
+                    state: 'off'
+                chip:
+                  type: entity
+                  entity: fan.xiaomi_smart_fan
+                  icon: mdi:fan-off
+                  icon_color: red
+                  content_info: none
+                  tap_action:
+                    action: fire-dom-event
+                    browser_mod:
+                      service: browser_mod.popup
+                      data:
+                        content:
+                          type: custom:fan-xiaomi
+                          name: Xiaomi Fan
+                          entity: fan.xiaomi_smart_fan
+                          disable_animation: false
+                          force_sleep_mode_support: true
+                          hide_led_button: true
+                          platform: xiaomi_miio_fan
+                  hold_action:
+                    action: more-info
+              - type: conditional
+                conditions:
+                  - entity: input_boolean.waschmaschine_an_aus
+                    state: 'on'
+                chip:
+                  type: entity
+                  entity: input_boolean.waschmaschine_an_aus
+                  icon_color: accent
+                  use_entity_picture: true
+                  content_info: none
+              - type: conditional
+                conditions:
+                  - entity: input_boolean.trocker_an_aus
+                    state: 'on'
+                chip:
+                  type: entity
+                  entity: input_boolean.trocker_an_aus
+                  icon_color: accent
+                  use_entity_picture: true
+                  content_info: none
+              - type: conditional
+                conditions:
+                  - entity: input_boolean.spulmaschine_an_aus
+                    state: 'on'
+                chip:
+                  type: entity
+                  entity: input_boolean.spulmaschine_an_aus
+                  icon_color: accent
+                  use_entity_picture: true
+                  content_info: none
+              - type: conditional
+                conditions:
+                  - entity: vacuum.roborock_s8
+                    state: cleaning
+                chip:
+                  type: entity
+                  entity: vacuum.roborock_s8
+                  icon_color: accent
+                  content_info: none
+              - type: conditional
+                conditions:
+                  - entity: input_number.mop_cleaning_count
+                    state: '2.0'
+                chip:
+                  type: entity
+                  entity: input_number.mop_cleaning_count
+                  icon_color: red
+                  content_info: none
+                  icon: mdi:robot-vacuum-alert
+              - type: conditional
+                conditions:
+                  - condition: or
+                    conditions:
+                      - condition: state
+                        entity: switch.heizung_gaste_wc
+                        state: 'on'
+                      - condition: state
+                        entity: switch.heizung_badezimmer
+                        state: 'on'
+                chip:
+                  type: entity
+                  entity: switch.heizkorper
+                  icon: mdi:heating-coil
+                  icon_color: accent
+                  content_info: none
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.current_isp
+                    state_not: Deutsche Telekom AG
+                chip:
+                  type: entity
+                  entity: sensor.current_isp
+                  icon_color: red
+                  icon: mdi:wan
+            alignment: center
+        view_layout:
+          grid-area: headerl
+      - type: horizontal-stack
+        cards:
+          - type: custom:mushroom-template-card
+            entity: alarm_control_panel.zu_hause_alarm
+            alignment: center
+            fill_container: false
+            layout: vertical
+            icon: >-
+              {% if states('alarm_control_panel.zu_hause_alarm') == 'disarmed'
+              %}
+                mdi:shield-off-outline
+              {% elif states('alarm_control_panel.zu_hause_alarm') ==
+              'armed_away' %}
+                mdi:shield-lock
+              {% elif states('alarm_control_panel.zu_hause_alarm') ==
+              'armed_home' %}
+                mdi:shield-home
+              {% endif %}
+            icon_color: >-
+              {% if states('alarm_control_panel.zu_hause_alarm') == 'disarmed'
+              %}
+                blue
+              {% elif states('alarm_control_panel.zu_hause_alarm') ==
+              'armed_away' %}
+                red
+              {% elif states('alarm_control_panel.zu_hause_alarm') ==
+              'armed_home' %}
+                orange
+              {% endif %}
+            badge_icon: |-
+              {% if states('lock.wohnungstur') == 'unlocked' %}
+                mdi:lock-open-alert
+              {% elif states('lock.wohnungstur') == 'locked' %}
+                mdi:lock
+              {% endif %}
+            badge_color: |-
+              {% if states('lock.wohnungstur') == 'unlocked' %}
+                red
+              {% elif states('lock.wohnungstur') == 'locked' %}
+                green
+              {% endif %}
+            tap_action:
+              action: navigate
+              navigation_path: /dashboard-playground/sicherheit
+            card_mod:
+              style: |
+                ha-card { background: transparent;
+                  --border-style: none;
+                  --border: 0px;
+                  --ha-card-header-font-size: 20px;
+                  --bar-card-border-radius: 51px;
+                  --ha-card-border-width: 0px;
+                }
+                mushroom-badge-icon {
+                  --badge-icon-size: 15px;
+                  --badge-size: 20px;
+                }
+          - type: custom:mushroom-template-card
+            entity: sensor.offene_fenster_turen
+            icon: mdi:window-open-variant
+            layout: vertical
+            alignment: center
+            fill_container: false
+            badge_icon: |2-
+                {{ 'mdi:numeric-' ~ states(entity) if states(entity)|int(0) < 9 else
+                'mdi:numeric-9-plus' }}
+            icon_color: blue
+            badge_color: |-
+              {% if states(entity) > '0' %}
+                red
+              {% elif states(entity) == "0" %}
+                green
+              {% endif %}
+            multiline_secondary: true
+            tap_action:
+              action: fire-dom-event
+              browser_mod:
+                service: browser_mod.popup
+                data:
+                  title: Offene Fenster
+                  content:
+                    type: entity-filter
+                    title: Offene Fenster
+                    entities:
+                      - entity: binary_sensor.fenster_badezimmer_contact
+                        name: Großes Badezimmer
+                      - entity: binary_sensor.fenster_buro
+                        name: Büro/Schlafzimmer
+                      - entity: binary_sensor.fenster_kinderzimmer
+                        name: Emilys Zimmer
+                      - entity: binary_sensor.fenster_schlafzimmer
+                        name: Lias Zimmer
+                      - entity: binary_sensor.sensor_fenster_sofa_neu_contact
+                        name: Fenster Sofa
+                      - entity: binary_sensor.kleines_kuchenfenster
+                        name: Kleines Küchenfenster
+                      - entity: binary_sensor.balkontur
+                        name: Balkontür
+                      - entity: binary_sensor.haustur
+                        name: Haustür
+                    state_filter:
+                      - 'on'
+                    card:
+                      type: entities
+            card_mod:
+              style: |
+                ha-card { background: transparent;
+                  --border-style: none;
+                  --border: 0px;
+                  --ha-card-header-font-size: 20px;
+                  --bar-card-border-radius: 51px;
+                  --ha-card-border-width: 0px;
+                }
+                mushroom-badge-icon {
+                  --badge-icon-size: 27px;
+                  --badge-size: 20px;
+                }
+          - type: custom:digital-clock
+            card_mod:
+              style: |
+                span.first-line 
+                {
+                  font-size: 25px;
+                  color: #a6dced;
+                }
+                span.second-line 
+                {
+                  font-size: 15px;
+                  color: #a6dced
+                }
+                ha-card { background: transparent;
+                  --border-style: none;
+                  --border: 0px;
+                  --ha-card-header-font-size: 20px;
+                  --ha-card-border-width: 0px;
+                    
+                }
+          - type: custom:mushroom-template-card
+            entity: sensor.ev6_ev_battery_level
+            icon: mdi:car-electric
+            alignment: center
+            fill_container: false
+            badge_icon: |2-
+                {{ 'mdi:numeric-' ~ (states('sensor.ev6_ev_battery_level') | float / 10)  | round(0) if (states('sensor.ev6_ev_battery_level') | float / 10)  | round(0) < 9 else
+                'mdi:numeric-10' }}
+            primary: ''
+            secondary: ''
+            icon_color: |-
+              {% if states('binary_sensor.ev6_ev_battery_charge') == 'on' %}
+                green
+              {% elif states('binary_sensor.ev6_ev_battery_charge') == 'off' %}
+                blue
+              {% endif %}
+            badge_color: green
+            layout: vertical
+            tap_action:
+              action: more-info
+            card_mod:
+              style: |
+                ha-card { background: transparent;
+                  --border-style: none;
+                  --border: 0px;
+                  --ha-card-header-font-size: 20px;
+                  --bar-card-border-radius: 51px;
+                  --ha-card-border-width: 0px;
+                }
+                mushroom-badge-icon {
+                  --badge-icon-size: 27px;
+                  --badge-size: 20px;
+                }
+          - type: custom:mushroom-template-card
+            entity: sensor.low_batt
+            icon: mdi:battery-low
+            layout: vertical
+            alignment: right
+            fill_container: false
+            badge_icon: |2-
+                {{ 'mdi:numeric-' ~ states(entity) if states(entity)|int(0) < 9 else
+                'mdi:numeric-9-plus' }}
+            icon_color: blue
+            badge_color: |-
+              {% if states(entity) > '0' %}
+                red
+              {% elif states(entity) == "0" %}
+                green
+              {% endif %}
+            multiline_secondary: true
+            tap_action:
+              action: fire-dom-event
+              browser_mod:
+                service: browser_mod.popup
+                data:
+                  title: Batterien/Akkus
+                  content:
+                    type: custom:battery-state-card
+                    title: Batterien/Akkus
+                    filter:
+                      include:
+                        - name: attributes.device_class
+                          value: battery
+                        - name: entity_id
+                          value: sensor.epson*ink
+                      exclude:
+                        - name: entity_id
+                          value: binary_sensor.*
+                        - name: entity_id
+                          value: sensor.0x54ef4410005e3584_battery
+                        - name: entity_id
+                          value: sensor.rolllade*
+                    sort:
+                      by: state
+                    collapse: 8
+            card_mod:
+              style: |
+                ha-card { background: transparent;
+                  --border-style: none;
+                  --border: 0px;
+                  --ha-card-header-font-size: 20px;
+                  --bar-card-border-radius: 51px;
+                  --ha-card-border-width: 0px;
+                }
+                mushroom-badge-icon {
+                  --badge-icon-size: 27px;
+                  --badge-size: 20px;
+                }
+        view_layout:
+          grid-area: headerm
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-chips-card
+            chips: []
+            alignment: center
+        view_layout:
+          grid-area: headerru
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: entity
+                entity: sensor.temperatur_balkon_sonoff_temperature
+                use_entity_picture: false
+                name: balkon
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-playground/wetter
+              - type: entity
+                entity: sensor.wohnzimmer_wohnzimmer_wohnzimmer_balkon_humidity
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-playground/wetter
+              - type: weather
+                entity: weather.home
+                show_temperature: false
+                show_conditions: false
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-playground/wetter
+              - type: entity
+                entity: sensor.openweathermap_wind_speed
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-playground/wetter
+              - type: entity
+                entity: sensor.openweathermap_rain
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-playground/wetter
+                use_entity_picture: true
+            alignment: center
+        view_layout:
+          grid-area: headerr
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-chips-card
+            chips: []
+            alignment: center
+        view_layout:
+          grid-area: headerlu
+      - type: custom:swipe-card
+        parameters:
+          spaceBetween: 8
+          effect: coverflow
+          grabCursor: true
+          centeredSlides: false
+          slidesPerView: auto
+          coverflowEffect:
+            rotate: 50
+            stretch: 0
+            depth: 100
+            modifier: 1
+            slideShadows: true
+          pagination:
+            type: bullets
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: custom:mushroom-light-card
+                entity: light.arbeitsplatte
+                name: Licht Arbeitsplatte
+                tap_action:
+                  action: call-service
+                  service: input_button.press
+                  target:
+                    entity_id: input_button.licht_arbeitsplatte
+                layout: vertical
+                secondary_info: none
+                icon_height: 30px
+              - type: horizontal-stack
+                cards:
+                  - type: custom:mushroom-light-card
+                    entity: light.esstisch_unten
+                    name: Esstisch
+                    tap_action:
+                      action: call-service
+                      service: input_button.press
+                      target:
+                        entity_id: input_button.lunch_light
+                    layout: vertical
+                    secondary_info: none
+                    icon_height: 30px
+                  - type: custom:mushroom-light-card
+                    entity: light.schreibtisch_links
+                    name: Leselampe
+                    layout: vertical
+                    secondary_info: none
+                    icon_height: 30px
+                    tap_action:
+                      action: more-info
+              - type: custom:gap-card
+                height: 10
+              - type: horizontal-stack
+                cards:
+                  - type: custom:mushroom-entity-card
+                    entity: automation.turn_on_lights_if_too_dark
+                    name: WZ & Küche Ambiente
+                    tap_action:
+                      action: call-service
+                      service: automation.trigger
+                      target:
+                        entity_id: automation.turn_on_lights_if_too_dark
+                      skip_conditions: true
+                    layout: vertical
+                    secondary_info: none
+                    icon_height: 30px
+                    icon: mdi:light-flood-up
+              - type: horizontal-stack
+                cards:
+                  - type: custom:mushroom-entity-card
+                    entity: script.living_room_full_brightness
+                    name: WZ volle Helligkeit
+                    tap_action:
+                      action: toggle
+                    layout: vertical
+                    secondary_info: none
+                    icon_height: 30px
+                    icon: mdi:lightbulb
+                  - type: custom:mushroom-entity-card
+                    entity: scene.kitchen_work_place_hue_christmas_kitchen
+                    name: WZ Warmes Licht
+                    tap_action:
+                      action: call-service
+                      service: hue.activate_scene
+                      target:
+                        entity_id:
+                          - scene.kitchen_work_place_hue_christmas_kitchen
+                          - scene.logical_living_room_hue_christmas
+                    layout: vertical
+                    secondary_info: none
+                    icon_height: 30px
+              - type: custom:gap-card
+                height: 10
+              - type: horizontal-stack
+                cards:
+                  - type: custom:mushroom-light-card
+                    name: Alle Räume hell
+                    entity: light.all_lights
+                    tap_action:
+                      action: call-service
+                      service: light.turn_on
+                      data:
+                        color_temp: 400
+                        brightness_pct: 100
+                      target:
+                        entity_id: all
+                    layout: vertical
+                    secondary_info: none
+                    icon_height: 30px
+                  - type: custom:mushroom-light-card
+                    name: Alle Lampen aus
+                    entity: light.all_lights
+                    tap_action:
+                      action: call-service
+                      service: light.turn_off
+                      target:
+                        entity_id: all
+                    layout: vertical
+                    secondary_info: none
+                    icon_height: 30px
+          - type: vertical-stack
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - type: button
+                    entity: input_boolean.good_night_switch
+                    tap_action:
+                      action: toggle
+                    layout: vertical
+                    secondary_info: none
+                    icon_height: 30px
+              - type: horizontal-stack
+                cards:
+                  - entity: group.gruppe_good_night_kids
+                    show_name: true
+                    show_icon: true
+                    type: button
+                    icon: mdi:teddy-bear
+                    tap_action:
+                      action: fire-dom-event
+                      browser_mod:
+                        service: browser_mod.popup
+                        data:
+                          title: Routine auswählen
+                          content:
+                            type: vertical-stack
+                            cards:
+                              - type: horizontal-stack
+                                cards:
+                                  - show_name: true
+                                    show_icon: true
+                                    type: custom:mushroom-entity-card
+                                    tap_action:
+                                      action: toggle
+                                    entity: input_boolean.good_night_emily
+                                    layout: vertical
+                                    secondary_info: none
+                                    icon_height: 30px
+                                  - show_name: true
+                                    show_icon: true
+                                    type: custom:mushroom-entity-card
+                                    tap_action:
+                                      action: toggle
+                                    entity: input_boolean.good_night_lia
+                                    layout: vertical
+                                    secondary_info: none
+                                    icon_height: 30px
+                              - type: horizontal-stack
+                                cards:
+                                  - show_name: true
+                                    show_icon: true
+                                    type: custom:mushroom-entity-card
+                                    tap_action:
+                                      action: toggle
+                                    entity: input_boolean.lias_nickerchen
+                                    show_state: false
+                                    layout: vertical
+                                    secondary_info: none
+                                    icon_height: 30px
+                    icon_height: 30px
+              - type: custom:gap-card
+                height: 10
+              - type: horizontal-stack
+                cards:
+                  - type: button
+                    name: WZ TV/Gaming
+                    entity: scene.blinds_tv_gaming_new
+                    tap_action:
+                      action: call-service
+                      service: scene.turn_on
+                      target:
+                        entity_id: scene.blinds_tv_gaming_new
+                      data: {}
+                    secondary_info: none
+                    icon_height: 30px
+                  - type: button
+                    name: WZ Rolladen hoch
+                    entity: scene.blinds_living_room_all_up
+                    tap_action:
+                      action: call-service
+                      service: scene.turn_on
+                      target:
+                        entity_id: scene.blinds_living_room_all_up
+                      data: {}
+                    secondary_info: none
+                    icon_height: 30px
+              - type: horizontal-stack
+                cards:
+                  - type: button
+                    entity: input_button.all_blinds_up
+                    name: Alle Rollladen hoch
+                    tap_action:
+                      action: toggle
+                    layout: vertical
+                    secondary_info: none
+                    icon_height: 30px
+                    icon: mdi:window-shutter-open
+                  - type: button
+                    entity: input_button.all_blinds_down
+                    name: Alle Rollladen runter
+                    tap_action:
+                      action: toggle
+                    layout: vertical
+                    secondary_info: none
+                    icon_height: 30px
+              - type: custom:gap-card
+                height: 10
+              - type: horizontal-stack
+                cards:
+                  - type: button
+                    entity: input_button.leaving_switch
+                    name: Good Bye
+                    tap_action:
+                      action: toggle
+                    layout: vertical
+                    secondary_info: none
+                    icon_height: 30px
+        view_layout:
+          grid-area: left
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            entity: light.wohnzimmer_und_highboard
+            icon: mdi:sofa
+            name: Wohnzimmer
+            hash: '#lichtwohnzimmer'
+            width_desktop: 900px
+            margin_top_mobile: 18px
+            margin_top_desktop: 74px
+            styles: |
+              #root {
+                /* This is a fix for older Safari (for my wall-mounted iPad) but it won't work on Firefox, this is optional */
+                display: grid !important;
+              }
+            auto_close: ''
+            is_sidebar_hidden: true
+            button_type: slider
+            show_attribute: true
+          - type: custom:bubble-card
+            card_type: separator
+            name: Beleuchtung
+            icon: mdi:lightbulb
+          - type: horizontal-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: button
+                button_type: slider
+                entity: light.sofa_links
+                name: Sofa links
+                icon: mdi:sofa
+                show_state: true
+              - type: custom:bubble-card
+                card_type: button
+                button_type: slider
+                entity: light.sofa_rechts
+                name: Sofa rechts
+                icon: mdi:sofa
+                show_state: true
+          - type: horizontal-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: button
+                button_type: slider
+                entity: light.sofa_unten
+                name: Sofa unten
+                icon: mdi:sofa
+                show_state: true
+              - type: custom:bubble-card
+                card_type: button
+                button_type: slider
+                entity: light.schreibtisch_links
+                name: Leselampe
+                icon: mdi:desk-lamp
+                show_state: true
+          - type: horizontal-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: button
+                button_type: slider
+                entity: light.tv_backlight
+                name: TV Backlight
+                icon: mdi:television-ambient-light
+                show_state: true
+              - type: custom:bubble-card
+                card_type: button
+                button_type: slider
+                entity: light.lowboard_links
+                name: Lowboard links
+                icon: mdi:buffet
+                show_state: true
+          - type: horizontal-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: button
+                button_type: slider
+                entity: light.lowboard_rechts
+                name: Lowboard rechts
+                icon: mdi:buffet
+                show_state: true
+              - type: custom:bubble-card
+                card_type: button
+                button_type: slider
+                entity: light.sideboard
+                name: Sideboard
+                icon: mdi:cupboard
+                show_state: true
+          - type: horizontal-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: button
+                button_type: switch
+                entity: light.beleuchtung_highboard
+                name: Highboard
+                icon: mdi:wardrobe-outline
+                show_state: true
+          - type: custom:bubble-card
+            card_type: separator
+            name: Lichtszenen
+            icon: mdi:palette-outline
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: entity
+                entity: scene.logical_living_room_hue_living_room_ambiente_hue
+                content_info: name
+                name: Ambientelicht
+                tap_action:
+                  action: toggle
+              - type: entity
+                entity: scene.wohnzimmer_hue_nachtlicht_wz
+                content_info: name
+                tap_action:
+                  action: toggle
+                name: Nachtlicht
+            alignment: center
+          - type: custom:bubble-card
+            card_type: separator
+            name: Rollladen
+            icon: mdi:window-shutter
+          - type: horizontal-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: cover
+                entity: cover.rolllade_sofa
+                name: Sofa
+                show_state: true
+                show_attribute: true
+                attribute: current_position
+              - type: custom:bubble-card
+                card_type: cover
+                entity: cover.rolllade_balkon
+                name: Balkon
+                show_state: true
+                show_attribute: true
+                attribute: current_position
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-chips-card
+                chips:
+                  - type: entity
+                    entity: scene.blinds_balkon_beschattung
+                    tap_action:
+                      action: toggle
+                    content_info: name
+                    name: Balkon Beschattung
+                  - type: entity
+                    entity: scene.blinds_beschattung_sonne_wz
+                    name: Beschattung Wohnzimmer
+                    tap_action:
+                      action: toggle
+                    content_info: name
+                  - type: entity
+                    entity: scene.blinds_living_room_all_up
+                    tap_action:
+                      action: toggle
+                    content_info: name
+                    name: Alle Rollladen hoch
+                alignment: center
+          - type: custom:bubble-card
+            card_type: separator
+            name: Multimedia
+            icon: mdi:multimedia
+          - type: horizontal-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: button
+                entity: media_player.sony_kd_65xg9505_2
+                show_state: true
+                icon: mdi:television
+                name: TV
+                button_type: slider
+              - type: custom:bubble-card
+                card_type: button
+                entity: media_player.fire_tv_192_168_2_61
+                show_state: true
+                icon: mdi:television
+                name: FireTV
+          - type: horizontal-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: button
+                entity: switch.sync_box_power
+                show_state: true
+                icon: mdi:television-play
+                name: SyncBox Power
+              - type: custom:bubble-card
+                card_type: button
+                entity: switch.sync_box_light_sync
+                show_state: true
+                icon: mdi:television-ambient-light
+                name: TV Light Sync
+          - type: horizontal-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: button
+                entity: media_player.echo_show_wohnzimmer
+                show_state: true
+                icon: mdi:play-network
+                name: Echo Show Wohnzimmer
+                button_type: slider
+          - type: custom:bubble-card
+            card_type: separator
+            name: Geräte
+            icon: mdi:devices
+          - type: horizontal-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: button
+                entity: vacuum.roborock_s8_maxv_ultra
+                show_state: true
+                icon: mdi:robot-vacuum
+                name: 'Roborock '
+              - type: custom:bubble-card
+                card_type: button
+                entity: fan.zion_air
+                show_state: true
+                icon: mdi:air-purifier
+                name: Luftreiniger
+                button_type: slider
+          - type: horizontal-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: button
+                entity: sensor.zion_pad_battery_level
+                show_state: true
+                icon: mdi:tablet
+                name: iPad Pro
+                button_type: slider
+              - type: custom:bubble-card
+                card_type: button
+                entity: sensor.zion_pad_2_battery_level
+                show_state: true
+                icon: mdi:tablet
+                name: iPad Emily
+                button_type: slider
+        view_layout:
+          grid-area: footer1
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            entity: light.kuche
+            icon: mdi:table-chair
+            name: Küche
+            hash: '#lichtkueche'
+            width_desktop: 900px
+            margin_top_mobile: 18px
+            margin_top_desktop: 74px
+            styles: |
+              #root {
+                /* This is a fix for older Safari (for my wall-mounted iPad) but it won't work on Firefox, this is optional */
+                display: grid !important;
+              }
+            auto_close: ''
+            is_sidebar_hidden: true
+            show_attribute: true
+            attribute: brightness
+            button_type: slider
+          - type: custom:bubble-card
+            card_type: separator
+            name: Beleuchtung Arbeitsplatte
+            icon: mdi:lightbulb
+          - type: horizontal-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: button
+                button_type: slider
+                entity: light.arbeitsplatte_links
+                name: Links
+                icon: mdi:faucet-variant
+                show_state: true
+              - type: custom:bubble-card
+                card_type: button
+                button_type: slider
+                entity: light.arbeitsplatte_rechts
+                name: Rechts
+                icon: mdi:faucet-variant
+                show_state: true
+          - type: horizontal-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: button
+                button_type: slider
+                entity: light.dimmable_light_1
+                name: Rechts außen
+                icon: mdi:faucet-variant
+                show_state: true
+          - type: custom:bubble-card
+            card_type: separator
+            name: Ambientebeleuchtung
+            icon: mdi:floor-lamp-dual
+          - type: horizontal-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: button
+                button_type: slider
+                entity: light.kuche_oben
+                name: Küche oben
+                icon: mdi:led-strip-variant
+                show_state: true
+              - type: custom:bubble-card
+                card_type: button
+                button_type: slider
+                entity: light.esstisch_oben
+                name: Esstisch oben
+                icon: mdi:ceiling-light
+                show_state: true
+          - type: custom:bubble-card
+            card_type: separator
+            name: Lichtszenen
+            icon: mdi:palette-outline
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: entity
+                entity: scene.arbeitsplatte_kitchen_ambiente_hue
+                content_info: name
+                name: Ambientelicht
+                tap_action:
+                  action: toggle
+              - type: entity
+                entity: scene.wohnzimmer_hue_nachtlicht_wz
+                content_info: name
+                tap_action:
+                  action: toggle
+                name: Nachtlicht
+            alignment: center
+          - type: custom:bubble-card
+            card_type: separator
+            name: Rollladen
+            icon: mdi:window-shutter
+          - type: horizontal-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: cover
+                entity: cover.rolllade_kleines_kuchenfenster
+                name: Kl. Küchenfenster
+                show_state: true
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-chips-card
+                chips:
+                  - type: entity
+                    entity: scene.blinds_beschattung_sonne_sudseite_ohne_emily
+                    tap_action:
+                      action: toggle
+                    content_info: name
+                    name: Südseite Beschattung
+                  - type: entity
+                    entity: scene.blinds_living_room_all_up
+                    tap_action:
+                      action: toggle
+                    content_info: name
+                    name: Alle Rollladen hoch
+                alignment: center
+          - type: custom:bubble-card
+            card_type: separator
+            name: Steckdosen
+            icon: mdi:devices
+          - type: horizontal-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: button
+                entity: sensor.steckdose_kuchenzeile_power
+                show_state: true
+                icon: mdi:power-plug
+                name: Küchenzeile 1
+              - type: custom:bubble-card
+                card_type: button
+                entity: sensor.steckdose_kuche_2_power
+                show_state: true
+                icon: mdi:power-plug
+                name: Küchenzeile 2
+                button_type: switch
+        view_layout:
+          grid-area: footer2
+      - type: vertical-stack
+        cards:
+          - type: custom:room-card
+            title: Wohnen
+            entity: light.wohnzimmer_und_highboard
+            icon: mdi:sofa
+            show_icon: true
+            content_alignment: center
+            tap_action:
+              action: navigate
+              navigation_path: '#lichtwohnzimmer'
+            double_tap_action:
+              action: toggle
+            info_entities:
+              - entity: cover.rollladen_wohnzimmer
+                show_icon: true
+                icon:
+                  conditions:
+                    - icon: mdi:window-shutter
+                      condition: below
+                      attribute: current_position
+                      value: 50
+                      styles:
+                        color: orange
+                    - icon: mdi:window-shutter-open
+                      condition: above
+                      attribute: current_position
+                      value: 50
+                      styles:
+                        color: grey
+              - entity: binary_sensor.fenster_gruppe_wohnzimmer
+                show_icon: true
+                state_color: true
+              - entity: sensor.temperatur_wohnzimmer_sonoff_temperature
+                format: precision1
+                styles:
+                  template: >
+                    if (entity.state < 20) return 'color: lightblue';  if
+                    (entity.state >= 25)return 'color: red';  if (entity.state
+                    >= 23) return 'color: orange'; if (entity.state >= 21)
+                    return 'color: lightgreen';  
+              - entity: sensor.temperatur_wohnzimmer_sonoff_humidity
+                format: precision1
+                styles:
+                  template: >
+                    if (entity.state < 40) return 'color: lightblue';  if
+                    (entity.state >= 70)return 'color: red';  if (entity.state
+                    >= 60) return 'color: orange'; if (entity.state >= 40)
+                    return 'color: lightgreen';          
+              - entity: sensor.wohnzimmer_co2
+                show_icon: true
+                icon:
+                  conditions:
+                    - icon: mdi:check-circle
+                      condition: below
+                      value: 1000
+                      styles:
+                        color: lightgreen
+                    - icon: mdi:alert-circle
+                      condition: above
+                      value: 1000
+                      styles:
+                        color: orange
+                    - icon: mdi:alert-circle
+                      condition: above
+                      value: 1500
+                      styles:
+                        color: red
+            entities:
+              - entity: media_player.sony_kd_65xg9505_2
+                name: TV
+                state_color: true
+              - entity: media_player.fire_tv_192_168_2_61
+                name: FireTV
+                show_icon: true
+                icon: mdi:set-top-box
+                state_color: true
+              - entity: media_player.echo_show_wohnzimmer
+                name: Echo
+                show_icon: true
+                state_color: true
+                icon: mdi:speaker-wireless
+              - entity: fan.zion_air
+                state_color: true
+                name: Luftreiniger
+              - entity: fan.ventilator_wohnen
+                state_color: true
+                name: Ventilator
+              - entity: vacuum.roborock_s8_maxv_ultra
+                state_color: true
+                name: Staubi
+              - entity: sensor.zion_pad_2_battery_level
+                name: Emilys iPad
+                state_color: true
+              - entity: sensor.zion_pad_battery_level
+                name: iPad Pro
+                state_color: true
+          - type: custom:room-card
+            title: Küche
+            icon: mdi:table-chair
+            entity: light.kuche
+            show_icon: true
+            content_alignment: center
+            tap_action:
+              action: navigate
+              navigation_path: '#lichtkueche'
+            double_tap_action:
+              action: toggle
+            info_entities:
+              - entity: cover.rolllade_kleines_kuchenfenster
+                show_icon: true
+                icon:
+                  conditions:
+                    - icon: mdi:window-shutter
+                      condition: below
+                      attribute: current_position
+                      value: 50
+                      styles:
+                        color: orange
+                    - icon: mdi:window-shutter-open
+                      condition: above
+                      attribute: current_position
+                      value: 50
+                      styles:
+                        color: grey
+              - entity: binary_sensor.kleines_kuchenfenster
+                show_icon: true
+                state_color: true
+              - entity: sensor.temperatur_wohnzimmer_sonoff_temperature
+                format: precision1
+                styles:
+                  template: >
+                    if (entity.state < 20) return 'color: lightblue';  if
+                    (entity.state >= 25)return 'color: red';  if (entity.state
+                    >= 23) return 'color: orange'; if (entity.state >= 21)
+                    return 'color: lightgreen';  
+              - entity: sensor.temperatur_wohnzimmer_sonoff_humidity
+                format: precision1
+                styles:
+                  template: >
+                    if (entity.state < 40) return 'color: lightblue';  if
+                    (entity.state >= 70)return 'color: red';  if (entity.state
+                    >= 60) return 'color: orange'; if (entity.state >= 40)
+                    return 'color: lightgreen';          
+              - entity: sensor.wohnzimmer_co2
+                show_icon: true
+                icon:
+                  conditions:
+                    - icon: mdi:check-circle
+                      condition: below
+                      value: 1000
+                      styles:
+                        color: lightgreen
+                    - icon: mdi:alert-circle
+                      condition: above
+                      value: 1000
+                      styles:
+                        color: orange
+                    - icon: mdi:alert-circle
+                      condition: above
+                      value: 1500
+                      styles:
+                        color: red
+            entities:
+              - entity: input_boolean.spulmaschine_an_aus
+                name: Spülm.
+                state_color: true
+              - entity: sensor.kuchenzeile_status
+                state_color: true
+                name: Geräte
+          - type: custom:room-card
+            title: Emily
+            entity: light.emilys_zimmer_gruppe
+            icon: mdi:teddy-bear
+            show_icon: true
+            content_alignment: center
+            info_entities:
+              - entity: cover.rolllade_emily
+                show_icon: true
+                icon:
+                  conditions:
+                    - icon: mdi:window-shutter
+                      condition: below
+                      attribute: current_position
+                      value: 50
+                      styles:
+                        color: orange
+                    - icon: mdi:window-shutter-open
+                      condition: above
+                      attribute: current_position
+                      value: 50
+                      styles:
+                        color: grey
+              - entity: binary_sensor.fenster_kinderzimmer
+                show_icon: true
+                state_color: true
+              - entity: sensor.sonoff_temperatur_emily_temperature
+                styles:
+                  template: >
+                    if (entity.state < 20) return 'color: lightblue';  if
+                    (entity.state >= 25)return 'color: red';  if (entity.state
+                    >= 23) return 'color: orange'; if (entity.state >= 21)
+                    return 'color: lightgreen';  
+              - entity: sensor.sonoff_temperatur_emily_humidity
+                styles:
+                  template: >
+                    if (entity.state < 40) return 'color: lightblue';  if
+                    (entity.state >= 70)return 'color: red';  if (entity.state
+                    >= 60) return 'color: orange'; if (entity.state >= 40)
+                    return 'color: lightgreen';        
+              - entity: sensor.wohnzimmer_wohnzimmer_wohnzimmer_emilys_zimmer_co2
+                show_icon: true
+                icon:
+                  conditions:
+                    - icon: mdi:check-circle
+                      condition: below
+                      value: 1000
+                      styles:
+                        color: lightgreen
+                    - icon: mdi:alert-circle
+                      condition: above
+                      value: 1000
+                      styles:
+                        color: orange
+                    - icon: mdi:alert-circle
+                      condition: above
+                      value: 1500
+                      styles:
+                        color: red
+            entities:
+              - entity: input_boolean.good_night_emily
+                name: Schlafmodus
+                state_color: true
+                icon: mdi:sleep
+                show_icon: true
+              - entity: device_tracker.toniebox
+                name: Toniebox
+                state_color: true
+              - entity: media_player.echo_emily
+                name: Echo
+                show_icon: true
+                icon: mdi:speaker-wireless
+                state_color: true
+              - entity: fan.ventilator_emily
+                state_color: true
+                name: Ventilator
+          - type: custom:room-card
+            title: Lia
+            icon: mdi:baby-buggy
+            entity: light.lias_zimmer_gruppe_2
+            show_icon: true
+            content_alignment: center
+            info_entities:
+              - entity: cover.rolllade_schlafzimmer
+                show_icon: true
+                icon:
+                  conditions:
+                    - icon: mdi:window-shutter
+                      condition: below
+                      attribute: current_position
+                      value: 50
+                      styles:
+                        color: orange
+                    - icon: mdi:window-shutter-open
+                      condition: above
+                      attribute: current_position
+                      value: 50
+                      styles:
+                        color: grey
+              - entity: binary_sensor.fenster_schlafzimmer
+                show_icon: true
+                state_color: true
+              - entity: sensor.sonoff_temperatur_schlafzimmer_temperature
+                styles:
+                  template: >
+                    if (entity.state < 20) return 'color: lightblue';  if
+                    (entity.state >= 25)return 'color: red';  if (entity.state
+                    >= 23) return 'color: orange'; if (entity.state >= 21)
+                    return 'color: lightgreen';    
+              - entity: sensor.sonoff_temperatur_schlafzimmer_humidity
+                styles:
+                  template: >
+                    if (entity.state < 40) return 'color: lightblue';  if
+                    (entity.state >= 70)return 'color: red';  if (entity.state
+                    >= 60) return 'color: orange'; if (entity.state >= 40)
+                    return 'color: lightgreen';        
+              - entity: sensor.wohnzimmer_wohnzimmer_wohnzimmer_schlafzimmer_co2
+                show_icon: true
+                icon:
+                  conditions:
+                    - icon: mdi:check-circle
+                      condition: below
+                      value: 1000
+                      styles:
+                        color: lightgreen
+                    - icon: mdi:alert-circle
+                      condition: above
+                      value: 1000
+                      styles:
+                        color: orange
+                    - icon: mdi:alert-circle
+                      condition: above
+                      value: 1500
+                      styles:
+                        color: red
+            entities:
+              - entity: input_boolean.good_night_lia
+                name: Schlafmodus
+                state_color: true
+                icon: mdi:sleep
+                show_icon: true
+        view_layout:
+          grid-area: middle
+      - type: custom:swipe-card
+        parameters:
+          spaceBetween: 8
+          effect: coverflow
+          grabCursor: true
+          centeredSlides: false
+          slidesPerView: auto
+          coverflowEffect:
+            rotate: 50
+            stretch: 0
+            depth: 100
+            modifier: 1
+            slideShadows: true
+          pagination:
+            type: bullets
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: custom:room-card
+                title: Schlafen/Büro
+                icon: mdi:bed-double
+                entity: light.schlafzimmer_gruppe
+                show_icon: true
+                content_alignment: center
+                double_tap_action:
+                  action: toggle
+                info_entities:
+                  - entity: cover.rolllade_buro
+                    show_icon: true
+                    icon:
+                      conditions:
+                        - icon: mdi:window-shutter
+                          condition: below
+                          attribute: current_position
+                          value: 50
+                          styles:
+                            color: orange
+                        - icon: mdi:window-shutter-open
+                          condition: above
+                          attribute: current_position
+                          value: 50
+                          styles:
+                            color: grey
+                  - entity: binary_sensor.fenster_buro
+                    show_icon: true
+                    state_color: true
+                  - entity: sensor.sonoff_display_temperatur_schlafzimmer_temperature
+                    styles:
+                      template: >
+                        if (entity.state < 20) return 'color: lightblue';  if
+                        (entity.state >= 25)return 'color: red';  if
+                        (entity.state >= 23) return 'color: orange'; if
+                        (entity.state >= 21) return 'color: lightgreen';  
+                  - entity: sensor.sonoff_display_temperatur_schlafzimmer_humidity
+                    styles:
+                      template: >
+                        if (entity.state < 40) return 'color: lightblue';  if
+                        (entity.state >= 70)return 'color: red';  if
+                        (entity.state >= 60) return 'color: orange'; if
+                        (entity.state >= 40) return 'color:
+                        lightgreen';                  
+                entities:
+                  - entity: input_boolean.good_night_switch
+                    name: Nachtmodus
+                    state_color: true
+                  - entity: device_tracker.zurich_pc
+                    name: Zurich PC
+                    state_color: true
+                  - entity: device_tracker.zion_gaming
+                    name: Gaming
+                    state_color: true
+                  - entity: media_player.saschas_echo_dot
+                    name: Echo
+                    show_icon: true
+                    icon: mdi:speaker-wireless
+                    state_color: true
+                  - entity: fan.levoit_schlafzimmer
+                    state_color: true
+                    name: Levoit
+                  - entity: switch.0xa4c13814a106ac2d
+                    name: Steckdose
+                    show_icon: true
+                    icon: mdi:power-socket-de
+                    state_color: true
+              - type: custom:room-card
+                title: Flur
+                icon: mdi:hanger
+                entity: light.flur_gruppe
+                show_icon: true
+                content_alignment: center
+                info_entities:
+                  - entity: binary_sensor.haustur
+                    show_icon: true
+                    state_color: true
+                  - entity: sensor.sonoff_display_flur_temperatur_temperature
+                    styles:
+                      template: >
+                        if (entity.state < 20) return 'color: lightblue';  if
+                        (entity.state >= 25)return 'color: red';  if
+                        (entity.state >= 23) return 'color: orange'; if
+                        (entity.state >= 21) return 'color:
+                        lightgreen';           
+                  - entity: sensor.sonoff_display_flur_temperatur_humidity
+                    styles:
+                      template: >
+                        if (entity.state < 40) return 'color: lightblue';  if
+                        (entity.state >= 70)return 'color: red';  if
+                        (entity.state >= 60) return 'color: orange'; if
+                        (entity.state >= 40) return 'color:
+                        lightgreen';                            
+                entities:
+                  - entity: alarm_control_panel.zu_hause_alarm
+                    name: Security
+                    state_color: true
+                  - entity: lock.smart_lock_pro
+                    name: Tür
+                    state_color: true
+                  - entity: binary_sensor.eingangstur_ding
+                    name: Klingel
+                    icon: mdi:bell
+                    show_icon: true
+                    state_color: true
+              - type: custom:room-card
+                title: Badezimmer
+                icon: mdi:bathtub
+                show_icon: true
+                content_alignment: center
+                info_entities:
+                  - entity: binary_sensor.fenster_badezimmer_contact
+                    show_icon: true
+                    state_color: true
+                  - entity: sensor.sensor_temperatur_wannenbad_temperature
+                    format: precision1
+                    styles:
+                      template: >
+                        if (entity.state < 20) return 'color: lightblue';  if
+                        (entity.state >= 25)return 'color: red';  if
+                        (entity.state >= 23) return 'color: orange'; if
+                        (entity.state >= 21) return 'color:
+                        lightgreen';             
+                  - entity: sensor.sensor_temperatur_wannenbad_humidity
+                    styles:
+                      template: >
+                        if (entity.state < 40) return 'color: lightblue';  if
+                        (entity.state >= 70)return 'color: red';  if
+                        (entity.state >= 60) return 'color: orange'; if
+                        (entity.state >= 40) return 'color:
+                        lightgreen';                            
+                entities:
+                  - entity: input_boolean.waschmaschine_an_aus
+                    name: WaMa
+                    state_color: true
+                  - entity: input_boolean.trocker_an_aus
+                    name: Trockner
+                    state_color: true
+                  - entity: switch.heizung_badezimmer
+                    name: Heizung
+                    icon: mdi:heating-coil
+                    show_icon: true
+                    state_color: true
+                  - entity: media_player.echo_badezimmer
+                    name: Echo
+                    show_icon: true
+                    icon: mdi:speaker-wireless
+                    state_color: true
+              - type: custom:room-card
+                title: Gäste WC
+                icon: mdi:toilet
+                show_icon: true
+                content_alignment: center
+                info_entities:
+                  - entity: sensor.sonoff_display_temperatur_duschbad_temperature
+                    styles:
+                      template: >
+                        if (entity.state < 20) return 'color: lightblue';  if
+                        (entity.state >= 25)return 'color: red';  if
+                        (entity.state >= 23) return 'color: orange'; if
+                        (entity.state >= 21) return 'color:
+                        lightgreen';                
+                  - entity: sensor.sonoff_display_temperatur_duschbad_humidity
+                    styles:
+                      template: >
+                        if (entity.state < 40) return 'color: lightblue';  if
+                        (entity.state >= 70)return 'color: red';  if
+                        (entity.state >= 60) return 'color: orange'; if
+                        (entity.state >= 40) return 'color:
+                        lightgreen';                            
+                entities:
+                  - entity: media_player.saschas_echo_dot_2
+                    name: Echo
+                    state_color: true
+                    show_icon: true
+                    icon: mdi:speaker-wireless
+                  - entity: switch.heizung_gaste_wc
+                    name: Heizung
+                    icon: mdi:heating-coil
+                    show_icon: true
+                    state_color: true
+          - type: vertical-stack
+            cards:
+              - type: custom:room-card
+                title: Balkon
+                icon: mdi:balcony
+                entity: light.lichtgruppe_balkon
+                show_icon: true
+                content_alignment: center
+                info_entities:
+                  - entity: sensor.temperatur_balkon_sonoff_temperature
+                    format: precision1
+                    styles:
+                      template: >
+                        if (entity.state < 20) return 'color: lightblue';  if
+                        (entity.state >= 25)return 'color: lightred';  if
+                        (entity.state >= 23) return 'color: orange'; if
+                        (entity.state >= 21) return 'color:
+                        lightgreen';              
+                  - entity: sensor.wohnzimmer_wohnzimmer_wohnzimmer_balkon_humidity
+                    format: precision1
+                    styles:
+                      template: >
+                        if (entity.state < 40) return 'color: lightblue';  if
+                        (entity.state >= 70)return 'color: red';  if
+                        (entity.state >= 60) return 'color: orange'; if
+                        (entity.state >= 40) return 'color:
+                        lightgreen';                            
+                entities:
+                  - entity: camera.cam_eingang
+                    name: Cam Balkon
+                    state_color: true
+                  - entity: switch.steckdose_balkon
+                    name: Steckdose
+                    state_color: true
+                    icon: mdi:power-socket-de
+                    show_icon: true
+              - type: custom:room-card
+                title: Abstellkammer
+                icon: mdi:vacuum
+                entity: light.abstellraum
+                show_icon: true
+                content_alignment: center
+                info_entities:
+                  - entity: sensor.sonoff_abstellkammer_temperature
+                    format: precision1
+                    styles:
+                      template: >
+                        if (entity.state < 20) return 'color: lightblue';  if
+                        (entity.state >= 25)return 'color: red';  if
+                        (entity.state >= 23) return 'color: orange'; if
+                        (entity.state >= 21) return 'color:
+                        lightgreen';                
+                  - entity: sensor.sonoff_abstellkammer_humidity
+                    format: precision1
+                    styles:
+                      template: >
+                        if (entity.state < 40) return 'color: lightblue';  if
+                        (entity.state >= 70)return 'color: red';  if
+                        (entity.state >= 60) return 'color: orange'; if
+                        (entity.state >= 40) return 'color:
+                        lightgreen';                            
+                entities:
+                  - entity: fan.steckdose_beluftung_kammer
+                    name: Belüftung
+                    state_color: true
+                    tap_action:
+                      action: toggle
+                  - entity: switch.abstellkammer_sensor_motion
+                    name: Motion Sensor
+                    state_color: true
+                    tap_action:
+                      action: toggle
+        view_layout:
+          grid-area: right
+      - type: vertical-stack
+        cards:
+          - type: custom:bubble-card
+            card_type: pop-up
+            entity: light.kuche
+            icon: mdi:table-chair
+            name: Küche
+            hash: '#lichtemily'
+            width_desktop: 900px
+            margin_top_mobile: 18px
+            margin_top_desktop: 74px
+            styles: |
+              #root {
+                /* This is a fix for older Safari (for my wall-mounted iPad) but it won't work on Firefox, this is optional */
+                display: grid !important;
+              }
+            auto_close: ''
+            is_sidebar_hidden: true
+            show_attribute: true
+            attribute: brightness
+            button_type: slider
+          - type: custom:bubble-card
+            card_type: separator
+            name: Beleuchtung Arbeitsplatte
+            icon: mdi:lightbulb
+          - type: horizontal-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: button
+                button_type: slider
+                entity: light.arbeitsplatte_links
+                name: Links
+                icon: mdi:faucet-variant
+                show_state: true
+              - type: custom:bubble-card
+                card_type: button
+                button_type: slider
+                entity: light.arbeitsplatte_rechts
+                name: Rechts
+                icon: mdi:faucet-variant
+                show_state: true
+          - type: horizontal-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: button
+                button_type: slider
+                entity: light.dimmable_light_1
+                name: Rechts außen
+                icon: mdi:faucet-variant
+                show_state: true
+          - type: custom:bubble-card
+            card_type: separator
+            name: Ambientebeleuchtung
+            icon: mdi:floor-lamp-dual
+          - type: horizontal-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: button
+                button_type: slider
+                entity: light.kuche_oben
+                name: Küche oben
+                icon: mdi:led-strip-variant
+                show_state: true
+              - type: custom:bubble-card
+                card_type: button
+                button_type: slider
+                entity: light.esstisch_oben
+                name: Esstisch oben
+                icon: mdi:ceiling-light
+                show_state: true
+          - type: custom:bubble-card
+            card_type: separator
+            name: Lichtszenen
+            icon: mdi:palette-outline
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: entity
+                entity: scene.arbeitsplatte_kitchen_ambiente_hue
+                content_info: name
+                name: Ambientelicht
+                tap_action:
+                  action: toggle
+              - type: entity
+                entity: scene.wohnzimmer_hue_nachtlicht_wz
+                content_info: name
+                tap_action:
+                  action: toggle
+                name: Nachtlicht
+            alignment: center
+          - type: custom:bubble-card
+            card_type: separator
+            name: Rollladen
+            icon: mdi:window-shutter
+          - type: horizontal-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: cover
+                entity: cover.rolllade_kleines_kuchenfenster
+                name: Kl. Küchenfenster
+                show_state: true
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-chips-card
+                chips:
+                  - type: entity
+                    entity: scene.blinds_beschattung_sonne_sudseite_ohne_emily
+                    tap_action:
+                      action: toggle
+                    content_info: name
+                    name: Südseite Beschattung
+                  - type: entity
+                    entity: scene.blinds_living_room_all_up
+                    tap_action:
+                      action: toggle
+                    content_info: name
+                    name: Alle Rollladen hoch
+                alignment: center
+          - type: custom:bubble-card
+            card_type: separator
+            name: Steckdosen
+            icon: mdi:devices
+          - type: horizontal-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: button
+                entity: sensor.steckdose_kuchenzeile_power
+                show_state: true
+                icon: mdi:power-plug
+                name: Küchenzeile 1
+              - type: custom:bubble-card
+                card_type: button
+                entity: sensor.steckdose_kuche_2_power
+                show_state: true
+                icon: mdi:power-plug
+                name: Küchenzeile 2
+                button_type: switch
+        view_layout:
+          grid-area: footer3
+  - path: security-lock
+    subview: false
+    visible: []
+    icon: mdi:lock
+    theme: Caule Black Rose Glass
+    badges:
+      - entity: alarm_control_panel.zu_hause_alarm
+    cards:
+      - type: entity
+        entity: alarm_control_panel.zu_hause_alarm
+  - title: Rollladen
+    path: rollladen
+    icon: mdi:window-shutter-settings
+    layout:
+      grid-template-columns: 50% 50%
+      grid-template-rows: auto
+      grid-template-areas: |
+        "header header"
+        "headerlu headerru"
+        "left right"
+        "footer footer"
+      mediaquery:
+        '(max-width: 932px)':
+          grid-template-columns: 100%
+          grid-template-areas: |
+            "header"
+            "headerlu"
+            "headerru"            
+            "messages"
+            "left"
+            "right"
+            "footer"
+    type: custom:grid-layout
+    theme: Caule Black Blue Glass
+    subview: false
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - show_name: true
+            show_icon: true
+            show_state: true
+            type: glance
+            entities:
+              - entity: sensor.nordseite
+              - entity: sensor.sudseite
+              - entity: sensor.westseite
+            state_color: true
+        view_layout:
+          grid-area: header
+      - type: vertical-stack
+        cards:
+          - type: custom:tabbed-card
+            tabs:
+              - attributes:
+                  label: Rollladen - Einzelsteuerung
+                card:
+                  type: vertical-stack
+                  cards:
+                    - type: custom:mushroom-cover-card
+                      entity: cover.alle_rollladen
+                      show_position_control: true
+                      show_buttons_control: false
+                      layout: horizontal
+                      icon_color: red
+                    - type: horizontal-stack
+                      cards:
+                        - type: custom:mushroom-cover-card
+                          entity: cover.rolllade_balkon
+                          show_position_control: true
+                          show_buttons_control: false
+                          name: Balkon
+                        - type: custom:mushroom-cover-card
+                          entity: cover.rolllade_sofa
+                          show_position_control: true
+                          show_buttons_control: false
+                          name: Sofa
+                        - type: custom:mushroom-cover-card
+                          entity: cover.rolllade_kleines_kuchenfenster
+                          show_position_control: true
+                          name: Küche
+                    - type: horizontal-stack
+                      cards:
+                        - type: custom:mushroom-cover-card
+                          entity: cover.rolllade_emily
+                          show_position_control: true
+                          show_buttons_control: false
+                          name: Emily
+                        - type: custom:mushroom-cover-card
+                          entity: cover.rolllade_schlafzimmer
+                          show_position_control: true
+                          show_buttons_control: false
+                          name: Knübbelchen
+                        - type: custom:mushroom-cover-card
+                          show_position_control: true
+                          entity: cover.rolllade_buro
+                          name: Büro
+          - type: entities
+            entities:
+              - input_boolean.rolladen_automation
+              - input_number.schwellwert_nordseite
+              - input_number.schwellwert_sudseite
+              - input_number.schwellwert_westseite
+            state_color: true
+        view_layout:
+          grid-area: left
+      - type: custom:tabbed-card
+        tabs:
+          - attributes:
+              label: Wohnzimmer
+            card:
+              type: vertical-stack
+              cards:
+                - type: custom:mushroom-cover-card
+                  entity: cover.rollladen_wohnzimmer
+                  show_position_control: true
+                  show_buttons_control: false
+                  layout: horizontal
+                  icon_color: red
+                - type: button
+                  name: TV/Gaming
+                  entity: scene.blinds_tv_gaming_new
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.blinds_tv_gaming_new
+                    data: {}
+                  secondary_info: none
+                  icon_height: 30px
+                - type: button
+                  name: Rolladen hoch
+                  entity: scene.blinds_living_room_all_up
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.blinds_living_room_all_up
+                    data: {}
+                  secondary_info: none
+                  icon_height: 30px
+                  icon: mdi:window-shutter-open
+                - type: button
+                  name: Rollladen runter
+                  tap_action:
+                    action: call-service
+                    service: cover.close_cover
+                    target:
+                      entity_id:
+                        - cover.rolllade_balkon
+                        - cover.rolllade_kleines_kuchenfenster
+                        - cover.rolllade_sofa
+                    data: {}
+                  icon_height: 30px
+                  icon: mdi:window-shutter
+                - type: button
+                  name: Beschattung
+                  entity: scene.blinds_beschattung_sonne_wz
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.blinds_beschattung_sonne_wz
+                    data: {}
+                  secondary_info: none
+                  icon_height: 30px
+                  icon: mdi:window-shutter-settings
+                - type: button
+                  name: Beschattung Balkon
+                  entity: scene.blinds_balkon_beschattung
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.blinds_balkon_beschattung
+                    data: {}
+                  secondary_info: none
+                  icon_height: 30px
+                  icon: mdi:window-shutter-settings
+          - attributes:
+              label: Emilys Zimmer
+            card:
+              type: vertical-stack
+              cards:
+                - type: button
+                  name: Beschattung
+                  entity: scene.blinds_beschattung_sonne_emily
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.blinds_beschattung_sonne_emily
+                    data: {}
+                  secondary_info: none
+                  icon_height: 30px
+          - attributes:
+              label: Knübbelchen
+            card:
+              type: vertical-stack
+              cards:
+                - type: button
+                  name: Beschattung
+                  entity: scene.beschattung_lia
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.blinds_beschattung_sonne_schlafzimmer
+                    data: {}
+                  secondary_info: none
+                  icon_height: 30px
+          - attributes:
+              label: Büro
+            card:
+              type: vertical-stack
+              cards:
+                - type: button
+                  name: Beschattung
+                  entity: scene.blinds_beschattung_sonne_buro_neu
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.blinds_beschattung_sonne_buro_neu
+                    data: {}
+                  secondary_info: none
+                  icon_height: 30px
+          - attributes:
+              label: Badezimmer
+            card:
+              type: vertical-stack
+              cards:
+                - type: vertical-stack
+                  cards:
+                    - type: custom:mushroom-cover-card
+                      entity: cover.rolllade_schlafzimmer
+                      show_buttons_control: true
+                      layout: horizontal
+        view_layout:
+          grid-area: right
+  - title: Vaccum
+    path: vaccum
+    icon: mdi:robot-vacuum
+    layout:
+      grid-template-columns: 50% 50%
+      grid-height: 500
+      grid-template-rows: auto
+      grid-template-areas: |
+        "headerl headerr"
+        "headerlu headerru"
+        "left right"
+        "footer footer"
+      mediaquery:
+        '(max-width: 932px)':
+          grid-template-columns: 100%
+          grid-template-areas: |
+            "headerl"
+            "headerr"
+            "headerlu"
+            "headerru"            
+            "messages"
+            "left"
+            "right"
+            "footer"
+    theme: Caule Black Blue
+    type: custom:grid-layout
+    cards:
+      - type: custom:xiaomi-vacuum-map-card
+        map_source:
+          camera: camera.roborock_s8_maxv_ultra_map
+        calibration_source:
+          camera: true
+        entity: vacuum.roborock_s8_maxv_ultra
+        vacuum_platform: humbertogontijo/homeassistant-roborock
+        map_modes:
+          - template: vacuum_clean_zone
+          - template: vacuum_goto
+          - template: vacuum_clean_segment
+            predefined_selections:
+              - id: '16'
+                icon:
+                  name: mdi:broom
+                  x: 26175
+                  'y': 23450
+                label:
+                  text: Room 16
+                  x: 26175
+                  'y': 23450
+                  offset_y: 35
+                outline:
+                  - - 23500
+                    - 20600
+                  - - 28850
+                    - 20600
+                  - - 28850
+                    - 26300
+                  - - 23500
+                    - 26300
+              - id: '17'
+                icon:
+                  name: mdi:broom
+                  x: 36375
+                  'y': 23500
+                label:
+                  text: Room 17
+                  x: 36375
+                  'y': 23500
+                  offset_y: 35
+                outline:
+                  - - 34600
+                    - 21150
+                  - - 38150
+                    - 21150
+                  - - 38150
+                    - 25850
+                  - - 34600
+                    - 25850
+              - id: '18'
+                icon:
+                  name: mdi:broom
+                  x: 33450
+                  'y': 23050
+                label:
+                  text: Room 18
+                  x: 33450
+                  'y': 23050
+                  offset_y: 35
+                outline:
+                  - - 32000
+                    - 21200
+                  - - 34900
+                    - 21200
+                  - - 34900
+                    - 24900
+                  - - 32000
+                    - 24900
+              - id: '19'
+                icon:
+                  name: mdi:broom
+                  x: 32275
+                  'y': 28475
+                label:
+                  text: Room 19
+                  x: 32275
+                  'y': 28475
+                  offset_y: 35
+                outline:
+                  - - 31400
+                    - 27600
+                  - - 33150
+                    - 27600
+                  - - 33150
+                    - 29350
+                  - - 31400
+                    - 29350
+              - id: '20'
+                icon:
+                  name: mdi:broom
+                  x: 29650
+                  'y': 23725
+                label:
+                  text: Room 20
+                  x: 29650
+                  'y': 23725
+                  offset_y: 35
+                outline:
+                  - - 28150
+                    - 21300
+                  - - 31150
+                    - 21300
+                  - - 31150
+                    - 26150
+                  - - 28150
+                    - 26150
+              - id: '21'
+                icon:
+                  name: mdi:broom
+                  x: 32750
+                  'y': 27950
+                label:
+                  text: Room 21
+                  x: 32750
+                  'y': 27950
+                  offset_y: 35
+                outline:
+                  - - 30950
+                    - 24700
+                  - - 34550
+                    - 24700
+                  - - 34550
+                    - 31200
+                  - - 30950
+                    - 31200
+              - id: '22'
+                icon:
+                  name: mdi:broom
+                  x: 35900
+                  'y': 30575
+                label:
+                  text: Room 22
+                  x: 35900
+                  'y': 30575
+                  offset_y: 35
+                outline:
+                  - - 34550
+                    - 29750
+                  - - 37250
+                    - 29750
+                  - - 37250
+                    - 31400
+                  - - 34550
+                    - 31400
+              - id: '23'
+                icon:
+                  name: mdi:broom
+                  x: 36275
+                  'y': 28075
+                label:
+                  text: Room 23
+                  x: 36275
+                  'y': 28075
+                  offset_y: 35
+                outline:
+                  - - 34550
+                    - 26250
+                  - - 38000
+                    - 26250
+                  - - 38000
+                    - 29900
+                  - - 34550
+                    - 29900
+        view_layout:
+          grid-area: left
+      - type: custom:tabbed-card
+        tabs:
+          - attributes:
+              label: Saugen
+            card:
+              type: vertical-stack
+              cards:
+                - type: grid
+                  columns: 3
+                  cards:
+                    - type: button
+                      name: Flur
+                      entity: vacuum.roborock_s8
+                      layout: vertical
+                      icon_height: 50px
+                      fill_container: true
+                      icon: mdi:wardrobe-outline
+                      secondary_info: none
+                      tap_action:
+                        action: call-service
+                        service: automation.trigger
+                        target:
+                          entity_id: automation.vac_flur_saugen
+                        data:
+                          skip_condition: true
+                    - type: button
+                      name: Wohnzimmer & Küche
+                      entity: vacuum.roborock_s8
+                      layout: vertical
+                      fill_container: true
+                      icon: mdi:sofa
+                      secondary_info: none
+                      tap_action:
+                        action: call-service
+                        service: automation.trigger
+                        target:
+                          entity_id: automation.vac_wohnbereich_kuche_saugen
+                        data:
+                          skip_condition: true
+                    - type: button
+                      name: Emilys Zimmer
+                      entity: vacuum.roborock_s8
+                      layout: vertical
+                      fill_container: true
+                      icon: mdi:teddy-bear
+                      secondary_info: none
+                      tap_action:
+                        action: call-service
+                        service: automation.trigger
+                        target:
+                          entity_id: automation.vac_emilys_zimmer_saugen
+                        data:
+                          skip_condition: true
+                    - type: button
+                      name: Büro
+                      entity: vacuum.roborock_s8
+                      layout: vertical
+                      fill_container: true
+                      icon: mdi:desk
+                      secondary_info: none
+                      tap_action:
+                        action: call-service
+                        service: automation.trigger
+                        target:
+                          entity_id: automation.vac_buro_saugen
+                        data:
+                          skip_condition: true
+                    - type: button
+                      name: Schlafzimmer
+                      entity: vacuum.roborock_s8
+                      layout: vertical
+                      fill_container: true
+                      icon: mdi:bed
+                      secondary_info: none
+                      tap_action:
+                        action: call-service
+                        service: automation.trigger
+                        target:
+                          entity_id: automation.vac_schlafzimmer_saugen
+                        data:
+                          skip_condition: true
+                    - type: button
+                      name: Gäste WC
+                      entity: vacuum.roborock_s8
+                      layout: vertical
+                      fill_container: true
+                      icon: mdi:toilet
+                      secondary_info: none
+                      tap_action:
+                        action: call-service
+                        service: automation.trigger
+                        target:
+                          entity_id: automation.vac_gaste_wc_saugen
+                        data:
+                          skip_condition: true
+                    - type: button
+                      name: Badezimmer
+                      entity: vacuum.roborock_s8
+                      layout: vertical
+                      fill_container: true
+                      icon: mdi:bathtub
+                      secondary_info: none
+                      tap_action:
+                        action: call-service
+                        service: automation.trigger
+                        target:
+                          entity_id: automation.vac_badezimmer_saugen
+                        data:
+                          skip_condition: true
+                    - type: button
+                      name: Kleiderschrank
+                      entity: vacuum.roborock_s8
+                      layout: vertical
+                      fill_container: true
+                      icon: mdi:cupboard
+                      secondary_info: none
+                      tap_action:
+                        action: call-service
+                        service: automation.trigger
+                        target:
+                          entity_id: automation.vac_schrank_saugen
+                        data:
+                          skip_condition: true
+          - attributes:
+              label: Saugen & Wischen
+            card:
+              type: vertical-stack
+              cards:
+                - type: grid
+                  columns: 3
+                  cards:
+                    - type: button
+                      name: Flur
+                      entity: vacuum.roborock_s8
+                      layout: vertical
+                      fill_container: true
+                      icon: mdi:wardrobe-outline
+                      secondary_info: none
+                      tap_action:
+                        action: call-service
+                        service: automation.trigger
+                        target:
+                          entity_id: automation.vac_flur_saugen_dann_wischen
+                        data:
+                          skip_condition: true
+                    - type: button
+                      name: Wohnzimmer & Küche
+                      entity: vacuum.roborock_s8
+                      layout: vertical
+                      fill_container: true
+                      icon: mdi:sofa
+                      secondary_info: none
+                      tap_action:
+                        action: call-service
+                        service: automation.trigger
+                        target:
+                          entity_id: automation.vac_wohnbereich_kuche_saugen_dann_wischen
+                        data:
+                          skip_condition: true
+                    - type: button
+                      name: Emilys Zimmer
+                      entity: vacuum.roborock_s8
+                      layout: vertical
+                      fill_container: true
+                      icon: mdi:teddy-bear
+                      secondary_info: none
+                      tap_action:
+                        action: call-service
+                        service: automation.trigger
+                        target:
+                          entity_id: automation.vac_emilys_zimmer_saugen_dann_wischen
+                        data:
+                          skip_condition: true
+                    - type: button
+                      name: Büro
+                      entity: vacuum.roborock_s8
+                      layout: vertical
+                      fill_container: true
+                      icon: mdi:desk
+                      secondary_info: none
+                      tap_action:
+                        action: call-service
+                        service: automation.trigger
+                        target:
+                          entity_id: automation.vac_buro_saugen_dann_wischen
+                        data:
+                          skip_condition: true
+                    - type: button
+                      name: Schlafzimmer
+                      entity: vacuum.roborock_s8
+                      layout: vertical
+                      fill_container: true
+                      icon: mdi:bed
+                      secondary_info: none
+                      tap_action:
+                        action: call-service
+                        service: automation.trigger
+                        target:
+                          entity_id: automation.vac_schlafzimmer_saugen_dann_wischen
+                        data:
+                          skip_condition: true
+                    - type: button
+                      name: Gäste WC
+                      entity: vacuum.roborock_s8
+                      layout: vertical
+                      fill_container: true
+                      icon: mdi:toilet
+                      secondary_info: none
+                      tap_action:
+                        action: call-service
+                        service: automation.trigger
+                        target:
+                          entity_id: automation.vac_gaste_wc_saugen_dann_wischen
+                        data:
+                          skip_condition: true
+                    - type: button
+                      name: Badezimmer
+                      entity: vacuum.roborock_s8
+                      layout: vertical
+                      fill_container: true
+                      icon: mdi:bathtub
+                      secondary_info: none
+                      tap_action:
+                        action: call-service
+                        service: automation.trigger
+                        target:
+                          entity_id: automation.vac_badezimmer_saugen_dann_wischen
+                        data:
+                          skip_condition: true
+                    - type: button
+                      name: Kleiderschrank
+                      entity: vacuum.roborock_s8
+                      layout: vertical
+                      fill_container: true
+                      icon: mdi:cupboard
+                      secondary_info: none
+                      tap_action:
+                        action: call-service
+                        service: automation.trigger
+                        target:
+                          entity_id: automation.vac_schrank_saugen_dann_wischen
+                        data:
+                          skip_condition: true
+          - attributes:
+              label: Wischen
+            card:
+              type: vertical-stack
+              cards:
+                - type: grid
+                  columns: 3
+                  cards:
+                    - type: button
+                      name: Wohnzimmer & Küche
+                      entity: vacuum.roborock_s8
+                      layout: vertical
+                      fill_container: true
+                      icon: mdi:table-chair
+                      secondary_info: none
+                      tap_action:
+                        action: call-service
+                        service: automation.trigger
+                        target:
+                          entity_id: automation.vac_wohnzimmer_nur_wischen
+                        data:
+                          skip_condition: true
+                    - type: button
+                      name: Wohnzimmer
+                      entity: vacuum.roborock_s8
+                      layout: vertical
+                      fill_container: true
+                      icon: mdi:sofa
+                      secondary_info: none
+                      tap_action:
+                        action: call-service
+                        service: automation.trigger
+                        target:
+                          entity_id: automation.vac_wohnzimmer_wischen
+                        data:
+                          skip_condition: true
+                    - type: button
+                      name: Küche
+                      entity: vacuum.roborock_s8
+                      layout: vertical
+                      fill_container: true
+                      icon: mdi:table-furniture
+                      secondary_info: none
+                      tap_action:
+                        action: call-service
+                        service: automation.trigger
+                        target:
+                          entity_id: automation.vac_kuche_nur_wischen
+                        data:
+                          skip_condition: true
+          - attributes:
+              label: Spezialprogramme
+            card:
+              type: vertical-stack
+              cards:
+                - type: grid
+                  columns: 3
+                  cards:
+                    - type: button
+                      name: Küchenzeile
+                      entity: vacuum.roborock_s8
+                      layout: vertical
+                      fill_container: true
+                      icon: mdi:dishwasher
+                      secondary_info: none
+                      tap_action:
+                        action: call-service
+                        service: automation.trigger
+                        target:
+                          entity_id: automation.kuchenzeile
+                        data:
+                          skip_condition: true
+                    - type: button
+                      name: Esstisch
+                      entity: vacuum.roborock_s8
+                      layout: vertical
+                      fill_container: true
+                      icon: mdi:table-chair
+                      secondary_info: none
+                      tap_action:
+                        action: call-service
+                        service: automation.trigger
+                        target:
+                          entity_id: automation.vac_esstisch
+                        data:
+                          skip_condition: true
+                    - type: button
+                      name: Futzis Tisch
+                      entity: vacuum.roborock_s8
+                      layout: vertical
+                      fill_container: true
+                      icon: mdi:teddy-bear
+                      secondary_info: none
+                      tap_action:
+                        action: call-service
+                        service: automation.trigger
+                        target:
+                          entity_id: automation.vac_futzis_tisch
+                        data:
+                          skip_condition: true
+                    - type: button
+                      name: Staubi leeren
+                      entity: vacuum.roborock_s8
+                      layout: vertical
+                      fill_container: true
+                      icon: mdi:trash-can
+                      secondary_info: none
+                      tap_action:
+                        action: call-service
+                        service: automation.trigger
+                        target:
+                          entity_id: automation.vac_come_to_bin
+                        data:
+                          skip_condition: true
+                    - type: button
+                      name: WZ/Küche schnell
+                      entity: vacuum.roborock_s8
+                      layout: vertical
+                      fill_container: true
+                      icon: mdi:spray-bottle
+                      secondary_info: none
+                      tap_action:
+                        action: call-service
+                        service: automation.trigger
+                        target:
+                          entity_id: automation.vac_quick_combined_cleaning_wohnzimmer
+                        data:
+                          skip_condition: true
+                    - type: button
+                      name: Vor der Couch
+                      entity: vacuum.roborock_s8
+                      layout: vertical
+                      fill_container: true
+                      icon: mdi:sofa-outline
+                      secondary_info: none
+                      tap_action:
+                        action: call-service
+                        service: automation.trigger
+                        target:
+                          entity_id: automation.vac_vor_der_couch
+                        data:
+                          skip_condition: true
+        view_layout:
+          grid-area: right
+    subview: true
+  - icon: mdi:multimedia
+    type: custom:masonry-layout
+    badges: []
+    cards:
+      - type: horizontal-stack
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: media-control
+                entity: media_player.sony_kd_65xg9505_2
+              - type: media-control
+                entity: media_player.fire_tv_192_168_2_61
+              - type: media-control
+                entity: media_player.echo_show_wohnzimmer
+              - type: media-control
+                entity: media_player.saschas_echo_dot
+              - type: media-control
+                entity: media_player.echo_emily
+              - type: media-control
+                entity: media_player.echo_badezimmer
+      - type: vertical-stack
+        cards:
+          - square: false
+            type: grid
+            cards:
+              - type: tile
+                entity: switch.sync_box_power
+                name: Sync Box Power
+                state_content: state
+                vertical: true
+              - type: tile
+                entity: switch.sync_box_light_sync
+                vertical: true
+            columns: 2
+            title: Ambient Light & Control
+          - type: custom:bubble-card
+            card_type: separator
+            name: Eingangsauswahl
+            icon: mdi:video-input-hdmi
+          - type: tile
+            name: Sync Box Select Input
+            entity: select.sync_box_hdmi_input
+            vertical: true
+          - type: custom:bubble-card
+            card_type: separator
+            name: Status Eingänge
+            icon: mdi:hdmi-port
+          - square: false
+            type: grid
+            cards:
+              - type: tile
+                entity: sensor.sync_box_hdmi1_status
+                vertical: true
+                name: <none>
+              - type: tile
+                entity: sensor.sync_box_hdmi2_status
+                vertical: true
+                name: FireTV
+              - type: tile
+                entity: sensor.sync_box_hdmi3_status
+                vertical: true
+                name: Nintendo Switch
+              - type: tile
+                entity: sensor.sync_box_hdmi4_status
+                vertical: true
+                name: PS5
+            columns: 2
+  - title: Energie
+    path: energie
+    icon: mdi:flash
+    theme: Caule Black Blue
+    type: custom:grid-layout
+    layout:
+      grid-template-columns: 33% 34% 33%
+      grid-template-rows: auto
+      grid-template-areas: |
+        "header header header"
+        "messagesl messagesm messagesr"
+        "left middle right"
+        "footer footer footer"
+      mediaquery:
+        '(max-width: 932px)':
+          grid-template-columns: 100%
+          grid-template-areas: |
+            "header"
+            "messagesl"
+            "messagesm"
+            "messagesr"
+            "left"
+            "middle"            
+            "right"
+            "footer"
+    subview: false
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: horizontal-stack
+            cards:
+              - graph: line
+                type: sensor
+                detail: 2
+                entity: sensor.steckdose_spulmaschine_power
+              - graph: line
+                type: sensor
+                detail: 2
+                entity: sensor.steckdose_trockner_power
+          - type: horizontal-stack
+            cards:
+              - graph: line
+                type: sensor
+                detail: 2
+                entity: sensor.steckdosen_arbeitsplatte
+              - graph: line
+                type: sensor
+                detail: 2
+                unit: W
+                entity: sensor.steckdose_medien_aux_power
+          - type: entities
+            entities:
+              - entity: sensor.steckdose_spulmaschine_energy
+              - entity: sensor.steckdose_trockner_energy
+              - entity: sensor.0xa4c13814a106ac2d_energy
+              - entity: sensor.steckdose_medien_aux_energy
+                name: Steckdose Roborock
+        view_layout:
+          grid-area: left
+      - type: vertical-stack
+        cards:
+          - type: horizontal-stack
+            cards:
+              - graph: line
+                type: sensor
+                detail: 2
+                entity: sensor.0xa4c13814a106ac2d_power
+              - graph: line
+                type: sensor
+                detail: 1
+                entity: sensor.steckdose_kuchenzeile_power
+          - type: horizontal-stack
+            cards:
+              - graph: line
+                type: sensor
+                detail: 2
+                entity: sensor.steckdose_medien_power
+              - graph: line
+                type: sensor
+                detail: 2
+                entity: sensor.steckdose_waschmaschine_power
+          - type: entities
+            entities:
+              - entity: sensor.steckdose_kuchenzeile_energy
+              - entity: sensor.steckdose_kuche_2_energy
+              - entity: sensor.steckdose_waschmaschine_energy
+              - entity: sensor.steckdose_medien_energy
+          - type: entities
+            entities:
+              - entity: input_boolean.spulmaschine_an_aus
+              - entity: input_boolean.trocker_an_aus
+                name: Trockner an/aus
+              - entity: input_boolean.waschmaschine_an_aus
+            state_color: false
+        view_layout:
+          grid-area: middle
+      - type: vertical-stack
+        cards:
+          - type: entities
+            entities:
+              - entity: sensor.shellyem3_485519d73b19_channel_b_power
+              - entity: sensor.shellyem3_485519d73b19_channel_a_power
+              - entity: sensor.shellyem3_485519d73b19_channel_c_power
+          - type: entity
+            entity: sensor.zahlerstand_gesamt_dynamisch
+            icon: mdi:counter
+          - type: entity
+            entity: input_number.strom_letzte_abrechnung
+          - graph: line
+            type: sensor
+            detail: 1
+            entity: sensor.verbrauchsperiode
+        view_layout:
+          grid-area: right
+      - type: vertical-stack
+        cards:
+          - show_name: true
+            show_icon: true
+            show_state: true
+            type: glance
+            entities:
+              - entity: sensor.shellyem3_485519d73b19_channel_a_power_factor
+                name: SpüMa/Tro/SZ/Mikro
+              - entity: sensor.shellyem3_485519d73b19_channel_b_power_factor
+                name: WZ/EZ/Balkon/Technik-HZ/Bad/Flur/AK/ArbPlatte
+              - entity: sensor.shellyem3_485519d73b19_channel_c_power_factor
+                name: WaMa/Büro/KühlS/Emily
+            state_color: false
+          - type: history-graph
+            entities:
+              - entity: sensor.shellyem3_485519d73b19_channel_a_power
+              - entity: sensor.shellyem3_485519d73b19_channel_b_power
+              - entity: sensor.shellyem3_485519d73b19_channel_c_power
+            hours_to_show: 6
+            title: Last - Letzte 6 Stunden
+          - type: history-graph
+            entities:
+              - entity: sensor.current_consumption
+            hours_to_show: 6
+        view_layout:
+          grid-area: header
+  - title: Sensors v2
+    path: sensors-v2
+    type: sections
+    max_columns: 2
+    icon: mdi:leak
+    sections:
+      - type: grid
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: custom:button-card
+                entity: sensor.epson_wf_4830_series
+                name: WF-4830
+                color: gray
+                show_state: true
+                styles:
+                  card:
+                    - padding: 0 0 5px 0
+                  icon:
+                    - width: 100%
+                  state:
+                    - text-align: left
+                    - width: 100%
+                  grid:
+                    - grid-template-areas: '"i c m y k" "n s s s s"'
+                    - grid-template-columns: 1fr 1fr 1fr 1fr 1fr
+                    - grid-template-rows: auto 1em
+                  custom_fields:
+                    k:
+                      - width: 80%
+                      - margin: auto
+                    c:
+                      - width: 80%
+                      - margin: auto
+                    m:
+                      - width: 80%
+                      - margin: auto
+                    'y':
+                      - width: 80%
+                      - margin: auto
+                custom_fields:
+                  k:
+                    card:
+                      type: custom:button-card
+                      template: inkwell
+                      entity: sensor.epson_wf_4830_series_black_ink
+                      variables:
+                        color: black
+                  c:
+                    card:
+                      type: custom:button-card
+                      template: inkwell
+                      entity: sensor.epson_wf_4830_series_cyan_ink
+                      variables:
+                        color: cyan
+                  m:
+                    card:
+                      type: custom:button-card
+                      template: inkwell
+                      entity: sensor.epson_wf_4830_series_magenta_ink
+                      variables:
+                        color: magenta
+                  'y':
+                    card:
+                      type: custom:button-card
+                      template: inkwell
+                      entity: sensor.epson_wf_4830_series_yellow_ink
+                      variables:
+                        color: yellow
+            view_layout:
+              grid-area: header
+          - type: history-graph
+            entities:
+              - binary_sensor.toniebox
+            title: Toniebox
+          - type: history-graph
+            entities:
+              - entity: binary_sensor.192_168_2_145
+            title: Nintendo Switch
+  - title: Sicherheit
+    path: sicherheit
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        cards:
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: entity
+                entity: person.sascha_thiebach
+                content_info: name
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-playground/grid
+                icon: mdi:arrow-left
+                name: zurück
+          - type: vertical-stack
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - type: custom:mushroom-lock-card
+                    entity: lock.smart_lock_pro
+                    fill_container: true
+              - type: custom:mushroom-alarm-control-panel-card
+                entity: alarm_control_panel.zu_hause_alarm
+                states:
+                  - armed_home
+                  - armed_away
+                show_keypad: false
+      - type: grid
+        cards:
+          - type: custom:tabbed-card
+            options: {}
+            tabs:
+              - card:
+                  type: custom:webrtc-camera
+                  streams:
+                    - url: Cam_Flur
+                attributes:
+                  label: Flur
+              - card:
+                  type: custom:webrtc-camera
+                  streams:
+                    - url: Cam_Kueche
+                attributes:
+                  label: Wohnzimmer
+              - card:
+                  type: custom:webrtc-camera
+                  streams:
+                    - url: Cam_Balkon
+                attributes:
+                  label: Balkon
+          - type: entities
+            entities:
+              - entity: binary_sensor.fenster_badezimmer_contact
+              - entity: binary_sensor.fenster_buro
+              - entity: binary_sensor.fenster_kinderzimmer
+              - entity: binary_sensor.fenster_schlafzimmer
+              - entity: binary_sensor.balkontur
+              - entity: binary_sensor.haustur
+              - entity: binary_sensor.sensor_fenster_sofa_neu_contact
+              - entity: binary_sensor.kleines_kuchenfenster
+        title: Kameras
+    icon: mdi:shield-lock
+    cards: []
+    subview: true
+  - title: Klima
+    path: wetter
+    icon: mdi:white-balance-sunny
+    subview: true
+    type: sections
+    sections:
+      - type: grid
+        cards:
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: entity
+                entity: person.sascha_thiebach
+                content_info: name
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-playground/grid
+                icon: mdi:arrow-left
+                name: zurück
+          - type: entity
+            entity: sensor.temperatur_balkon_sonoff_temperature
+          - type: custom:weather-chart-card
+            entity: weather.home
+            show_main: true
+            show_temperature: true
+            show_current_condition: true
+            show_attributes: true
+            show_time: false
+            show_day: false
+            show_date: false
+            show_humidity: true
+            show_pressure: true
+            show_wind_direction: true
+            show_wind_speed: true
+            show_sun: true
+            show_feels_like: false
+            icons_size: 25
+            animated_icons: true
+            icon_style: style2
+            forecast:
+              precipitation_type: rainfall
+              labels_font_size: '11'
+              precip_bar_size: '100'
+              style: style2
+              show_wind_forecast: true
+              condition_icons: true
+              round_temp: false
+              type: daily
+              use_12hour_format: false
+            units:
+              pressure: ''
+              speed: ''
+            locale: de
+            title: Aktuelles Wetter
+            show_last_changed: true
+            use_12hour_format: false
+            description: sensor.openweathermap_condition
+          - type: custom:weather-chart-card
+            entity: weather.home
+            show_main: false
+            show_temperature: false
+            show_current_condition: false
+            show_attributes: false
+            show_time: false
+            show_day: false
+            show_date: false
+            show_humidity: false
+            show_pressure: false
+            show_wind_direction: false
+            show_wind_speed: false
+            show_sun: false
+            show_feels_like: false
+            icons_size: 25
+            animated_icons: true
+            icon_style: style1
+            forecast:
+              precipitation_type: rainfall
+              labels_font_size: '11'
+              precip_bar_size: '100'
+              style: style2
+              show_wind_forecast: true
+              condition_icons: true
+              round_temp: true
+              type: hourly
+              use_12hour_format: false
+              disable_animation: false
+              show_probability: true
+              number_of_forecasts: '6'
+            units:
+              pressure: ''
+              speed: ''
+            locale: de
+            use_12hour_format: false
+            show_wind_gust_speed: false
+            show_visibility: false
+            show_last_changed: false
+      - type: grid
+        cards:
+          - type: custom:meteoalarm-card
+            entities:
+              - entity: sensor.stadt_leverkusen_vorwarnstufe
+              - entity: sensor.stadt_leverkusen_aktuelle_warnstufe
+            integration: dwd
+            disable_swiper: false
+            hide_caption: false
+            hide_when_no_warning: false
+          - show_state: true
+            show_name: false
+            camera_view: live
+            type: picture-entity
+            entity: weather.home
+            camera_image: camera.regenradar
+            aspect_ratio: '6:8'
+        title: Karte & Warnungen
+      - type: grid
+        cards:
+          - type: tile
+            entity: sensor.zion_air_pm2_5
+            vertical: false
+            name: Luftqualität
+          - type: tile
+            vertical: false
+            entity: fan.zion_air
+          - type: tile
+            vertical: false
+            name: Luftqualität Schlafen
+            entity: sensor.levoit_schlafzimmer_pm2_5
+          - type: tile
+            vertical: false
+            entity: fan.levoit_schlafzimmer
+          - graph: line
+            type: sensor
+            detail: 1
+            entity: sensor.temperatur_wohnzimmer_sonoff_temperature
+            name: Wohnzimmer
+          - graph: line
+            type: sensor
+            entity: sensor.sonoff_display_flur_temperatur_temperature
+            detail: 1
+            name: Flur
+          - graph: line
+            type: sensor
+            entity: sensor.sonoff_display_temperatur_duschbad_temperature
+            detail: 1
+            name: Gäste WC
+          - graph: line
+            type: sensor
+            entity: sensor.sonoff_display_temperatur_schlafzimmer_temperature
+            detail: 1
+            name: Büro/Schlafen
+          - graph: line
+            type: sensor
+            entity: sensor.sonoff_temperatur_emily_temperature
+            detail: 1
+            name: Emily
+          - graph: line
+            type: sensor
+            entity: sensor.sonoff_temperatur_schlafzimmer_temperature
+            detail: 1
+            name: Lia
+          - graph: line
+            type: sensor
+            detail: 1
+            name: Badezimmer
+            entity: sensor.sensor_temperatur_wannenbad_temperature
+          - graph: line
+            type: sensor
+            detail: 1
+            name: Kammer
+            entity: sensor.sonoff_abstellkammer_temperature
+        title: Lokale Temperaturen & Luftqualität
+    max_columns: 3
+    cards: []
+  - title: Wohnzimmer
+    path: wohnzimmer
+    type: sections
+    max_columns: 3
+    subview: true
+    icon: mdi:sofa
+    sections:
+      - type: grid
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: custom:mushroom-light-card
+                entity: light.wohnzimmer_und_highboard
+                use_light_color: true
+                show_brightness_control: true
+                layout: vertical
+                tap_action:
+                  action: navigate
+                  navigation_path: '#lichtwohnzimmer'
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                entity: light.wohnzimmer_und_highboard
+                icon: mdi:sofa
+                name: Wohnzimmer
+                hash: '#lichtwohnzimmer'
+                width_desktop: 540px
+                margin_top_mobile: 18px
+                margin_top_desktop: 74px
+                styles: |
+                  #root {
+                    /* This is a fix for older Safari (for my wall-mounted iPad) but it won't work on Firefox, this is optional */
+                    display: grid !important;
+                  }
+              - type: custom:bubble-card
+                card_type: separator
+                name: Lampes
+                icon: mdi:lightbulb
+              - type: horizontal-stack
+                cards:
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: light.sofa_links
+                    name: Sofa links
+                    icon: mdi:sofa
+                    show_state: true
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: light.sofa_rechts
+                    name: Sofa rechts
+                    icon: mdi:sofa
+                    show_state: true
+              - type: horizontal-stack
+                cards:
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: light.sofa_unten
+                    name: Sofa unten
+                    icon: mdi:sofa
+                    show_state: true
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: light.schreibtisch_links
+                    name: Leselampe
+                    icon: mdi:desk-lamp
+                    show_state: true
+              - type: horizontal-stack
+                cards:
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: light.tv_backlight
+                    name: TV Backlight
+                    icon: mdi:television-ambient-light
+                    show_state: true
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: light.lowboard_links
+                    name: Lowboard links
+                    icon: mdi:buffet
+                    show_state: true
+              - type: horizontal-stack
+                cards:
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: light.lowboard_rechts
+                    name: Lowboard rechts
+                    icon: mdi:buffet
+                    show_state: true
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: light.sideboard
+                    name: Sideboard
+                    icon: mdi:cupboard
+                    show_state: true
+              - type: horizontal-stack
+                cards:
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: light.beleuchtung_highboard
+                    name: Highboard
+                    icon: mdi:wardrobe-outline
+                    show_state: true
+        title: Beleuchtung
+      - type: grid
+        cards:
+          - type: custom:mushroom-cover-card
+            entity: cover.rolllade_sofa
+            show_position_control: true
+            show_buttons_control: false
+            fill_container: true
+            tap_action:
+              action: more-info
+          - type: custom:mushroom-cover-card
+            entity: cover.rolllade_balkon
+            show_position_control: true
+            tap_action:
+              action: more-info
+          - type: custom:bar-card
+            entities:
+              - entity: sensor.temperatur_wohnzimmer_sonoff_temperature
+                name: Temperatur
+                icon: mdi:thermometer
+                severity:
+                  - from: '20'
+                    to: '23'
+                    color: green
+                    hide: false
+                  - from: '23'
+                    to: '25'
+                    color: orange
+                    hide: false
+                  - from: '25'
+                    to: '30'
+                    color: red
+                    hide: false
+                min: 20
+                max: 30
+              - entity: sensor.temperatur_wohnzimmer_sonoff_humidity
+                name: Luftfeuchtigkeit
+                icon: mdi:thermometer
+                severity:
+                  - from: '0'
+                    to: '40'
+                    color: orange
+                    hide: false
+                  - from: '40'
+                    to: '60'
+                    color: green
+                    hide: false
+                  - from: '60'
+                    to: '100'
+                    color: red
+                    hide: false
+                min: 0
+                max: 100
+              - entity: sensor.zion_air_pm2_5
+                name: Luftqualität PM2.5
+                icon: mdi:thermometer
+                severity:
+                  - from: '0'
+                    to: '15'
+                    color: green
+                    hide: false
+                  - from: '15'
+                    to: '30'
+                    color: orange
+                    hide: false
+                  - from: '30'
+                    to: '200'
+                    color: red
+                    hide: false
+                min: 0
+                max: 200
+        title: Klima/Umgebung
+      - type: grid
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: custom:mini-media-player
+                entity: media_player.fire_tv_192_168_2_61
+                group: false
+                artwork: full-cover
+                source: icon
+              - type: custom:mini-media-player
+                entity: media_player.sony_kd_65xg9505_2
+              - type: custom:mini-media-player
+                entity: media_player.echo_show_wohnzimmer
+                group: false
+        title: Medien
+      - type: grid
+        cards: []
+        title: Szenen
+      - type: grid
+        cards: []
+        title: Rollladen Szenen
+      - type: grid
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: custom:mushroom-vacuum-card
+                entity: vacuum.roborock_s8_maxv_ultra
+                icon_animation: true
+                commands:
+                  - on_off
+                  - start_pause
+                  - stop
+                  - locate
+                  - clean_spot
+                  - return_home
+              - type: custom:mushroom-fan-card
+                entity: fan.zion_air
+                icon_animation: true
+                show_percentage_control: true
+                show_oscillate_control: false
+                tap_action:
+                  action: more-info
+          - type: custom:mushroom-entity-card
+            entity: switch.sync_box_power
+          - type: custom:mushroom-entity-card
+            entity: switch.sync_box_light_sync
+        title: Geräte
+  - title: Küche
+    path: kueche
+    type: sections
+    max_columns: 3
+    subview: true
+    icon: mdi:table-chair
+    sections:
+      - type: grid
+        cards:
+          - type: tile
+            entity: light.sofa_links
+            show_entity_picture: true
+            hide_state: true
+            vertical: false
+          - type: tile
+            entity: light.sofa_rechts
+            vertical: false
+            hide_state: true
+            show_entity_picture: true
+          - type: tile
+            entity: light.sofa_unten
+            vertical: false
+            hide_state: true
+            show_entity_picture: true
+          - type: tile
+            entity: light.schreibtisch_links
+            vertical: false
+            hide_state: true
+            show_entity_picture: true
+          - type: tile
+            entity: light.tv_backlight
+            hide_state: true
+          - type: tile
+            entity: light.lowboard_links
+            hide_state: true
+          - type: tile
+            entity: light.lowboard_rechts
+            hide_state: true
+          - type: tile
+            entity: light.sideboard
+            hide_state: true
+          - type: tile
+            entity: light.beleuchtung_highboard
+            hide_state: true
+        title: Beleuchtung
+      - type: grid
+        cards:
+          - type: custom:mushroom-cover-card
+            entity: cover.rolllade_sofa
+            show_position_control: true
+            show_buttons_control: false
+            fill_container: true
+            tap_action:
+              action: more-info
+          - type: custom:mushroom-cover-card
+            entity: cover.rolllade_balkon
+            show_position_control: true
+            tap_action:
+              action: more-info
+          - type: custom:bar-card
+            entities:
+              - entity: sensor.temperatur_wohnzimmer_sonoff_temperature
+                name: Temperatur
+                icon: mdi:thermometer
+                severity:
+                  - from: '20'
+                    to: '23'
+                    color: green
+                    hide: false
+                  - from: '23'
+                    to: '25'
+                    color: orange
+                    hide: false
+                  - from: '25'
+                    to: '30'
+                    color: red
+                    hide: false
+                min: 20
+                max: 30
+              - entity: sensor.temperatur_wohnzimmer_sonoff_humidity
+                name: Luftfeuchtigkeit
+                icon: mdi:thermometer
+                severity:
+                  - from: '0'
+                    to: '40'
+                    color: orange
+                    hide: false
+                  - from: '40'
+                    to: '60'
+                    color: green
+                    hide: false
+                  - from: '60'
+                    to: '100'
+                    color: red
+                    hide: false
+                min: 0
+                max: 100
+          - type: entities
+            entities:
+              - entity: sensor.zion_air_pm2_5
+            state_color: true
+        title: Klima/Umgebung
+      - type: grid
+        cards: []
+        title: Geräte
+    cards: []
+  - title: Büro/Schlafen
+    path: buro-schlafen
+    type: sections
+    max_columns: 3
+    subview: true
+    icon: mdi:bed-king
+    sections:
+      - type: grid
+        cards:
+          - type: tile
+            entity: light.sofa_links
+            show_entity_picture: true
+            hide_state: true
+            vertical: false
+          - type: tile
+            entity: light.sofa_rechts
+            vertical: false
+            hide_state: true
+            show_entity_picture: true
+          - type: tile
+            entity: light.sofa_unten
+            vertical: false
+            hide_state: true
+            show_entity_picture: true
+          - type: tile
+            entity: light.schreibtisch_links
+            vertical: false
+            hide_state: true
+            show_entity_picture: true
+          - type: tile
+            entity: light.tv_backlight
+            hide_state: true
+          - type: tile
+            entity: light.lowboard_links
+            hide_state: true
+          - type: tile
+            entity: light.lowboard_rechts
+            hide_state: true
+          - type: tile
+            entity: light.sideboard
+            hide_state: true
+          - type: tile
+            entity: light.beleuchtung_highboard
+            hide_state: true
+        title: Beleuchtung
+      - type: grid
+        cards:
+          - type: custom:mushroom-cover-card
+            entity: cover.rolllade_sofa
+            show_position_control: true
+            show_buttons_control: false
+            fill_container: true
+            tap_action:
+              action: more-info
+          - type: custom:mushroom-cover-card
+            entity: cover.rolllade_balkon
+            show_position_control: true
+            tap_action:
+              action: more-info
+          - type: custom:bar-card
+            entities:
+              - entity: sensor.temperatur_wohnzimmer_sonoff_temperature
+                name: Temperatur
+                icon: mdi:thermometer
+                severity:
+                  - from: '20'
+                    to: '23'
+                    color: green
+                    hide: false
+                  - from: '23'
+                    to: '25'
+                    color: orange
+                    hide: false
+                  - from: '25'
+                    to: '30'
+                    color: red
+                    hide: false
+                min: 20
+                max: 30
+              - entity: sensor.temperatur_wohnzimmer_sonoff_humidity
+                name: Luftfeuchtigkeit
+                icon: mdi:thermometer
+                severity:
+                  - from: '0'
+                    to: '40'
+                    color: orange
+                    hide: false
+                  - from: '40'
+                    to: '60'
+                    color: green
+                    hide: false
+                  - from: '60'
+                    to: '100'
+                    color: red
+                    hide: false
+                min: 0
+                max: 100
+          - type: entities
+            entities:
+              - entity: sensor.zion_air_pm2_5
+            state_color: true
+        title: Klima/Umgebung
+      - type: grid
+        cards: []
+        title: Geräte
+    cards: []
+  - title: Emilys Zimmer
+    path: emilys-zimmer
+    type: sections
+    max_columns: 3
+    subview: true
+    icon: mdi:teddy-bear
+    sections:
+      - type: grid
+        cards:
+          - type: tile
+            entity: light.sofa_links
+            show_entity_picture: true
+            hide_state: true
+            vertical: false
+          - type: tile
+            entity: light.sofa_rechts
+            vertical: false
+            hide_state: true
+            show_entity_picture: true
+          - type: tile
+            entity: light.sofa_unten
+            vertical: false
+            hide_state: true
+            show_entity_picture: true
+          - type: tile
+            entity: light.schreibtisch_links
+            vertical: false
+            hide_state: true
+            show_entity_picture: true
+          - type: tile
+            entity: light.tv_backlight
+            hide_state: true
+          - type: tile
+            entity: light.lowboard_links
+            hide_state: true
+          - type: tile
+            entity: light.lowboard_rechts
+            hide_state: true
+          - type: tile
+            entity: light.sideboard
+            hide_state: true
+          - type: tile
+            entity: light.beleuchtung_highboard
+            hide_state: true
+        title: Beleuchtung
+      - type: grid
+        cards:
+          - type: custom:mushroom-cover-card
+            entity: cover.rolllade_sofa
+            show_position_control: true
+            show_buttons_control: false
+            fill_container: true
+            tap_action:
+              action: more-info
+          - type: custom:mushroom-cover-card
+            entity: cover.rolllade_balkon
+            show_position_control: true
+            tap_action:
+              action: more-info
+          - type: custom:bar-card
+            entities:
+              - entity: sensor.temperatur_wohnzimmer_sonoff_temperature
+                name: Temperatur
+                icon: mdi:thermometer
+                severity:
+                  - from: '20'
+                    to: '23'
+                    color: green
+                    hide: false
+                  - from: '23'
+                    to: '25'
+                    color: orange
+                    hide: false
+                  - from: '25'
+                    to: '30'
+                    color: red
+                    hide: false
+                min: 20
+                max: 30
+              - entity: sensor.temperatur_wohnzimmer_sonoff_humidity
+                name: Luftfeuchtigkeit
+                icon: mdi:thermometer
+                severity:
+                  - from: '0'
+                    to: '40'
+                    color: orange
+                    hide: false
+                  - from: '40'
+                    to: '60'
+                    color: green
+                    hide: false
+                  - from: '60'
+                    to: '100'
+                    color: red
+                    hide: false
+                min: 0
+                max: 100
+          - type: entities
+            entities:
+              - entity: sensor.zion_air_pm2_5
+            state_color: true
+        title: Klima/Umgebung
+      - type: grid
+        cards: []
+        title: Geräte
+    cards: []
+title: Home
