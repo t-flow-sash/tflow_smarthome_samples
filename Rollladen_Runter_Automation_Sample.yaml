@@ -1,0 +1,51 @@
+alias: Env-Blinds|Roll down blinds on sun
+description: ""
+trigger:
+  - platform: state
+    entity_id:
+      - sensor.sudseite
+    to: Sonnig
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+condition:
+  - condition: state
+    entity_id: input_boolean.rolladen_automation
+    state: "on"
+  - condition: state
+    entity_id: sensor.sudseite
+    state: Sonnig
+action:
+  - if:
+      - condition: and
+        conditions:
+          - condition: state
+            entity_id: input_boolean.emilys_nap
+            state: "off"
+          - condition: state
+            entity_id: input_boolean.good_night_emily
+            state: "off"
+    then:
+      - service: scene.turn_on
+        target:
+          entity_id: scene.blinds_beschattung_sonne_sudseite
+        metadata: {}
+      - service: automation.trigger
+        metadata: {}
+        data:
+          skip_condition: true
+        target:
+          entity_id: automation.turn_off_on_enough_daylight
+    else:
+      - service: scene.turn_on
+        target:
+          entity_id: scene.blinds_beschattung_sonne_sudseite_ohne_emily
+        metadata: {}
+      - service: automation.trigger
+        metadata: {}
+        data:
+          skip_condition: true
+        target:
+          entity_id: automation.turn_off_on_enough_daylight
+mode: single
