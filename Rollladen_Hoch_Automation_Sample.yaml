@@ -1,0 +1,54 @@
+alias: "ENV-Blinds|Open blinds when sun is gone "
+description: ""
+trigger:
+  - platform: time_pattern
+    minutes: /30
+    enabled: false
+  - platform: state
+    entity_id:
+      - sensor.sudseite
+    to: Nicht sonnig
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+condition:
+  - condition: state
+    entity_id: input_boolean.rolladen_automation
+    state: "on"
+  - condition: state
+    entity_id: sensor.sudseite
+    state: Nicht sonnig
+action:
+  - if:
+      - condition: and
+        conditions:
+          - condition: state
+            entity_id: input_boolean.emilys_nap
+            state: "off"
+          - condition: state
+            entity_id: input_boolean.good_night_emily
+            state: "off"
+    then:
+      - device_id: e715f5ea8bcb513a94de27af551d9354
+        domain: cover
+        entity_id: cover.rolllade_emily
+        type: open
+      - device_id: b4ad49e62b8c9a8ff1541625e96cfb09
+        domain: cover
+        entity_id: cover.rolllade_sofa
+        type: open
+      - device_id: 2911137347a4ef903dcb4342a95e6cfb
+        domain: cover
+        entity_id: cover.rolllade_kleines_kuchenfenster
+        type: open
+    else:
+      - device_id: b4ad49e62b8c9a8ff1541625e96cfb09
+        domain: cover
+        entity_id: cover.rolllade_sofa
+        type: open
+      - device_id: 2911137347a4ef903dcb4342a95e6cfb
+        domain: cover
+        entity_id: cover.rolllade_kleines_kuchenfenster
+        type: open
+mode: single
