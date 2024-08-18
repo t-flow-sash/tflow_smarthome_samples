@@ -1,0 +1,66 @@
+#########################################################################################################################################
+### WICHTIG - Den "Template Kontext" erstellt ihr nur einmal. Darunter kommen dann alle Sensoren, welche über Templates gebaut werden ###
+#########################################################################################################################################
+
+template:
+#####  Diese Sensoren vergleichen die Helligkeit mit dem in der Input Number Entity definierten Grenzwert
+  - sensor:
+      - name: Südseite
+        icon: mdi:weather-sunny
+        unique_id: sonne_sudseite
+        state: |
+          {% if states('sensor.sensor_balkon_helligkeit_illuminance_lux')|float > states('input_number.schwellwert_sudseite')|float %}
+             Sonnig
+          {% else %}
+             Nicht sonnig
+          {% endif %}
+  - sensor:
+      - name: Nordseite
+        icon: mdi:weather-sunny
+        unique_id: sonne_nordseite
+        state: |
+          {% if states('sensor.sensor_strasse_helligkeit_illuminance_lux')|float > states('input_number.schwellwert_nordseite')|float %}
+             Sonnig
+          {% else %}
+             Nicht sonnig
+          {% endif %}
+
+####### Dieser Sensor zählt die offenen Fenster/Türen - WICHTIG: Ich musste alles von meinem Auto ausklammern. Nutzt ihr eine Auto-Integration solltet ihr das auch tun, da in meinem Fall die offene Ladeklappe als offene TÜr mit eingerechnet wurden :D
+  - sensor:
+      - name: "Offene Fenster/Türen"
+        unique_id: open_window_count
+        icon: mdi:window-open-variant
+        state: | 
+          {{ states.binary_sensor | selectattr('attributes.device_class', 'eq', 'door') | selectattr('state', 'eq', 'on') | reject('search', 'ev6') | reject('search', 'gruppe')  | list | count +
+             states.binary_sensor | selectattr('attributes.device_class', 'eq', 'window') | selectattr('state', 'eq', 'on') | reject('search', 'ev6') | reject('search', 'gruppe')  | list | count }}
+
+####### Dieser Sensor zählt alle Entitäten der Classe "Battery". Ein paar Z-Wave Geräte liefern unnütze Battery-Sensoren, welche ich hier auch ausgeklammert habe
+- sensor:
+      - name: "Low Batt"
+        icon: mdi:battery-outline
+        state: | 
+          {% set count = namespace(value=0) %}
+          {% for state in states.sensor %}
+            {% if state.attributes.device_class == 'battery' and state.state != 'unknown' and state.state != 'unavailable' %}
+              {% if 'z-wave' not in state.name.lower() %}
+                  {% if state.state | float < 20 %}
+                    {% set count.value = count.value + 1 %}
+                  {% endif %}
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+          {{ count.value }}
+
+###### Wer es mag, der Sensor um alle eingeschalteten einzelenn Lichter zu zählen.
+  - sensor:
+      - name: "Lights turned on"
+        icon: mdi:light-flood-up
+        state: |
+          {{ states.light 
+            | rejectattr('attributes.entity_id', 'defined') 
+            | rejectattr('attributes.is_hue_group', 'true') 
+            | selectattr('state', 'eq', 'on') 
+            | reject('search', 'screen')
+            | reject('search', 'segment')            
+            | list
+            | count }}
