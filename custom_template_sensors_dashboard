@@ -1,5 +1,6 @@
 #########################################################################################################################################
 ### WICHTIG - Den "Template Kontext" erstellt ihr nur einmal. Darunter kommen dann alle Sensoren, welche über Templates gebaut werden ###
+###                     Die unten aufgeführten Sensor-Configs kopiert ihr in eure configuration.yaml                                  ###
 #########################################################################################################################################
 
 template:
