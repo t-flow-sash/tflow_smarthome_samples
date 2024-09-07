@@ -1,0 +1,239 @@
+type: custom:swipe-card
+parameters:
+  spaceBetween: 8
+  effect: coverflow
+  grabCursor: false
+  centeredSlides: false
+  slidesPerView: auto
+  coverflowEffect:
+    rotate: 50
+    stretch: 0
+    depth: 100
+    modifier: 1
+    slideShadows: true
+  pagination:
+    type: bullets
+cards:
+  - type: vertical-stack
+    cards:
+      - type: custom:mushroom-light-card
+        entity: light.arbeitsplatte
+        name: Licht Arbeitsplatte
+        tap_action:
+          action: call-service
+          service: input_button.press
+          target:
+            entity_id: input_button.licht_arbeitsplatte
+        layout: vertical
+        secondary_info: none
+        icon_height: 30px
+      - type: horizontal-stack
+        cards:
+          - type: custom:mushroom-light-card
+            entity: light.esstisch_unten
+            name: Esstisch
+            tap_action:
+              action: call-service
+              service: input_button.press
+              target:
+                entity_id: input_button.lunch_light
+            layout: vertical
+            secondary_info: none
+            icon_height: 30px
+          - type: custom:mushroom-light-card
+            entity: light.schreibtisch_links
+            name: Leselampe
+            layout: vertical
+            secondary_info: none
+            icon_height: 30px
+            tap_action:
+              action: more-info
+      - type: custom:gap-card
+        height: 10
+      - type: horizontal-stack
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: automation.turn_on_lights_if_too_dark
+            name: WZ & Küche Ambiente
+            tap_action:
+              action: call-service
+              service: automation.trigger
+              target:
+                entity_id: automation.turn_on_lights_if_too_dark
+              skip_conditions: true
+            layout: vertical
+            secondary_info: none
+            icon_height: 30px
+            icon: mdi:light-flood-up
+      - type: horizontal-stack
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: script.living_room_full_brightness
+            name: WZ volle Helligkeit
+            tap_action:
+              action: toggle
+            layout: vertical
+            secondary_info: none
+            icon_height: 30px
+            icon: mdi:lightbulb
+          - type: custom:mushroom-entity-card
+            entity: scene.kitchen_work_place_hue_christmas_kitchen
+            name: WZ Warmes Licht
+            tap_action:
+              action: call-service
+              service: hue.activate_scene
+              target:
+                entity_id:
+                  - scene.kitchen_work_place_hue_christmas_kitchen
+                  - scene.logical_living_room_hue_christmas
+            layout: vertical
+            secondary_info: none
+            icon_height: 30px
+      - type: custom:gap-card
+        height: 10
+      - type: horizontal-stack
+        cards:
+          - type: custom:mushroom-light-card
+            name: Alle Räume hell
+            entity: light.all_lights
+            tap_action:
+              action: call-service
+              service: light.turn_on
+              data:
+                color_temp: 400
+                brightness_pct: 100
+              target:
+                entity_id: all
+            layout: vertical
+            secondary_info: none
+            icon_height: 30px
+          - type: custom:mushroom-light-card
+            name: Alle Lampen aus
+            entity: light.all_lights
+            tap_action:
+              action: call-service
+              service: light.turn_off
+              target:
+                entity_id: all
+            layout: vertical
+            secondary_info: none
+            icon_height: 30px
+  - type: vertical-stack
+    cards:
+      - type: horizontal-stack
+        cards:
+          - type: button
+            entity: input_boolean.good_night_switch
+            tap_action:
+              action: toggle
+            layout: vertical
+            secondary_info: none
+            icon_height: 30px
+      - type: horizontal-stack
+        cards:
+          - entity: group.gruppe_good_night_kids
+            show_name: true
+            show_icon: true
+            type: button
+            icon: mdi:teddy-bear
+            tap_action:
+              action: fire-dom-event
+              browser_mod:
+                service: browser_mod.popup
+                data:
+                  title: Routine auswählen
+                  content:
+                    type: vertical-stack
+                    cards:
+                      - type: horizontal-stack
+                        cards:
+                          - show_name: true
+                            show_icon: true
+                            type: custom:mushroom-entity-card
+                            tap_action:
+                              action: toggle
+                            entity: input_boolean.good_night_emily
+                            layout: vertical
+                            secondary_info: none
+                            icon_height: 30px
+                          - show_name: true
+                            show_icon: true
+                            type: custom:mushroom-entity-card
+                            tap_action:
+                              action: toggle
+                            entity: input_boolean.good_night_lia
+                            layout: vertical
+                            secondary_info: none
+                            icon_height: 30px
+                      - type: horizontal-stack
+                        cards:
+                          - show_name: true
+                            show_icon: true
+                            type: custom:mushroom-entity-card
+                            tap_action:
+                              action: toggle
+                            entity: input_boolean.lias_nickerchen
+                            show_state: false
+                            layout: vertical
+                            secondary_info: none
+                            icon_height: 30px
+            icon_height: 30px
+      - type: custom:gap-card
+        height: 10
+      - type: horizontal-stack
+        cards:
+          - type: button
+            name: WZ TV/Gaming
+            entity: scene.blinds_tv_gaming_new
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              target:
+                entity_id: scene.blinds_tv_gaming_new
+              data: {}
+            secondary_info: none
+            icon_height: 30px
+          - type: button
+            name: WZ Rolladen hoch
+            entity: scene.blinds_living_room_all_up
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              target:
+                entity_id: scene.blinds_living_room_all_up
+              data: {}
+            secondary_info: none
+            icon_height: 30px
+      - type: horizontal-stack
+        cards:
+          - type: button
+            entity: input_button.all_blinds_up
+            name: Alle Rollladen hoch
+            tap_action:
+              action: toggle
+            layout: vertical
+            secondary_info: none
+            icon_height: 30px
+            icon: mdi:window-shutter-open
+          - type: button
+            entity: input_button.all_blinds_down
+            name: Alle Rollladen runter
+            tap_action:
+              action: toggle
+            layout: vertical
+            secondary_info: none
+            icon_height: 30px
+      - type: custom:gap-card
+        height: 10
+      - type: horizontal-stack
+        cards:
+          - type: button
+            entity: input_button.leaving_switch
+            name: Good Bye
+            tap_action:
+              action: toggle
+            layout: vertical
+            secondary_info: none
+            icon_height: 30px
+view_layout:
+  grid-area: left
