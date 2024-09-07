@@ -1,0 +1,138 @@
+type: vertical-stack
+cards:
+  - type: custom:bubble-card
+    card_type: pop-up
+    entity: light.kuche
+    icon: mdi:table-chair
+    name: Küche
+    hash: '#lichtkueche'
+    width_desktop: 900px
+    margin_top_mobile: 18px
+    margin_top_desktop: 74px
+    styles: |
+      #root {
+        /* This is a fix for older Safari (for my wall-mounted iPad) but it won't work on Firefox, this is optional */
+        display: grid !important;
+      }
+    auto_close: ''
+    is_sidebar_hidden: true
+    show_attribute: true
+    attribute: brightness
+    button_type: slider
+  - type: custom:bubble-card
+    card_type: separator
+    name: Beleuchtung Arbeitsplatte
+    icon: mdi:lightbulb
+  - type: horizontal-stack
+    cards:
+      - type: custom:bubble-card
+        card_type: button
+        button_type: slider
+        entity: light.arbeitsplatte_links
+        name: Links
+        icon: mdi:faucet-variant
+        show_state: true
+      - type: custom:bubble-card
+        card_type: button
+        button_type: slider
+        entity: light.arbeitsplatte_rechts
+        name: Rechts
+        icon: mdi:faucet-variant
+        show_state: true
+  - type: horizontal-stack
+    cards:
+      - type: custom:bubble-card
+        card_type: button
+        button_type: slider
+        entity: light.dimmable_light_1
+        name: Rechts außen
+        icon: mdi:faucet-variant
+        show_state: true
+  - type: custom:bubble-card
+    card_type: separator
+    name: Ambientebeleuchtung
+    icon: mdi:floor-lamp-dual
+  - type: horizontal-stack
+    cards:
+      - type: custom:bubble-card
+        card_type: button
+        button_type: slider
+        entity: light.kuche_oben
+        name: Küche oben
+        icon: mdi:led-strip-variant
+        show_state: true
+      - type: custom:bubble-card
+        card_type: button
+        button_type: slider
+        entity: light.esstisch_oben
+        name: Esstisch oben
+        icon: mdi:ceiling-light
+        show_state: true
+  - type: custom:bubble-card
+    card_type: separator
+    name: Lichtszenen
+    icon: mdi:palette-outline
+  - type: custom:mushroom-chips-card
+    chips:
+      - type: entity
+        entity: scene.arbeitsplatte_kitchen_ambiente_hue
+        content_info: name
+        name: Ambientelicht
+        tap_action:
+          action: toggle
+      - type: entity
+        entity: scene.wohnzimmer_hue_nachtlicht_wz
+        content_info: name
+        tap_action:
+          action: toggle
+        name: Nachtlicht
+    alignment: center
+  - type: custom:bubble-card
+    card_type: separator
+    name: Rollladen
+    icon: mdi:window-shutter
+  - type: horizontal-stack
+    cards:
+      - type: custom:bubble-card
+        card_type: cover
+        entity: cover.rolllade_kleines_kuchenfenster
+        name: Kl. Küchenfenster
+        show_state: true
+  - type: horizontal-stack
+    cards:
+      - type: custom:mushroom-chips-card
+        chips:
+          - type: entity
+            entity: scene.blinds_beschattung_sonne_sudseite_ohne_emily
+            tap_action:
+              action: toggle
+            content_info: name
+            name: Südseite Beschattung
+          - type: entity
+            entity: scene.blinds_living_room_all_up
+            tap_action:
+              action: toggle
+            content_info: name
+            name: Alle Rollladen hoch
+        alignment: center
+  - type: custom:bubble-card
+    card_type: separator
+    name: Steckdosen
+    icon: mdi:devices
+  - type: horizontal-stack
+    cards:
+      - type: custom:bubble-card
+        card_type: button
+        entity: sensor.steckdose_kuchenzeile_power
+        show_state: true
+        icon: mdi:power-plug
+        name: Küchenzeile 1
+      - type: custom:bubble-card
+        card_type: button
+        entity: sensor.steckdose_kuche_2_power
+        show_state: true
+        icon: mdi:power-plug
+        name: Küchenzeile 2
+        button_type: switch
+view_layout:
+  grid-area: footer2
