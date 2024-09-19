@@ -1,0 +1,155 @@
+alias: Turn on lights if too dark
+description: ""
+trigger:
+  - platform: state
+    entity_id:
+      - binary_sensor.wohnzimmer_hue_sensor_motion
+    from: "off"
+    to: "on"
+  - platform: numeric_state
+    entity_id: cover.rollladen_wohnzimmer
+    attribute: current_position
+    above: 99
+  - platform: state
+    entity_id:
+      - binary_sensor.wohnzimmer_motion_aqara_occupancy
+    from: "off"
+    to: "on"
+  - platform: state
+    entity_id:
+      - binary_sensor.wohnzimmer
+    from: "off"
+    to: "on"
+  - platform: state
+    entity_id:
+      - sensor.helligkeit_innen
+    from: Hell
+    to: Dunkel
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+condition:
+  - condition: and
+    conditions:
+      - condition: state
+        state: "off"
+        entity_id: light.beleuchtung_highboard
+      - condition: or
+        conditions:
+          - condition: state
+            entity_id: person.janine
+            state: home
+          - condition: state
+            entity_id: person.sascha_thiebach
+            state: home
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: alarm_control_panel.zu_hause_alarm
+            state: armed_home
+      - condition: state
+        entity_id: light.sideboard
+        state: "off"
+      - condition: numeric_state
+        entity_id: sensor.mittelwert_licht_aussen
+        below: 2500
+      - condition: state
+        for:
+          hours: 0
+          minutes: 0
+          seconds: 0
+        entity_id: input_boolean.light_automation
+        state: "on"
+      - condition: state
+        for:
+          hours: 0
+          minutes: 10
+          seconds: 0
+        entity_id: sensor.helligkeit_innen
+        state: Dunkel
+action:
+  - if:
+      - condition: state
+        entity_id: light.arbeitsplatte_rechts
+        state: "on"
+    then:
+      - data:
+          transition: 10
+        target:
+          entity_id: scene.logical_living_room_hue_living_room_ambiente_hue
+        action: hue.activate_scene
+      - type: turn_on
+        device_id: 545ecd972085e2a1ef6b71bef42bdf7e
+        entity_id: d63a14c7bb64572bcdf2f7129c4e81e9
+        domain: switch
+        enabled: false
+      - data:
+          delay_secs: 1
+          hold_secs: 0
+          device: candle
+          command: power_on
+        target:
+          entity_id: remote.ir_tv
+        alias: Turn on candles
+        action: remote.send_command
+      - if:
+          - condition: not
+            conditions:
+              - condition: state
+                entity_id: media_player.sony_kd_65xg9505_2
+                state: "off"
+        then:
+          - data:
+              sync: true
+            action: huesyncbox.set_sync_state
+    else:
+      - data:
+          transition: 5
+        target:
+          entity_id:
+            - scene.arbeitsplatte_kitchen_ambiente_hue
+            - scene.logical_living_room_hue_living_room_ambiente_hue
+        action: hue.activate_scene
+      - type: turn_on
+        device_id: 545ecd972085e2a1ef6b71bef42bdf7e
+        entity_id: d63a14c7bb64572bcdf2f7129c4e81e9
+        domain: switch
+        enabled: false
+      - data:
+          delay_secs: 1
+          hold_secs: 0
+          device: candle
+          command: power_on
+        target:
+          entity_id: remote.ir_tv
+        alias: Turn on candles
+        action: remote.send_command
+      - if:
+          - condition: not
+            conditions:
+              - condition: state
+                entity_id: media_player.sony_kd_65xg9505_2
+                state: "off"
+        then:
+          - data: {}
+            target:
+              entity_id: switch.sync_box_light_sync
+            action: switch.turn_on
+  - if:
+      - condition: state
+        entity_id: input_boolean.good_night_emily
+        state: "off"
+    then:
+      - data: {}
+        target:
+          entity_id: scene.emilys_zimmer_evening_light_emily
+        action: hue.activate_scene
+      - metadata: {}
+        data:
+          brightness_pct: 100
+          effect: Love
+        target:
+          entity_id: light.neon_emily
+        action: light.turn_on
+mode: single
