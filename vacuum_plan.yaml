@@ -1,0 +1,237 @@
+alias: "VAC|On schedule: Clean rooms every two days based on vacation "
+description: ""
+trigger:
+  - platform: time
+    at: "17:00:00"
+condition:
+  - condition: and
+    conditions:
+      - condition: time
+        weekday:
+          - tue
+          - thu
+          - sat
+      - condition: state
+        entity_id: input_boolean.vacuum_schedule
+        state: "on"
+action:
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.arbeit_pc
+            state: "off"
+        sequence:
+          - if:
+              - condition: state
+                entity_id: input_boolean.urlaubs_modus
+                state: "on"
+            then:
+              - data:
+                  command: set_water_box_custom_mode
+                  params: 200
+                alias: Kein Mop
+                target:
+                  entity_id: vacuum.roborock_s8
+                action: vacuum.send_command
+              - data:
+                  command: set_custom_mode
+                  params: 102
+                alias: Vac Mode Balanced
+                target:
+                  entity_id: vacuum.roborock_s8
+                enabled: true
+                action: vacuum.send_command
+              - alias: Alle Räume wenn im Urlaub
+                data:
+                  segments:
+                    - 24
+                    - 17
+                    - 18
+                    - 22
+                    - 16
+                    - 19
+                    - 25
+                    - 20
+                    - 21
+                target:
+                  entity_id: vacuum.roborock_s8
+                action: roborock.vacuum_clean_segment
+            else:
+              - if:
+                  - condition: state
+                    entity_id: vacuum.roborock_s8
+                    attribute: waterBoxCarriageStatus
+                    state: 0
+                then:
+                  - data:
+                      message: >-
+                        Raumreinigung startet in 5 Minuten. Für Nassreinigung
+                        bitte Mop jetzt anbringen und Wasserstand prüfen.
+                    action: notify.alexa_media_echo_show_wohnzimmer
+                  - data:
+                      message: >-
+                        Raumreinigung startet in 5 Minuten. Für Nassreinigung
+                        bitte Mop jetzt anbringen und Wasserstand prüfen.
+                      title: Kein Mop angebracht!
+                    action: notify.notify
+                  - delay:
+                      hours: 0
+                      minutes: 5
+                      seconds: 0
+                      milliseconds: 0
+                alias: Alexa Mop Info wenn kein Mop
+              - alias: Vac Mode Balanced
+                data:
+                  command: set_custom_mode
+                  params: 102
+                target:
+                  entity_id: vacuum.roborock_s8
+                enabled: true
+                action: vacuum.send_command
+              - data:
+                  command: set_water_box_custom_mode
+                  params: 203
+                target:
+                  entity_id: vacuum.roborock_s8
+                alias: Mop Mode "intense"
+                action: vacuum.send_command
+              - data:
+                  command: set_mop_mode
+                  params: 300
+                target:
+                  entity_id: vacuum.roborock_s8
+                alias: Mop Route Standard
+                action: vacuum.send_command
+              - alias: Nur Nebenräume wenn zu Hause
+                data:
+                  segments:
+                    - 24
+                    - 17
+                    - 18
+                    - 22
+                    - 16
+                    - 19
+                    - 25
+                target:
+                  entity_id: vacuum.roborock_s8
+                action: roborock.vacuum_clean_segment
+              - data: {}
+                target:
+                  entity_id: input_number.mop_cleaning_count
+                action: input_number.increment
+      - conditions:
+          - condition: state
+            entity_id: binary_sensor.arbeit_pc
+            state: "on"
+        sequence:
+          - wait_for_trigger:
+              - platform: state
+                entity_id:
+                  - binary_sensor.arbeit_pc
+                from: "on"
+                to: "off"
+            timeout:
+              hours: 1
+              minutes: 0
+              seconds: 0
+              milliseconds: 0
+            continue_on_timeout: false
+          - if:
+              - condition: state
+                entity_id: input_boolean.urlaubs_modus
+                state: "on"
+            then:
+              - data:
+                  command: set_water_box_custom_mode
+                  params: 200
+                alias: Kein Mop
+                target:
+                  entity_id: vacuum.roborock_s8
+                action: vacuum.send_command
+              - data:
+                  command: set_custom_mode
+                  params: 102
+                alias: Vac Mode Balanced
+                target:
+                  entity_id: vacuum.roborock_s8
+                enabled: true
+                action: vacuum.send_command
+              - alias: Alle Räume wenn im Urlaub
+                data:
+                  segments:
+                    - 24
+                    - 17
+                    - 18
+                    - 22
+                    - 16
+                    - 19
+                    - 25
+                    - 20
+                    - 21
+                target:
+                  entity_id: vacuum.roborock_s8
+                action: roborock.vacuum_clean_segment
+            else:
+              - if:
+                  - condition: state
+                    entity_id: vacuum.roborock_s8
+                    attribute: waterBoxCarriageStatus
+                    state: 0
+                then:
+                  - data:
+                      message: >-
+                        Raumreinigung startet in 5 Minuten. Für Nassreinigung
+                        bitte Mop jetzt anbringen und Wasserstand prüfen.
+                    action: notify.alexa_media_echo_show_wohnzimmer
+                  - data:
+                      message: >-
+                        Raumreinigung startet in 5 Minuten. Für Nassreinigung
+                        bitte Mop jetzt anbringen und Wasserstand prüfen.
+                      title: Kein Mop angebracht!
+                    action: notify.notify
+                  - delay:
+                      hours: 0
+                      minutes: 5
+                      seconds: 0
+                      milliseconds: 0
+                alias: Alexa Mop Info wenn kein Mop
+              - alias: Vac Mode Balanced
+                data:
+                  command: set_custom_mode
+                  params: 102
+                target:
+                  entity_id: vacuum.roborock_s8
+                enabled: true
+                action: vacuum.send_command
+              - data:
+                  command: set_water_box_custom_mode
+                  params: 203
+                target:
+                  entity_id: vacuum.roborock_s8
+                alias: Mop Mode "intense"
+                action: vacuum.send_command
+              - data:
+                  command: set_mop_mode
+                  params: 300
+                target:
+                  entity_id: vacuum.roborock_s8
+                alias: Mop Route Standard
+                action: vacuum.send_command
+              - alias: Nur Nebenräume wenn zu Hause
+                data:
+                  segments:
+                    - 24
+                    - 17
+                    - 18
+                    - 22
+                    - 16
+                    - 19
+                    - 25
+                target:
+                  entity_id: vacuum.roborock_s8
+                action: roborock.vacuum_clean_segment
+              - data: {}
+                target:
+                  entity_id: input_number.mop_cleaning_count
+                action: input_number.increment
+mode: single
