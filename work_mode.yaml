@@ -1,0 +1,68 @@
+alias: ROUTINE|Work mode im Büro
+description: ""
+trigger:
+  - platform: state
+    entity_id:
+      - binary_sensor.arbeit_pc
+    to: "on"
+    id: work-on
+  - platform: state
+    entity_id:
+      - binary_sensor.arbeit_pc
+    to: "off"
+    id: work-off
+    for:
+      hours: 0
+      minutes: 3
+      seconds: 0
+condition: []
+action:
+  - if:
+      - condition: or
+        conditions:
+          - condition: trigger
+            id: work-on
+    then:
+      - data:
+          media_content_id: play Star FM Alternative on tunein
+          media_content_type: custom
+        target:
+          entity_id: media_player.saschas_echo_dot
+        action: media_player.play_media
+      - metadata: {}
+        data:
+          brightness_pct: 100
+          rgb_color:
+            - 254
+            - 80
+            - 22
+        target:
+          entity_id: light.neon_light_desk_2
+        action: light.turn_on
+      - metadata: {}
+        data:
+          percentage: 50
+        target:
+          entity_id: fan.levoit_schlafzimmer
+        action: fan.set_percentage
+  - if:
+      - condition: or
+        conditions:
+          - condition: trigger
+            id: work-off
+    then:
+      - data: {}
+        target:
+          entity_id: media_player.saschas_echo_dot
+        action: media_player.media_stop
+      - type: turn_off
+        device_id: ead5c4d769d4f007f06490d9ef4c2eb4
+        entity_id: 0406276c59ee6a5aa00ff7d01f0978fd
+        domain: light
+      - metadata: {}
+        data:
+          preset_mode: auto
+        target:
+          entity_id: fan.levoit_schlafzimmer
+        action: fan.set_preset_mode
+mode: single
