@@ -1,0 +1,51 @@
+alias: Leaving home
+description: ""
+trigger:
+  - platform: state
+    entity_id:
+      - input_button.leaving_switch
+  - platform: state
+    entity_id:
+      - input_boolean.urlaubs_modus
+    to: "on"
+condition: []
+action:
+  - metadata: {}
+    data: {}
+    target:
+      entity_id: lock.smart_lock_pro
+    action: lock.unlock
+  - alias: Turn off candles
+    data:
+      delay_secs: 1
+      hold_secs: 0
+      device: candle
+      command: power_off
+    target:
+      entity_id: remote.ir_tv
+    enabled: false
+    action: remote.send_command
+  - data:
+      color_temp: 380
+      brightness_pct: 100
+    target:
+      entity_id: light.flur_hue
+    action: light.turn_on
+  - wait_for_trigger:
+      - platform: state
+        entity_id:
+          - binary_sensor.haustur
+        from: "on"
+        to: "off"
+    timeout:
+      hours: 0
+      minutes: 20
+      seconds: 0
+      milliseconds: 0
+  - data: {}
+    action: script.1683906607862
+  - device_id: ff7904c2afff155245c3d4eb6cdc7855
+    domain: alarm_control_panel
+    entity_id: alarm_control_panel.zu_hause_alarm
+    type: arm_away
+mode: single
