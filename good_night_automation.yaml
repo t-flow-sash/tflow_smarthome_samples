@@ -1,0 +1,200 @@
+alias: Good night
+description: ""
+trigger:
+  - platform: state
+    entity_id:
+      - input_boolean.good_night_switch
+    from: "off"
+    to: "on"
+  - platform: event
+    event_type: ios.action_fired
+    event_data:
+      actionID: 22303289-42CC-4D72-9947-C3E12E120C8D
+condition: []
+action:
+  - metadata: {}
+    data: {}
+    target:
+      entity_id: switch.sync_box_light_sync
+    action: switch.turn_off
+  - metadata: {}
+    data:
+      percentage: 65
+    target:
+      entity_id: fan.levoit_schlafzimmer
+    action: fan.set_percentage
+  - metadata: {}
+    data:
+      brightness_pct: 15
+      rgb_color:
+        - 255
+        - 0
+        - 38
+    target:
+      device_id: ead5c4d769d4f007f06490d9ef4c2eb4
+    enabled: false
+    action: light.turn_on
+  - device_id: 16fa25c9005780c65398ebf80b4b1157
+    domain: light
+    entity_id: light.wohnzimmer_hue
+    type: turn_on
+    brightness_pct: 25
+  - metadata: {}
+    data:
+      dismissable: false
+      content:
+        type: custom:circular-timer-card
+        entity: timer.good_night_mode_timer
+        name: Good Night
+        bins: 60
+        color:
+          - "#1e7883"
+          - "#a9bdbb"
+          - "#ee7256"
+      right_button: "Routine abbrechen "
+      right_button_action:
+        service: script.stop_and_start_good_night_routine
+        metadata: {}
+        data: {}
+      title: "Nacht-Modus aktivieren "
+    action: browser_mod.popup
+  - target:
+      entity_id: timer.good_night_mode_timer
+    data: {}
+    action: timer.start
+  - type: turn_off
+    device_id: 992a2e48ba9f30dc8887f10b07efae79
+    entity_id: switch.wohnzimmer_hue_sensor_motion
+    domain: switch
+  - alias: Turn off candles
+    data:
+      delay_secs: 1
+      hold_secs: 0
+      device: candle
+      command: power_off
+    target:
+      entity_id: remote.ir_tv
+    action: remote.send_command
+  - if:
+      - condition: state
+        entity_id: lock.wohnungstur
+        state: unlocked
+    then:
+      - metadata: {}
+        data: {}
+        target:
+          entity_id: lock.wohnungstur
+        action: lock.lock
+    alias: Lock door
+  - wait_for_trigger:
+      - platform: state
+        entity_id:
+          - timer.good_night_mode_timer
+        from: active
+        to: idle
+  - target:
+      device_id:
+        - 997e290663822692fc0e65b6a06c338e
+        - 905e659e7968621940a3d917262bfd1b
+    data: {}
+    action: browser_mod.close_popup
+  - metadata: {}
+    data:
+      brightness_pct: 15
+    target:
+      entity_id: light.spots_balkon_2
+    action: light.turn_on
+  - metadata: {}
+    data:
+      brightness_pct: 10
+    target:
+      entity_id: light.light_strings_balkon_2
+    action: light.turn_on
+  - type: turn_off
+    device_id: 7e4f2ff570b041aa75068c0bcf499915
+    entity_id: 0818f1afec7de6435433fb5d7bc6f8ad
+    domain: switch
+  - type: turn_off
+    device_id: 445e8bce48ffe2929fdc3d0c4c164a7d
+    entity_id: light.beleuchtung_highboard
+    domain: light
+  - type: turn_on
+    device_id: 992a2e48ba9f30dc8887f10b07efae79
+    entity_id: switch.wohnzimmer_hue_sensor_motion
+    domain: switch
+  - type: turn_off
+    device_id: 16fa25c9005780c65398ebf80b4b1157
+    entity_id: light.wohnzimmer_hue
+    domain: light
+  - type: turn_off
+    device_id: 16fa25c9005780c65398ebf80b4b1157
+    entity_id: light.flur_hue
+    domain: light
+  - metadata: {}
+    data:
+      transition: 15
+    target:
+      device_id: ead5c4d769d4f007f06490d9ef4c2eb4
+    action: light.turn_off
+  - data:
+      value: "10"
+    target:
+      entity_id: number.lenovo_tab_m10_plus_3rd_gen_bildschirmhelligkeit
+    action: number.set_value
+  - data: {}
+    target:
+      entity_id: alarm_control_panel.zu_hause_alarm
+    enabled: true
+    action: alarm_control_panel.alarm_arm_home
+  - metadata: {}
+    data:
+      preset_mode: sleep
+    target:
+      entity_id: fan.levoit_schlafzimmer
+    action: fan.set_preset_mode
+  - delay:
+      hours: 0
+      minutes: 30
+      seconds: 0
+      milliseconds: 0
+    enabled: false
+  - if:
+      - condition: time
+        weekday:
+          - tue
+          - thu
+          - sat
+      - condition: state
+        entity_id: input_boolean.vacuum_schedule
+        state: "on"
+    then:
+      - data:
+          skip_condition: true
+        enabled: true
+        target:
+          entity_id: automation.vac_quick_combined_cleaning_wohnzimmer
+        action: automation.trigger
+    else:
+      - if:
+          - condition: state
+            entity_id: input_boolean.vacuum_schedule
+            state: "on"
+        then:
+          - data:
+              skip_condition: true
+            enabled: true
+            target:
+              entity_id: automation.vac_wohnbereich_kuche_saugen
+            action: automation.trigger
+    enabled: false
+    alias: "Start vacuum based on day "
+  - wait_for_trigger:
+      - platform: sun
+        event: sunrise
+        offset: "-01:00:00"
+  - device_id: 2b6695d8cfafe9e065cab7f815e03e57
+    domain: cover
+    entity_id: fc05cbaafa038ac0f14b8485af0f4fc1
+    type: set_position
+    position: 7
+mode: restart
