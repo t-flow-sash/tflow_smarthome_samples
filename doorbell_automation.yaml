@@ -1,0 +1,82 @@
+alias: NOTIFY|Doorbell
+description: ""
+triggers:
+  - type: turned_on
+    device_id: 03f6957ceccd738a7925ad67e5ca7e13
+    entity_id: 7d9bd6a8d82f086baeded51671caa583
+    domain: binary_sensor
+    trigger: device
+conditions: []
+actions:
+  - metadata: {}
+    data:
+      message: Achtung! Es klingelt an der Tür
+      title: "*** TÜRKLINGEL ***"
+    action: notify.mobile_app_iphone_von_janini
+  - data:
+      message: Achtung! Es klingelt an der Tür
+      title: "*** TÜRKLINGEL ***"
+      data:
+        url: /dashboard-playground/sicherheit
+        actions:
+          - action: open_main_door
+            title: Haustür öffnen
+    action: notify.mobile_app_zion_ios_14
+  - action: media_player.volume_set
+    metadata: {}
+    data:
+      volume_level: 0.5
+    target:
+      device_id: 083a620664fb89d6744b4abe44b4e06d
+      entity_id: media_player.saschas_echo_dot
+  - metadata: {}
+    data:
+      message: Achtung! Es hat an der Tür geklingelt!
+    action: notify.alexa_media_echo_show_wohnzimmer
+  - action: notify.alexa_media_saschas_echo_dot
+    data:
+      message: Achtung! Es hat an der Tür geklingelt!
+  - metadata: {}
+    data:
+      dismissable: true
+      content:
+        show_state: false
+        show_name: false
+        camera_view: live
+        type: picture-entity
+        image: https://demo.home-assistant.io/stub_config/bedroom.png
+        entity: camera.cam_eingang_fliessend
+        camera_image: camera.cam_eingang_fliessend
+      title: Flur-Überwachung
+      browser_id:
+        - 997e290663822692fc0e65b6a06c338e
+        - cb8c74dc8c7e2edee22a15af413efbc0
+      autoclose: false
+      timeout: 30000
+      size: wide
+      right_button: Türen öffnen
+      right_button_action:
+        service: script.alle_turen_entsperren
+        metadata: {}
+        data: {}
+    action: browser_mod.popup
+  - action: media_player.volume_set
+    metadata: {}
+    data:
+      volume_level: 0.2
+    target:
+      device_id: 083a620664fb89d6744b4abe44b4e06d
+      entity_id: media_player.saschas_echo_dot
+  - wait_for_trigger:
+      - trigger: event
+        event_type: mobile_app_notification_action
+        event_data:
+          action: open_main_door
+    timeout:
+      hours: 0
+      minutes: 0
+      seconds: 30
+      milliseconds: 0
+  - action: script.hauseingang_entsperren
+    data: {}
+mode: restart
