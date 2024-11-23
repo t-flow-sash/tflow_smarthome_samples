@@ -1,0 +1,29 @@
+alias: Show cam on unlock
+description: ""
+triggers:
+  - device_id: 50dae049a07a0442c0b4df80e379a43c
+    domain: lock
+    entity_id: bf2b80c52bc0de1c8e044741dac92bf8
+    type: unlocked
+    trigger: device
+conditions: []
+actions:
+  - metadata: {}
+    data:
+      dismissable: true
+      content:
+        show_state: false
+        show_name: false
+        camera_view: live
+        type: picture-entity
+        image: https://demo.home-assistant.io/stub_config/bedroom.png
+        entity: camera.camera_hub_g3_3b5e
+        camera_image: camera.camera_hub_g3_3b5e
+      title: Flur-Überwachung
+      browser_id:
+        - 997e290663822692fc0e65b6a06c338e
+        - cb8c74dc8c7e2edee22a15af413efbc0
+      autoclose: false
+      timeout: 30000
+    action: browser_mod.popup
+mode: single
