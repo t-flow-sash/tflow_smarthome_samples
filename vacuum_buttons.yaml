@@ -1,0 +1,371 @@
+type: custom:tabbed-card
+tabs:
+  - attributes:
+      label: Saugen
+    card:
+      type: vertical-stack
+      cards:
+        - type: grid
+          columns: 3
+          cards:
+            - type: button
+              name: Flur
+              entity: vacuum.roborock_s8_maxv_ultra
+              layout: vertical
+              icon_height: 50px
+              fill_container: true
+              icon: mdi:wardrobe-outline
+              secondary_info: none
+              tap_action:
+                action: call-service
+                service: automation.trigger
+                target:
+                  entity_id: automation.vac_flur_saugen
+                data:
+                  skip_condition: true
+            - type: button
+              name: Wohnzimmer & Küche
+              entity: vacuum.roborock_s8_maxv_ultra
+              layout: vertical
+              fill_container: true
+              icon: mdi:sofa
+              secondary_info: none
+              tap_action:
+                action: call-service
+                service: automation.trigger
+                target:
+                  entity_id: automation.vac_wohnbereich_kuche_saugen
+                data:
+                  skip_condition: true
+            - type: button
+              name: Emilys Zimmer
+              entity: vacuum.roborock_s8_maxv_ultra
+              layout: vertical
+              fill_container: true
+              icon: mdi:teddy-bear
+              secondary_info: none
+              tap_action:
+                action: call-service
+                service: automation.trigger
+                target:
+                  entity_id: automation.vac_emilys_zimmer_saugen
+                data:
+                  skip_condition: true
+            - type: button
+              name: Büro
+              entity: vacuum.roborock_s8_maxv_ultra
+              layout: vertical
+              fill_container: true
+              icon: mdi:desk
+              secondary_info: none
+              tap_action:
+                action: call-service
+                service: automation.trigger
+                target:
+                  entity_id: automation.vac_buro_saugen
+                data:
+                  skip_condition: true
+            - type: button
+              name: Schlafzimmer
+              entity: vacuum.roborock_s8_maxv_ultra
+              layout: vertical
+              fill_container: true
+              icon: mdi:bed
+              secondary_info: none
+              tap_action:
+                action: call-service
+                service: automation.trigger
+                target:
+                  entity_id: automation.vac_schlafzimmer_saugen
+                data:
+                  skip_condition: true
+            - type: button
+              name: Gäste WC
+              entity: vacuum.roborock_s8_maxv_ultra
+              layout: vertical
+              fill_container: true
+              icon: mdi:toilet
+              secondary_info: none
+              tap_action:
+                action: call-service
+                service: automation.trigger
+                target:
+                  entity_id: automation.vac_gaste_wc_saugen
+                data:
+                  skip_condition: true
+            - type: button
+              name: Badezimmer
+              entity: vacuum.roborock_s8_maxv_ultra
+              layout: vertical
+              fill_container: true
+              icon: mdi:bathtub
+              secondary_info: none
+              tap_action:
+                action: call-service
+                service: automation.trigger
+                target:
+                  entity_id: automation.vac_badezimmer_saugen
+                data:
+                  skip_condition: true
+            - type: button
+              name: Kleiderschrank
+              entity: vacuum.roborock_s8_maxv_ultra
+              layout: vertical
+              fill_container: true
+              icon: mdi:cupboard
+              secondary_info: none
+              tap_action:
+                action: call-service
+                service: automation.trigger
+                target:
+                  entity_id: automation.vac_schrank_saugen
+                data:
+                  skip_condition: true
+  - attributes:
+      label: Saugen & Wischen
+    card:
+      type: vertical-stack
+      cards:
+        - type: grid
+          columns: 3
+          cards:
+            - type: button
+              name: Flur
+              entity: vacuum.roborock_s8_maxv_ultra
+              layout: vertical
+              fill_container: true
+              icon: mdi:wardrobe-outline
+              secondary_info: none
+              tap_action:
+                action: call-service
+                service: automation.trigger
+                target:
+                  entity_id: automation.vac_flur_saugen_dann_wischen
+                data:
+                  skip_condition: true
+            - type: button
+              name: Wohnzimmer & Küche
+              entity: vacuum.roborock_s8_maxv_ultra
+              layout: vertical
+              fill_container: true
+              icon: mdi:sofa
+              secondary_info: none
+              tap_action:
+                action: call-service
+                service: automation.trigger
+                target:
+                  entity_id: automation.vac_wohnbereich_kuche_saugen_dann_wischen
+                data:
+                  skip_condition: true
+            - type: button
+              name: Emilys Zimmer
+              entity: vacuum.roborock_s8_maxv_ultra
+              layout: vertical
+              fill_container: true
+              icon: mdi:teddy-bear
+              secondary_info: none
+              tap_action:
+                action: call-service
+                service: automation.trigger
+                target:
+                  entity_id: automation.vac_emilys_zimmer_saugen_dann_wischen
+                data:
+                  skip_condition: true
+            - type: button
+              name: Büro
+              entity: vacuum.roborock_s8_maxv_ultra
+              layout: vertical
+              fill_container: true
+              icon: mdi:desk
+              secondary_info: none
+              tap_action:
+                action: call-service
+                service: automation.trigger
+                target:
+                  entity_id: automation.vac_buro_saugen_dann_wischen
+                data:
+                  skip_condition: true
+            - type: button
+              name: Schlafzimmer
+              entity: vacuum.roborock_s8_maxv_ultra
+              layout: vertical
+              fill_container: true
+              icon: mdi:bed
+              secondary_info: none
+              tap_action:
+                action: call-service
+                service: automation.trigger
+                target:
+                  entity_id: automation.vac_schlafzimmer_saugen_dann_wischen
+                data:
+                  skip_condition: true
+            - type: button
+              name: Gäste WC
+              entity: vacuum.roborock_s8_maxv_ultra
+              layout: vertical
+              fill_container: true
+              icon: mdi:toilet
+              secondary_info: none
+              tap_action:
+                action: call-service
+                service: automation.trigger
+                target:
+                  entity_id: automation.vac_gaste_wc_saugen_dann_wischen
+                data:
+                  skip_condition: true
+            - type: button
+              name: Badezimmer
+              entity: vacuum.roborock_s8_maxv_ultra
+              layout: vertical
+              fill_container: true
+              icon: mdi:bathtub
+              secondary_info: none
+              tap_action:
+                action: call-service
+                service: automation.trigger
+                target:
+                  entity_id: automation.vac_badezimmer_saugen_dann_wischen
+                data:
+                  skip_condition: true
+            - type: button
+              name: Kleiderschrank
+              entity: vacuum.roborock_s8_maxv_ultra
+              layout: vertical
+              fill_container: true
+              icon: mdi:cupboard
+              secondary_info: none
+              tap_action:
+                action: call-service
+                service: automation.trigger
+                target:
+                  entity_id: automation.vac_schrank_saugen_dann_wischen
+                data:
+                  skip_condition: true
+  - attributes:
+      label: Wischen
+    card:
+      type: vertical-stack
+      cards:
+        - type: grid
+          columns: 3
+          cards:
+            - type: button
+              name: Wohnzimmer & Küche
+              entity: vacuum.roborock_s8_maxv_ultra
+              layout: vertical
+              fill_container: true
+              icon: mdi:table-chair
+              secondary_info: none
+              tap_action:
+                action: call-service
+                service: automation.trigger
+                target:
+                  entity_id: automation.vac_wohnzimmer_nur_wischen
+                data:
+                  skip_condition: true
+            - type: button
+              name: Wohnzimmer
+              entity: vacuum.roborock_s8_maxv_ultra
+              layout: vertical
+              fill_container: true
+              icon: mdi:sofa
+              secondary_info: none
+              tap_action:
+                action: call-service
+                service: automation.trigger
+                target:
+                  entity_id: automation.vac_wohnzimmer_wischen
+                data:
+                  skip_condition: true
+            - type: button
+              name: Küche
+              entity: vacuum.roborock_s8_maxv_ultra
+              layout: vertical
+              fill_container: true
+              icon: mdi:table-furniture
+              secondary_info: none
+              tap_action:
+                action: call-service
+                service: automation.trigger
+                target:
+                  entity_id: automation.vac_kuche_nur_wischen
+                data:
+                  skip_condition: true
+  - attributes:
+      label: Spezialprogramme
+    card:
+      type: vertical-stack
+      cards:
+        - type: grid
+          columns: 3
+          cards:
+            - type: button
+              name: Küchenzeile
+              entity: vacuum.roborock_s8_maxv_ultra
+              layout: vertical
+              fill_container: true
+              icon: mdi:dishwasher
+              secondary_info: none
+              tap_action:
+                action: call-service
+                service: automation.trigger
+                target:
+                  entity_id: automation.kuchenzeile
+                data:
+                  skip_condition: true
+            - type: button
+              name: Esstisch
+              entity: vacuum.roborock_s8_maxv_ultra
+              layout: vertical
+              fill_container: true
+              icon: mdi:table-chair
+              secondary_info: none
+              tap_action:
+                action: call-service
+                service: automation.trigger
+                target:
+                  entity_id: automation.vac_esstisch
+                data:
+                  skip_condition: true
+            - type: button
+              name: Futzis Tisch
+              entity: vacuum.roborock_s8_maxv_ultra
+              layout: vertical
+              fill_container: true
+              icon: mdi:teddy-bear
+              secondary_info: none
+              tap_action:
+                action: call-service
+                service: automation.trigger
+                target:
+                  entity_id: automation.vac_futzis_tisch
+                data:
+                  skip_condition: true
+            - type: button
+              name: WZ/Küche schnell
+              entity: vacuum.roborock_s8_maxv_ultra
+              layout: vertical
+              fill_container: true
+              icon: mdi:spray-bottle
+              secondary_info: none
+              tap_action:
+                action: call-service
+                service: automation.trigger
+                target:
+                  entity_id: automation.vac_quick_combined_cleaning_wohnzimmer
+                data:
+                  skip_condition: true
+            - type: button
+              name: Vor der Couch
+              entity: vacuum.roborock_s8_maxv_ultra
+              layout: vertical
+              fill_container: true
+              icon: mdi:sofa-outline
+              secondary_info: none
+              tap_action:
+                action: call-service
+                service: automation.trigger
+                target:
+                  entity_id: automation.vac_vor_der_couch
+                data:
+                  skip_condition: true
