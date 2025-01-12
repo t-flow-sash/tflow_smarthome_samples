@@ -1,0 +1,25 @@
+alias: "WARN|Power supply gone "
+description: ""
+triggers:
+  - trigger: state
+    entity_id:
+      - sensor.eaton_3s_statusdaten
+    to: OB
+conditions: []
+actions:
+  - metadata: {}
+    data:
+      message: >-
+        Aktuell ist der Strom zu Hause ausgefallen. Batterielaufzeit
+        {{states('sensor.eaton_3s_akkulaufzeit')|round|int/60}} Minuten
+      title: "*** ACHTUNG STROMSUSFALL ***"
+    action: notify.mobile_app_zion_ios_14
+  - wait_for_trigger:
+      - trigger: numeric_state
+        entity_id:
+          - sensor.eaton_3s_akku_ladung
+        below: 10
+  - action: shell_command.shutdown_environment
+    metadata: {}
+    data: {}
+mode: single
