@@ -1,0 +1,17 @@
+users:
+  - username: admin
+    password: xxxx
+    instcmds:
+      - all
+    actions: []
+devices:
+  - name: eaton-3s
+    driver: usbhid-ups
+    port: auto
+    config:
+      - vendor = "EATON.*"
+      - ignorelb
+      - override.battery.charge.low = 10
+      - override.battery.runtime.low = 60
+mode: netserver
+shutdown_host: "false"
