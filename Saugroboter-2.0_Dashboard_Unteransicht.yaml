@@ -1,0 +1,119 @@
+  - type: sections
+    max_columns: 2
+    path: roborock-new
+    dense_section_placement: true
+    subview: true
+    title: Roborock
+    icon: mdi:robot-vacuum
+    sections:
+      - type: grid
+        cards:
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: entity
+                entity: person.sascha_thiebach
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-playground/grid
+                hold_action:
+                  action: none
+                double_tap_action:
+                  action: none
+                name: zurück
+                icon: mdi:arrow-left
+                content_info: name
+            grid_options:
+              columns: 12
+              rows: 1
+          - type: heading
+            heading: Roborock Karte
+            heading_style: title
+            icon: mdi:map
+          - type: picture
+            image: https://demo.home-assistant.io/stub_config/t-shirt-promo.png
+            image_entity: image.roborock_s8_maxv_ultra_home_base
+      - type: grid
+        cards:
+          - type: heading
+            icon: ''
+            heading_style: title
+          - type: heading
+            icon: mdi:cog
+            heading: Reinigungs-Modi
+            heading_style: title
+          - type: custom:vacuum-card
+            entity: vacuum.roborock_s8_maxv_ultra
+          - type: heading
+            icon: ''
+            heading_style: title
+          - type: custom:mushroom-select-card
+            entity: input_select.roborock_raum
+            grid_options:
+              columns: 12
+              rows: 1
+            fill_container: false
+            layout: horizontal
+            name: Raum
+            secondary_info: none
+            icon_type: icon
+            tap_action:
+              action: none
+            hold_action:
+              action: none
+            double_tap_action:
+              action: none
+            primary_info: name
+            icon: mdi:home
+          - type: custom:mushroom-select-card
+            entity: input_select.roborock_reinigungsmodus
+            grid_options:
+              columns: full
+              rows: 1
+            primary_info: name
+            icon_type: icon
+            secondary_info: none
+            name: Modus
+            layout: horizontal
+            icon: mdi:tools
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: input_select.roborock_raum
+                state_not: '--- auswählen ---'
+              - condition: state
+                entity: input_select.roborock_reinigungsmodus
+                state_not: '--- auswählen ---'
+            card:
+              type: horizontal-stack
+              cards:
+                - show_name: true
+                  show_icon: true
+                  type: button
+                  tap_action:
+                    action: toggle
+                  entity: input_button.roborock_start
+                  name: Start
+                  icon: mdi:play
+                - show_name: true
+                  show_icon: true
+                  type: button
+                  tap_action:
+                    action: toggle
+                  entity: input_button.roborock_pause
+                  name: Pause
+                  icon: mdi:pause
+                - show_name: true
+                  show_icon: true
+                  type: button
+                  tap_action:
+                    action: toggle
+                  entity: input_button.roborock_stop
+                  name: Stop
+                  icon: mdi:stop
+          - type: tile
+            entity: schedule.roborock_plan
+            grid_options:
+              columns: full
+            state_content:
+              - state
+              - next_event
