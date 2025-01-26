@@ -1,0 +1,1409 @@
+alias: Roborock Programme
+description: ""
+triggers:
+  - trigger: state
+    entity_id:
+      - input_button.roborock_start
+    id: start
+  - trigger: state
+    entity_id:
+      - input_button.roborock_stop
+    id: stop
+  - trigger: state
+    entity_id:
+      - input_button.roborock_pause
+    id: pause
+  - trigger: state
+    entity_id:
+      - schedule.roborock_plan
+    from: "off"
+    to: "on"
+    id: planstart
+conditions:
+  - condition: not
+    conditions:
+      - condition: state
+        entity_id: vacuum.roborock_s8_maxv_ultra
+        state: cleaning
+  - condition: state
+    entity_id: input_boolean.vacuum_schedule
+    state: "on"
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id:
+              - start
+        sequence:
+          - choose:
+              - conditions:
+                  - condition: state
+                    entity_id: input_select.roborock_raum
+                    state: Wohnzimmer
+                sequence:
+                  - choose:
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Saugen
+                        sequence:
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: "off"
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: max_plus
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 16
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Wischen
+                        sequence:
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: "off"
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: max
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 937b57aed4a17aa46f029be54c551ab5
+                            type: select_option
+                            option: deep_plus
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 16
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Vac & Mop
+                        sequence:
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: custom
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: custom
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 937b57aed4a17aa46f029be54c551ab5
+                            type: select_option
+                            option: custom
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 16
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Tiefenreinigung
+                        sequence:
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_start_wash
+                              params: {}
+                          - wait_for_trigger:
+                              - trigger: state
+                                entity_id:
+                                  - sensor.roborock_s8_maxv_ultra_status
+                                to: charging
+                            timeout:
+                              hours: 0
+                              minutes: 10
+                              seconds: 0
+                            continue_on_timeout: false
+                          - delay:
+                              hours: 0
+                              minutes: 0
+                              seconds: 5
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: max_plus
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: "off"
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 19
+                          - wait_for_trigger:
+                              - trigger: state
+                                entity_id:
+                                  - sensor.roborock_s8_maxv_ultra_status
+                                to: returning_home
+                            timeout:
+                              hours: 1
+                              minutes: 0
+                              seconds: 0
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: max
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 937b57aed4a17aa46f029be54c551ab5
+                            type: select_option
+                            option: deep_plus
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 16
+                                  repeat: 2
+              - conditions:
+                  - condition: state
+                    entity_id: input_select.roborock_raum
+                    state: Küche
+                sequence:
+                  - choose:
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Saugen
+                        sequence:
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: "off"
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: max_plus
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 20
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Wischen
+                        sequence:
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: "off"
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: max
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 937b57aed4a17aa46f029be54c551ab5
+                            type: select_option
+                            option: deep_plus
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 20
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Vac & Mop
+                        sequence:
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: custom
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: custom
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 937b57aed4a17aa46f029be54c551ab5
+                            type: select_option
+                            option: custom
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 20
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Tiefenreinigung
+                        sequence:
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_start_wash
+                              params: {}
+                          - wait_for_trigger:
+                              - trigger: state
+                                entity_id:
+                                  - sensor.roborock_s8_maxv_ultra_status
+                                to: charging
+                            timeout:
+                              hours: 0
+                              minutes: 10
+                              seconds: 0
+                            continue_on_timeout: false
+                          - delay:
+                              hours: 0
+                              minutes: 0
+                              seconds: 5
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: max_plus
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: "off"
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 20
+                          - wait_for_trigger:
+                              - trigger: state
+                                entity_id:
+                                  - sensor.roborock_s8_maxv_ultra_status
+                                to: returning_home
+                            timeout:
+                              hours: 1
+                              minutes: 0
+                              seconds: 0
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: max
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 937b57aed4a17aa46f029be54c551ab5
+                            type: select_option
+                            option: deep_plus
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 20
+                                  repeat: 2
+              - conditions:
+                  - condition: state
+                    entity_id: input_select.roborock_raum
+                    state: Badezimmer
+                sequence:
+                  - choose:
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Saugen
+                        sequence:
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: "off"
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: max_plus
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 22
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Wischen
+                        sequence:
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: "off"
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: max
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 937b57aed4a17aa46f029be54c551ab5
+                            type: select_option
+                            option: deep_plus
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 22
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Vac & Mop
+                        sequence:
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: custom
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: custom
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 937b57aed4a17aa46f029be54c551ab5
+                            type: select_option
+                            option: custom
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 22
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Tiefenreinigung
+                        sequence:
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_start_wash
+                              params: {}
+                          - wait_for_trigger:
+                              - trigger: state
+                                entity_id:
+                                  - sensor.roborock_s8_maxv_ultra_status
+                                to: charging
+                            timeout:
+                              hours: 0
+                              minutes: 10
+                              seconds: 0
+                            continue_on_timeout: false
+                          - delay:
+                              hours: 0
+                              minutes: 0
+                              seconds: 5
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: max_plus
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: "off"
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 22
+                          - wait_for_trigger:
+                              - trigger: state
+                                entity_id:
+                                  - sensor.roborock_s8_maxv_ultra_status
+                                to: returning_home
+                            timeout:
+                              hours: 1
+                              minutes: 0
+                              seconds: 0
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: max
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 937b57aed4a17aa46f029be54c551ab5
+                            type: select_option
+                            option: deep_plus
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 22
+                                  repeat: 2
+              - conditions:
+                  - condition: state
+                    entity_id: input_select.roborock_raum
+                    state: Gäste-WC
+                sequence:
+                  - choose:
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Saugen
+                        sequence:
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: "off"
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: max_plus
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 19
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Wischen
+                        sequence:
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: "off"
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: max
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 937b57aed4a17aa46f029be54c551ab5
+                            type: select_option
+                            option: deep_plus
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 19
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Vac & Mop
+                        sequence:
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: custom
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: custom
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 937b57aed4a17aa46f029be54c551ab5
+                            type: select_option
+                            option: custom
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 19
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Tiefenreinigung
+                        sequence:
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_start_wash
+                              params: {}
+                          - wait_for_trigger:
+                              - trigger: state
+                                entity_id:
+                                  - sensor.roborock_s8_maxv_ultra_status
+                                to: charging
+                            timeout:
+                              hours: 0
+                              minutes: 10
+                              seconds: 0
+                            continue_on_timeout: false
+                          - delay:
+                              hours: 0
+                              minutes: 0
+                              seconds: 5
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: max_plus
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: "off"
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 19
+                          - wait_for_trigger:
+                              - trigger: state
+                                entity_id:
+                                  - sensor.roborock_s8_maxv_ultra_status
+                                to: returning_home
+                            timeout:
+                              hours: 1
+                              minutes: 0
+                              seconds: 0
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: max
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 937b57aed4a17aa46f029be54c551ab5
+                            type: select_option
+                            option: deep_plus
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 19
+                                  repeat: 2
+              - conditions:
+                  - condition: state
+                    entity_id: input_select.roborock_raum
+                    state: Emilys Zimmer
+                sequence:
+                  - choose:
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Saugen
+                        sequence:
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: "off"
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: max_plus
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 24
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Wischen
+                        sequence:
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: "off"
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: max
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 937b57aed4a17aa46f029be54c551ab5
+                            type: select_option
+                            option: deep_plus
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 24
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Vac & Mop
+                        sequence:
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: custom
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: custom
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 937b57aed4a17aa46f029be54c551ab5
+                            type: select_option
+                            option: custom
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 24
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Tiefenreinigung
+                        sequence:
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_start_wash
+                              params: {}
+                          - wait_for_trigger:
+                              - trigger: state
+                                entity_id:
+                                  - sensor.roborock_s8_maxv_ultra_status
+                                to: charging
+                            timeout:
+                              hours: 0
+                              minutes: 10
+                              seconds: 0
+                            continue_on_timeout: false
+                          - delay:
+                              hours: 0
+                              minutes: 0
+                              seconds: 5
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: max_plus
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: "off"
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 24
+                          - wait_for_trigger:
+                              - trigger: state
+                                entity_id:
+                                  - sensor.roborock_s8_maxv_ultra_status
+                                to: returning_home
+                            timeout:
+                              hours: 1
+                              minutes: 0
+                              seconds: 0
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: max
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 937b57aed4a17aa46f029be54c551ab5
+                            type: select_option
+                            option: deep_plus
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 24
+                                  repeat: 2
+              - conditions:
+                  - condition: state
+                    entity_id: input_select.roborock_raum
+                    state: Lias Zimmer
+                sequence:
+                  - choose:
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Saugen
+                        sequence:
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: "off"
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: max_plus
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 23
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Wischen
+                        sequence:
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: "off"
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: max
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 937b57aed4a17aa46f029be54c551ab5
+                            type: select_option
+                            option: deep_plus
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 23
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Vac & Mop
+                        sequence:
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: custom
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: custom
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 937b57aed4a17aa46f029be54c551ab5
+                            type: select_option
+                            option: custom
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 23
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Tiefenreinigung
+                        sequence:
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_start_wash
+                              params: {}
+                          - wait_for_trigger:
+                              - trigger: state
+                                entity_id:
+                                  - sensor.roborock_s8_maxv_ultra_status
+                                to: charging
+                            timeout:
+                              hours: 0
+                              minutes: 10
+                              seconds: 0
+                            continue_on_timeout: false
+                          - delay:
+                              hours: 0
+                              minutes: 0
+                              seconds: 5
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: max_plus
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: "off"
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 23
+                          - wait_for_trigger:
+                              - trigger: state
+                                entity_id:
+                                  - sensor.roborock_s8_maxv_ultra_status
+                                to: returning_home
+                            timeout:
+                              hours: 1
+                              minutes: 0
+                              seconds: 0
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: max
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 937b57aed4a17aa46f029be54c551ab5
+                            type: select_option
+                            option: deep_plus
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 23
+                                  repeat: 2
+              - conditions:
+                  - condition: state
+                    entity_id: input_select.roborock_raum
+                    state: Büro/Schlafen
+                sequence:
+                  - choose:
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Saugen
+                        sequence:
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: "off"
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: max_plus
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 17
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Wischen
+                        sequence:
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: "off"
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: max
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 937b57aed4a17aa46f029be54c551ab5
+                            type: select_option
+                            option: deep_plus
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 17
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Vac & Mop
+                        sequence:
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: custom
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: custom
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 937b57aed4a17aa46f029be54c551ab5
+                            type: select_option
+                            option: custom
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 17
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Tiefenreinigung
+                        sequence:
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_start_wash
+                              params: {}
+                          - wait_for_trigger:
+                              - trigger: state
+                                entity_id:
+                                  - sensor.roborock_s8_maxv_ultra_status
+                                to: charging
+                            timeout:
+                              hours: 0
+                              minutes: 10
+                              seconds: 0
+                            continue_on_timeout: false
+                          - delay:
+                              hours: 0
+                              minutes: 0
+                              seconds: 5
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: max_plus
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: "off"
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 17
+                          - wait_for_trigger:
+                              - trigger: state
+                                entity_id:
+                                  - sensor.roborock_s8_maxv_ultra_status
+                                to: returning_home
+                            timeout:
+                              hours: 1
+                              minutes: 0
+                              seconds: 0
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: max
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 937b57aed4a17aa46f029be54c551ab5
+                            type: select_option
+                            option: deep_plus
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 17
+                                  repeat: 2
+              - conditions:
+                  - condition: state
+                    entity_id: input_select.roborock_raum
+                    state: Flur
+                sequence:
+                  - choose:
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Saugen
+                        sequence:
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: "off"
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: max_plus
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 21
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Wischen
+                        sequence:
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: "off"
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: max
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 937b57aed4a17aa46f029be54c551ab5
+                            type: select_option
+                            option: deep_plus
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 21
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Vac & Mop
+                        sequence:
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: custom
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: custom
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 937b57aed4a17aa46f029be54c551ab5
+                            type: select_option
+                            option: custom
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 21
+                      - conditions:
+                          - condition: state
+                            entity_id: input_select.roborock_reinigungsmodus
+                            state: Tiefenreinigung
+                        sequence:
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_start_wash
+                              params: {}
+                          - wait_for_trigger:
+                              - trigger: state
+                                entity_id:
+                                  - sensor.roborock_s8_maxv_ultra_status
+                                to: charging
+                            timeout:
+                              hours: 0
+                              minutes: 10
+                              seconds: 0
+                            continue_on_timeout: false
+                          - delay:
+                              hours: 0
+                              minutes: 0
+                              seconds: 5
+                          - action: vacuum.set_fan_speed
+                            metadata: {}
+                            data:
+                              fan_speed: max_plus
+                            target:
+                              device_id: f22bc6bdb98041e0221f87351e32ee10
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: "off"
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 21
+                          - wait_for_trigger:
+                              - trigger: state
+                                entity_id:
+                                  - sensor.roborock_s8_maxv_ultra_status
+                                to: returning_home
+                            timeout:
+                              hours: 1
+                              minutes: 0
+                              seconds: 0
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+                            type: select_option
+                            option: max
+                          - device_id: f22bc6bdb98041e0221f87351e32ee10
+                            domain: select
+                            entity_id: 937b57aed4a17aa46f029be54c551ab5
+                            type: select_option
+                            option: deep_plus
+                          - action: vacuum.send_command
+                            target:
+                              entity_id: vacuum.roborock_s8_maxv_ultra
+                            data:
+                              command: app_segment_clean
+                              params:
+                                - segments:
+                                    - 21
+                                  repeat: 2
+      - conditions:
+          - condition: trigger
+            id:
+              - stop
+        sequence:
+          - device_id: f22bc6bdb98041e0221f87351e32ee10
+            domain: vacuum
+            entity_id: 9ca22e9f90faa4df81c62dfbd46b0028
+            type: dock
+      - conditions:
+          - condition: trigger
+            id:
+              - pause
+        sequence:
+          - if:
+              - condition: state
+                entity_id: sensor.roborock_s8_maxv_ultra_status
+                state: paused
+            then:
+              - action: vacuum.start
+                metadata: {}
+                data: {}
+                target:
+                  device_id: f22bc6bdb98041e0221f87351e32ee10
+            else:
+              - action: vacuum.pause
+                metadata: {}
+                data: {}
+                target:
+                  device_id: f22bc6bdb98041e0221f87351e32ee10
+      - conditions:
+          - condition: trigger
+            id:
+              - planstart
+        sequence:
+          - device_id: f22bc6bdb98041e0221f87351e32ee10
+            domain: select
+            entity_id: 9ff4ebef8456f47dcc6fdad7bfcc9e62
+            type: select_option
+            option: custom
+          - action: vacuum.set_fan_speed
+            metadata: {}
+            data:
+              fan_speed: custom
+            target:
+              device_id: f22bc6bdb98041e0221f87351e32ee10
+          - device_id: f22bc6bdb98041e0221f87351e32ee10
+            domain: select
+            entity_id: 937b57aed4a17aa46f029be54c551ab5
+            type: select_option
+            option: custom
+          - delay:
+              hours: 0
+              minutes: 0
+              seconds: 3
+          - action: vacuum.send_command
+            target:
+              entity_id: vacuum.roborock_s8_maxv_ultra
+            data:
+              command: app_segment_clean
+              params:
+                - segments:
+                    - 23
+                    - 24
+                    - 17
+                    - 21
+                    - 19
+                    - 22
+  - wait_for_trigger:
+      - trigger: state
+        entity_id:
+          - sensor.roborock_s8_maxv_ultra_status
+        to: charging
+        for:
+          hours: 0
+          minutes: 2
+          seconds: 0
+    timeout:
+      hours: 2
+      minutes: 0
+      seconds: 0
+  - action: input_select.select_option
+    metadata: {}
+    data:
+      option: "--- auswählen ---"
+    target:
+      entity_id:
+        - input_select.roborock_raum
+        - input_select.roborock_reinigungsmodus
+mode: queued
+max: 5
