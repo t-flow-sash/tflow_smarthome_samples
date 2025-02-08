@@ -1,0 +1,43 @@
+sidebar:
+  width:
+    mobile: 0
+    tablet: 15
+    desktop: 15
+  style: |
+    :host {
+        --sidebar-background: #000;
+        --sidebar-text-color: #FFF;
+        --face-color: #FFF;
+        --face-border-color: #FFF;
+        --clock-hands-color: #000;
+        --clock-seconds-hand-color: #FF4B3E;
+        --clock-middle-background: #FFF;
+        --clock-middle-border: #000;
+    }
+  clock: true
+  sidebarMenu:
+    - action: navigate
+      navigation_path: /flur-dev/0
+      name: Hauptansicht
+      active: true
+    - action: navigate
+      navigation_path: /flur-dev/emilys-zimmer
+      name: Büro
+      active: true
+    - action: navigate
+      navigation_path: /flur-dev/kuche
+      name: Küche
+      active: true
+  bottomCard:
+    type: weather-forecast
+    cardOptions:
+      entity: weather.home
+    cardStyle: |
+      ha-card { background: transparent;
+          --border-style: none;
+          --border: 0px;
+      }
+      :host {
+        width: 100%;
+        background-color:#000;
+      }
