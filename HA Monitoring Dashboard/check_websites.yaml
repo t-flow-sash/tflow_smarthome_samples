@@ -1,0 +1,12 @@
+websitechecker:
+  update_interval: 10  # Optional, value in minutes, defaults to 10
+  websites:
+    - url: http://192.168.2.136:8006
+      name: Proxmox Frontend
+      verify_ssl: false
+    - url: http://192.168.2.139:8010
+      name: Paperless Frontend
+    - url: http://192.168.2.139:8080
+      name: Zigbee2MQTT Frontend
+    - url: http://192.168.2.139:8091
+      name: ZWaveJS Frontend  
