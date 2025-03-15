@@ -1,0 +1,15 @@
+type: custom:mini-graph-card
+name: HA CPU/RAM
+entities:
+  - entity: sensor.qemu_home_os_100_cpu_auslastung
+    name: HA CPU Auslastung
+    show_state: true
+  - entity: sensor.qemu_home_os_100_prozentsatz_genutzter_arbeitsspeicher
+    name: HA RAM Auslastung
+    show_state: true
+hours_to_show: 48
+points_per_hour: 60
+smoothing: false
+line_width: 1
+lower_bound: 0
+upper_bound: 100
