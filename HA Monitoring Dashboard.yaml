@@ -1,0 +1,264 @@
+views:
+  - type: sections
+    max_columns: 4
+    title: Overview
+    path: overview
+    icon: mdi:desktop-tower
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Frontend & Maria DB Status
+          - type: entities
+            entities:
+              - entity: binary_sensor.proxmox_frontend
+                type: attribute
+                attribute: last_status
+              - entity: binary_sensor.zwavejs_frontend
+                type: attribute
+                attribute: last_status
+              - entity: binary_sensor.paperless_frontend
+                type: attribute
+                attribute: last_status
+              - entity: binary_sensor.zigbee2mqtt_frontend
+                type: attribute
+                attribute: last_status
+          - type: custom:mini-graph-card
+            entities:
+              - sensor.mariadb_size
+            hours_to_show: 576
+            show_legend: true
+            line_width: 1
+      - type: grid
+        cards:
+          - type: heading
+            heading: Container Status
+          - type: entities
+            entities:
+              - entity: sensor.portainer_endpoints_local
+                icon: mdi:docker
+              - entity: sensor.portainer_local_paperless_ngx_2_broker_1
+                icon: mdi:server-outline
+              - entity: sensor.portainer_local_paperless_ngx_2_db_1
+                icon: mdi:server-outline
+              - entity: sensor.portainer_local_paperless_ngx_2_webserver_1_2
+                icon: mdi:server-outline
+              - entity: sensor.portainer_local_mosquitto_2
+              - entity: sensor.portainer_local_portainer
+              - entity: sensor.portainer_local_ring_mqtt_4
+              - entity: sensor.portainer_local_zigbee2mqtt
+              - entity: sensor.portainer_local_zwavejs_oct24_3
+      - type: grid
+        cards:
+          - type: heading
+            heading: VM Status
+          - type: custom:bar-card
+            title: CPU-Auslasung
+            decimal: 1
+            entities:
+              - entity: sensor.node_proxmox_cpu_auslastung
+                name: Proxmox Primary Node
+              - entity: sensor.qemu_portainer_101_cpu_auslastung
+                name: Portainer VM
+              - entity: sensor.qemu_home_os_100_cpu_auslastung
+                name: Home Assistant VM
+          - type: custom:bar-card
+            title: Arbeitsspeicher
+            decimal: 1
+            entities:
+              - entity: sensor.node_proxmox_prozentsatz_genutzter_arbeitsspeicher
+                name: Proxmox Primary Node
+              - entity: >-
+                  sensor.qemu_portainer_101_prozentsatz_genutzter_arbeitsspeicher
+                name: Portainer VM
+              - entity: sensor.qemu_home_os_100_prozentsatz_genutzter_arbeitsspeicher
+                name: Home Assistant VM
+          - type: custom:bar-card
+            title: Storage
+            decimal: 1
+            entities:
+              - entity: >-
+                  sensor.storage_proxmox_local_prozentsatz_belegter_speicherplatz
+                name: Proxmox Local Storage
+              - entity: >-
+                  sensor.storage_proxmox_local_lvm_prozentsatz_belegter_speicherplatz
+                name: Proxmox VM Storage
+              - entity: >-
+                  sensor.storage_proxmox_backup_new_prozentsatz_belegter_speicherplatz
+                name: Backup Storage
+          - type: custom:mini-graph-card
+            name: HA CPU/RAM
+            entities:
+              - entity: sensor.qemu_home_os_100_cpu_auslastung
+                name: HA CPU Auslastung
+                show_state: true
+              - entity: sensor.qemu_home_os_100_prozentsatz_genutzter_arbeitsspeicher
+                name: HA RAM Auslastung
+                show_state: true
+            hours_to_show: 48
+            points_per_hour: 60
+            smoothing: false
+            line_width: 1
+            lower_bound: 0
+            upper_bound: 100
+        column_span: 2
+      - type: grid
+        cards:
+          - type: heading
+            heading: Tablet Views
+            heading_style: title
+            icon: mdi:tablet
+            badges:
+              - type: entity
+                entity: sensor.lenovo_tab_m10_plus_3rd_gen_batterie
+          - type: picture
+            image: https://demo.home-assistant.io/stub_config/t-shirt-promo.png
+            image_entity: image.lenovo_tab_m10_plus_3rd_gen_bildschirmfoto
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.lenovo_tab_m10_plus_3rd_gen_start_url_laden
+          - type: heading
+            heading_style: subtitle
+            icon: mdi:tablet
+            badges:
+              - type: entity
+                show_state: true
+                show_icon: true
+                entity: sensor.c10_batterie
+          - type: picture
+            image: https://demo.home-assistant.io/stub_config/t-shirt-promo.png
+            image_entity: image.c10_bildschirmfoto
+            alt_text: Display Flur
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.c10_start_url_laden
+      - type: grid
+        cards:
+          - type: heading
+            heading: USV Status
+            heading_style: title
+            icon: mdi:home-battery
+            badges:
+              - type: entity
+                entity: sensor.eaton_3s_status
+              - type: entity
+                entity: sensor.eaton_3s_wirkleistung
+          - type: horizontal-stack
+            cards:
+              - type: gauge
+                entity: sensor.eaton_3s_akku_ladung
+                severity:
+                  green: 80
+                  yellow: 20
+                  red: 0
+                needle: true
+                grid_options:
+                  columns: 24
+                  rows: 3
+              - type: vertical-stack
+                cards:
+                  - type: tile
+                    entity: sensor.eaton_3s_status
+                    features_position: bottom
+                    vertical: false
+                  - type: tile
+                    entity: sensor.eaton_3s_last
+                    features_position: bottom
+                    vertical: false
+              - type: vertical-stack
+                cards:
+                  - type: tile
+                    entity: sensor.eaton_3s_akkulaufzeit
+                    features_position: bottom
+                    vertical: false
+                  - type: tile
+                    entity: sensor.eaton_3s_sollwert_fur_schwache_batterie
+                    features_position: bottom
+                    vertical: false
+            grid_options:
+              columns: 24
+              rows: auto
+          - type: custom:mini-graph-card
+            entities:
+              - sensor.eaton_3s_last
+            hours_to_show: 72
+            show_legend: true
+            points_per_hour: 30
+            line_width: 1
+            grid_options:
+              columns: 24
+              rows: auto
+            upper_bound: 30
+            lower_bound: 10
+        column_span: 2
+      - type: grid
+        cards:
+          - type: heading
+            heading: Internet Connection Status
+            heading_style: title
+            icon: mdi:web-check
+            badges:
+              - type: entity
+                show_state: true
+                show_icon: true
+                entity: binary_sensor.internet
+                color: green
+                visibility:
+                  - condition: state
+                    entity: binary_sensor.internet
+                    state: 'on'
+              - type: entity
+                show_state: true
+                show_icon: true
+                entity: binary_sensor.internet
+                color: red
+                visibility:
+                  - condition: state
+                    entity: binary_sensor.internet
+                    state: 'off'
+          - type: entities
+            entities:
+              - entity: sensor.myip_ipv6
+                name: IPv6
+              - entity: sensor.myip
+              - entity: sensor.current_isp
+          - type: tile
+            entity: sensor.speedtest_download
+            layout_options:
+              grid_columns: 4
+              grid_rows: 1
+            vertical: true
+          - type: tile
+            entity: sensor.speedtest_ping
+          - type: tile
+            entity: sensor.speedtest_upload
+    cards: []
+    header:
+      card:
+        type: markdown
+        content: |-
+          # ✅ Systemstatus ✅ 
+            🕒 **Läuft seit:** {{ states('sensor.localhost_betriebszeit_2') | as_timestamp | timestamp_custom('%d. %B %Y, %H:%M Uhr') }}  
+            ⏳ **Dauer:** {{ (now().timestamp() - states('sensor.localhost_betriebszeit_2') | as_timestamp) | timestamp_custom('%d Tage, %H Stunden, %M Minuten', false) }}
+        text_only: true
+    badges:
+      - type: custom:mushroom-template-badge
+        content: ''
+        icon: mdi:docker
+        color: red
+        visibility:
+          - condition: state
+            entity: sensor.portainer_endpoints_local
+            state_not: '8'
+      - type: custom:mushroom-template-badge
+        content: ''
+        icon: mdi:web-cancel
+        color: red
+        visibility:
+          - condition: state
+            entity: sensor.current_isp
+            state_not: Deutsche Telekom AG
