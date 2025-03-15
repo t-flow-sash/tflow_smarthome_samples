@@ -1,0 +1,5 @@
+  - platform: rest
+    name: Current ISP
+    scan_interval: 60
+    resource: http://ip-api.com/json/?fields=isp
+    value_template: '{{ value_json.isp }}'
