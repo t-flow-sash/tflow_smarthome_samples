@@ -1,0 +1,10 @@
+type: custom:bar-card
+title: CPU-Auslasung
+decimal: 1
+entities:
+  - entity: sensor.node_proxmox_cpu_auslastung
+    name: Proxmox Primary Node
+  - entity: sensor.qemu_portainer_101_cpu_auslastung
+    name: Portainer VM
+  - entity: sensor.qemu_home_os_100_cpu_auslastung
+    name: Home Assistant VM
