@@ -1,79 +1,106 @@
 template:
   - sensor:
       - name: "Schwache AAA Batterien (<10%)"
-              state: >
-                {% set total = namespace(count=0) %}
-                {% for entity in states.binary_sensor if 'battery_plus_low' in entity.entity_id and entity.state == 'on' %}
-                  {% if 'battery_type' in entity.attributes and 'battery_quantity' in entity.attributes %}
-                    {% if entity.attributes.battery_type == 'AAA' %}
-                      {% set total.count = total.count + (entity.attributes.battery_quantity | int(0)) %}
-                    {% endif %}
-                  {% endif %}
-                {% endfor %}
-                {{ total.count }}
-              unit_of_measurement: "Stück"
-      
-            - name: "Schwache CR2032 Batterien (<10%)"
-              state: >
-                {% set total = namespace(count=0) %}
-                {% for entity in states.binary_sensor if 'battery_plus_low' in entity.entity_id and entity.state == 'on' %}
-                  {% if 'battery_type' in entity.attributes and 'battery_quantity' in entity.attributes %}
-                    {% if entity.attributes.battery_type == 'CR2032' %}
-                      {% set total.count = total.count + (entity.attributes.battery_quantity | int(0)) %}
-                    {% endif %}
-                  {% endif %}
-                {% endfor %}
-                {{ total.count }}
-              unit_of_measurement: "Stück"
-      
-            - name: "Schwache CR1632 Batterien (<10%)"
-              state: >
-                {% set total = namespace(count=0) %}
-                {% for entity in states.binary_sensor if 'battery_plus_low' in entity.entity_id and entity.state == 'on' %}
-                  {% if 'battery_type' in entity.attributes and 'battery_quantity' in entity.attributes %}
-                    {% if entity.attributes.battery_type == 'CR1632' %}
-                      {% set total.count = total.count + (entity.attributes.battery_quantity | int(0)) %}
-                    {% endif %}
-                  {% endif %}
-                {% endfor %}
-                {{ total.count }}
-              unit_of_measurement: "Stück"
-      
-            - name: "Schwache CR17450 Batterien (<10%)"
-              state: >
-                {% set total = namespace(count=0) %}
-                {% for entity in states.binary_sensor if 'battery_plus_low' in entity.entity_id and entity.state == 'on' %}
-                  {% if 'battery_type' in entity.attributes and 'battery_quantity' in entity.attributes %}
-                    {% if entity.attributes.battery_type == 'CR17450' %}
-                      {% set total.count = total.count + (entity.attributes.battery_quantity | int(0)) %}
-                    {% endif %}
-                  {% endif %}
-                {% endfor %}
-                {{ total.count }}
-              unit_of_measurement: "Stück"
-      
-            - name: "Schwache CR2430 Batterien (<10%)"
-              state: >
-                {% set total = namespace(count=0) %}
-                {% for entity in states.binary_sensor if 'battery_plus_low' in entity.entity_id and entity.state == 'on' %}
-                  {% if 'battery_type' in entity.attributes and 'battery_quantity' in entity.attributes %}
-                    {% if entity.attributes.battery_type == 'CR2430' %}
-                      {% set total.count = total.count + (entity.attributes.battery_quantity | int(0)) %}
-                    {% endif %}
-                  {% endif %}
-                {% endfor %}
-                {{ total.count }}
-              unit_of_measurement: "Stück"
-      
-            - name: "Schwache CR2450 Batterien (<10%)"
-              state: >
-                {% set total = namespace(count=0) %}
-                {% for entity in states.binary_sensor if 'battery_plus_low' in entity.entity_id and entity.state == 'on' %}
-                  {% if 'battery_type' in entity.attributes and 'battery_quantity' in entity.attributes %}
-                    {% if entity.attributes.battery_type == 'CR2450' %}
-                      {% set total.count = total.count + (entity.attributes.battery_quantity | int(0)) %}
-                    {% endif %}
-                  {% endif %}
-                {% endfor %}
-                {{ total.count }}
-              unit_of_measurement: "Stück"
+        state: >
+          {% set total = namespace(count=0) %}
+          {% for entity in states.binary_sensor
+              if 'battery_plus_low' in entity.entity_id
+              and entity.state == 'on'
+              and 'battery_type' in entity.attributes
+              and 'battery_quantity' in entity.attributes %}
+            {% if entity.attributes.battery_type == 'AAA' %}
+              {% set total.count = total.count + (entity.attributes.battery_quantity | int(0)) %}
+            {% endif %}
+          {% endfor %}
+          {{ total.count }}
+        unit_of_measurement: "Stück"
+
+      - name: "Schwache AA Batterien (<10%)"
+        state: >
+          {% set total = namespace(count=0) %}
+          {% for entity in states.binary_sensor
+              if 'battery_plus_low' in entity.entity_id
+              and entity.state == 'on'
+              and 'battery_type' in entity.attributes
+              and 'battery_quantity' in entity.attributes %}
+            {% if entity.attributes.battery_type == 'AA' %}
+              {% set total.count = total.count + (entity.attributes.battery_quantity | int(0)) %}
+            {% endif %}
+          {% endfor %}
+          {{ total.count }}
+        unit_of_measurement: "Stück"
+
+      - name: "Schwache CR2032 Batterien (<10%)"
+        state: >
+          {% set total = namespace(count=0) %}
+          {% for entity in states.binary_sensor
+              if 'battery_plus_low' in entity.entity_id
+              and entity.state == 'on'
+              and 'battery_type' in entity.attributes
+              and 'battery_quantity' in entity.attributes %}
+            {% if entity.attributes.battery_type == 'CR2032' %}
+              {% set total.count = total.count + (entity.attributes.battery_quantity | int(0)) %}
+            {% endif %}
+          {% endfor %}
+          {{ total.count }}
+        unit_of_measurement: "Stück"
+
+      - name: "Schwache CR1632 Batterien (<10%)"
+        state: >
+          {% set total = namespace(count=0) %}
+          {% for entity in states.binary_sensor
+              if 'battery_plus_low' in entity.entity_id
+              and entity.state == 'on'
+              and 'battery_type' in entity.attributes
+              and 'battery_quantity' in entity.attributes %}
+            {% if entity.attributes.battery_type == 'CR1632' %}
+              {% set total.count = total.count + (entity.attributes.battery_quantity | int(0)) %}
+            {% endif %}
+          {% endfor %}
+          {{ total.count }}
+        unit_of_measurement: "Stück"
+
+      - name: "Schwache CR17450 Batterien (<10%)"
+        state: >
+          {% set total = namespace(count=0) %}
+          {% for entity in states.binary_sensor
+              if 'battery_plus_low' in entity.entity_id
+              and entity.state == 'on'
+              and 'battery_type' in entity.attributes
+              and 'battery_quantity' in entity.attributes %}
+            {% if entity.attributes.battery_type == 'CR17450' %}
+              {% set total.count = total.count + (entity.attributes.battery_quantity | int(0)) %}
+            {% endif %}
+          {% endfor %}
+          {{ total.count }}
+        unit_of_measurement: "Stück"
+
+      - name: "Schwache CR2430 Batterien (<10%)"
+        state: >
+          {% set total = namespace(count=0) %}
+          {% for entity in states.binary_sensor
+              if 'battery_plus_low' in entity.entity_id
+              and entity.state == 'on'
+              and 'battery_type' in entity.attributes
+              and 'battery_quantity' in entity.attributes %}
+            {% if entity.attributes.battery_type == 'CR2430' %}
+              {% set total.count = total.count + (entity.attributes.battery_quantity | int(0)) %}
+            {% endif %}
+          {% endfor %}
+          {{ total.count }}
+        unit_of_measurement: "Stück"
+
+      - name: "Schwache CR2450 Batterien (<10%)"
+        state: >
+          {% set total = namespace(count=0) %}
+          {% for entity in states.binary_sensor
+              if 'battery_plus_low' in entity.entity_id
+              and entity.state == 'on'
+              and 'battery_type' in entity.attributes
+              and 'battery_quantity' in entity.attributes %}
+            {% if entity.attributes.battery_type == 'CR2450' %}
+              {% set total.count = total.count + (entity.attributes.battery_quantity | int(0)) %}
+            {% endif %}
+          {% endfor %}
+          {{ total.count }}
+        unit_of_measurement: "Stück"
