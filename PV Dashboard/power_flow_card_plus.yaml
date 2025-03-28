@@ -1,0 +1,46 @@
+type: custom:power-flow-card-plus
+entities:
+  battery:
+    entity:
+      consumption: sensor.zion_battery_total_out_power
+      production: sensor.zion_battery_total_in_power
+    color_circle: true
+    color_icon: true
+    state_of_charge: sensor.zion_battery_battery_level
+    display_zero_tolerance: 0
+  solar:
+    entity: sensor.pv_total_in
+    display_zero_state: true
+    secondary_info: {}
+    color_circle: true
+    color_icon: true
+  grid:
+    secondary_info: {}
+    entity:
+      consumption: sensor.current_consumption_no_zero
+      production: sensor.power_grid_feed
+    color_circle: true
+    color_icon: true
+  home:
+    color_circle: true
+    color_icon: true
+clickable_entities: true
+display_zero_lines:
+  mode: show
+  transparency: 50
+  grey_color:
+    - 189
+    - 189
+    - 189
+use_new_flow_rate_model: true
+w_decimals: 0
+kw_decimals: 1
+min_flow_rate: 0.75
+max_flow_rate: 6
+max_expected_power: 800
+min_expected_power: 0.01
+watt_threshold: 1000
+transparency_zero_lines: 0
+grid_options:
+  columns: 24
+  rows: auto
