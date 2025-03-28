@@ -1,0 +1,8 @@
+### Wenn Batterie-Lade-Wert negativ wird (also Einspeisung), sicherstellen, dass dieser hier gleuch Null bleibt, damit nicht falsch gerechnet wird
+
+{% set input_val = states('sensor.zion_inverter_battery_input_watts_2') | float %}
+          {% if input_val > 0 %}
+            {{ input_val | round(2) }}
+          {% else %}
+            0
+          {% endif %}
