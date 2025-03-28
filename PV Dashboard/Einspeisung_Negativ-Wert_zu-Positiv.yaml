@@ -1,0 +1,7 @@
+### Für einen Verbrauchssensor, der negative Werte liefert wenn eingspeist wird
+{% set wert = states('sensor.current_consumption') | float %}
+{% if wert < 0 %}
+  {{ wert | abs }}
+{% else %}
+  0
+{% endif %}
