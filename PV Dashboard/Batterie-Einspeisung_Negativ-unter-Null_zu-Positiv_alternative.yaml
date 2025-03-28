@@ -1,0 +1,7 @@
+### Ein Alternativer Weg für Negativ zu Positiv - hier im Falle eines Sensors, der negativ wird wenn in die Batterie eingespeist wird
+{% set input_val = states('sensor.zion_inverter_battery_input_watts_2') | float %}
+          {% if input_val < 0 %}
+            {{ (input_val * -1) | round(2) }}
+          {% else %}
+            0
+          {% endif %}
