@@ -1,0 +1,256 @@
+views:
+  - type: sections
+    max_columns: 4
+    icon: mdi:solar-power-variant
+    path: solar-overview
+    sections:
+      - type: grid
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: custom:power-flow-card-plus
+                entities:
+                  battery:
+                    entity:
+                      consumption: sensor.zion_battery_total_out_power
+                      production: sensor.zion_battery_total_in_power
+                    color_circle: true
+                    color_icon: true
+                    state_of_charge: sensor.zion_battery_battery_level
+                    display_zero_tolerance: 0
+                  solar:
+                    entity: sensor.pv_total_in
+                    display_zero_state: true
+                    secondary_info: {}
+                    color_circle: true
+                    color_icon: true
+                  grid:
+                    secondary_info: {}
+                    entity:
+                      consumption: sensor.current_consumption_no_zero
+                      production: sensor.power_grid_feed
+                    color_circle: true
+                    color_icon: true
+                  home:
+                    color_circle: true
+                    color_icon: true
+                clickable_entities: true
+                display_zero_lines:
+                  mode: show
+                  transparency: 50
+                  grey_color:
+                    - 189
+                    - 189
+                    - 189
+                use_new_flow_rate_model: true
+                w_decimals: 0
+                kw_decimals: 1
+                min_flow_rate: 0.75
+                max_flow_rate: 6
+                max_expected_power: 800
+                min_expected_power: 0.01
+                watt_threshold: 1000
+                transparency_zero_lines: 0
+                grid_options:
+                  columns: 24
+                  rows: auto
+              - type: history-graph
+                entities:
+                  - entity: sensor.pv_total_in
+                  - entity: sensor.power_production_now
+                grid_options:
+                  columns: 24
+                  rows: 6
+            grid_options:
+              columns: 33
+              rows: auto
+          - type: heading
+            heading: Übersicht
+            heading_style: title
+            icon: mdi:monitor-dashboard
+            badges:
+              - type: entity
+                show_state: false
+                show_icon: true
+                entity: sun.sun
+              - type: entity
+                show_state: false
+                show_icon: true
+                entity: weather.openweathermap
+          - type: gauge
+            entity: sensor.pv_total_in
+            needle: true
+            severity:
+              green: 600
+              yellow: 250
+              red: 0
+            max: 800
+            unit: W
+            name: PV Leistung
+            grid_options:
+              columns: 9
+              rows: auto
+          - type: gauge
+            needle: true
+            severity:
+              green: 80
+              yellow: 20
+              red: 0
+            max: 100
+            name: PV SoC
+            grid_options:
+              rows: auto
+              columns: 18
+            unit: '%'
+            min: 0
+            entity: sensor.zion_battery_battery_level
+          - type: gauge
+            min: 0
+            max: 800
+            name: Leistung Speicher
+            needle: true
+            severity:
+              green: 0
+              yellow: 100
+              red: 700
+            grid_options:
+              columns: 9
+              rows: auto
+            entity: sensor.zion_battery_total_out_power
+        column_span: 4
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Basisübersicht
+            icon: mdi:battery-heart
+          - type: tile
+            entity: sensor.pv_battery_charging
+          - type: tile
+            entity: sensor.pv_battery_charging_total
+          - type: tile
+            entity: sensor.zion_battery_battery_level
+          - type: tile
+            entity: sensor.zion_inverter_charge_time_2
+          - type: tile
+            entity: sensor.zion_inverter_discharge_time_2
+      - type: grid
+        cards:
+          - type: heading
+            heading: Einstellungen
+            heading_style: title
+            icon: mdi:cog-outline
+            badges:
+              - type: entity
+                entity: number.zion_inverter_min_discharge_level
+              - type: entity
+                entity: number.zion_inverter_max_charge_level
+          - type: custom:mushroom-select-card
+            entity: select.zion_inverter_power_supply_mode
+            layout: horizontal
+          - type: custom:mushroom-number-card
+            entity: number.zion_inverter_max_charge_level
+            layout: horizontal
+            name: Max SoC
+          - type: custom:mushroom-number-card
+            entity: number.zion_inverter_min_discharge_level
+            layout: horizontal
+            name: Min SoC
+          - type: tile
+            entity: switch.zion_battery_usb_enabled
+            grid_options:
+              columns: 12
+              rows: 1
+      - type: grid
+        cards:
+          - type: heading
+            heading: Wechselrichter
+            heading_style: title
+            icon: mdi:heart-pulse
+            badges:
+              - type: entity
+                entity: sensor.zion_inverter_llc_temperature
+              - type: entity
+                entity: sensor.zion_inverter_inverter_output_watts_2
+          - type: tile
+            entity: sensor.zion_inverter_battery_input_watts_2
+            name: Batterieentladung
+            show_entity_picture: true
+          - type: tile
+            entity: sensor.zion_inverter_battery_temperature_2
+            name: Batterietemperatur
+          - type: tile
+            entity: sensor.zion_inverter_esp_temperature
+            name: Steuergerät Temp
+          - type: tile
+            entity: sensor.zion_inverter_inverter_frequency_2
+            name: Inv. Frequenz
+          - type: tile
+            entity: sensor.zion_inverter_inverter_op_potential_2
+            name: Inverter AC Spannung
+          - type: tile
+            entity: sensor.zion_inverter_inverter_output_watts_2
+            name: Inverter Output
+          - type: tile
+            entity: sensor.zion_inverter_inverter_temperature_2
+            name: Inverter Temp
+          - type: tile
+            entity: sensor.zion_inverter_llc_temperature
+            name: Converter Temp
+          - type: tile
+            entity: sensor.zion_inverter_solar_1_watts_2
+            name: Solar 1 In
+          - type: tile
+            entity: sensor.zion_inverter_solar_2_watts_2
+            name: Solar 2 In
+    badges:
+      - type: entity
+        show_name: false
+        show_state: false
+        show_icon: true
+        color: ''
+        entity: person.sascha_thiebach
+        icon: mdi:arrow-left
+        tap_action:
+          action: navigate
+          navigation_path: /dashboard-playground/grid
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        color: amber
+        entity: sensor.power_highest_peak_time_today
+        icon: mdi:weather-sunset-up
+        name: 'Max: '
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        color: amber
+        entity: sensor.energy_production_today_remaining
+        icon: mdi:solar-power
+        name: 'Heute Rest:'
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        color: amber
+        entity: sensor.energy_production_tomorrow
+        icon: mdi:solar-power
+        name: 'Morgen:'
+      - type: entity
+        show_name: true
+        show_state: true
+        show_icon: true
+        color: ''
+        entity: sensor.zion_inverter_status_2
+        icon: mdi:chip
+        name: Inverter
+      - type: entity
+        show_name: false
+        show_state: true
+        show_icon: true
+        color: ''
+        entity: sensor.current_consumption
+        icon: mdi:transmission-tower
+    cards: []
