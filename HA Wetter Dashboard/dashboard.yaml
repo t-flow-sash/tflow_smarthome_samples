@@ -1,0 +1,216 @@
+views:
+  - title: Klima
+    path: wetter
+    icon: mdi:white-balance-sunny
+    subview: true
+    type: sections
+    sections:
+      - type: grid
+        cards:
+          - type: custom:mushroom-chips-card
+            chips:
+              - type: entity
+                entity: person.sascha_thiebach
+                content_info: name
+                tap_action:
+                  action: navigate
+                  navigation_path: /dashboard-playground/grid
+                icon: mdi:arrow-left
+                name: zurück
+          - graph: line
+            type: sensor
+            detail: 2
+            entity: sensor.temperatur_balkon_sonoff_temperature
+            name: Außentemperatur reell
+            grid_options:
+              columns: 6
+              rows: 2
+          - graph: line
+            type: sensor
+            detail: 2
+            entity: sensor.wohnzimmer_wohnzimmer_wohnzimmer_balkon_humidity
+            name: Luftfeuchtigkeit reell
+            grid_options:
+              columns: 6
+              rows: 2
+          - type: custom:weather-chart-card
+            entity: weather.home
+            show_main: true
+            show_temperature: true
+            show_current_condition: true
+            show_attributes: true
+            show_time: false
+            show_day: false
+            show_date: false
+            show_humidity: true
+            show_pressure: true
+            show_wind_direction: true
+            show_wind_speed: true
+            show_sun: true
+            show_feels_like: true
+            icons_size: '40'
+            animated_icons: true
+            icon_style: style1
+            forecast:
+              precipitation_type: rainfall
+              labels_font_size: '11'
+              precip_bar_size: '100'
+              style: style2
+              show_wind_forecast: true
+              condition_icons: true
+              round_temp: false
+              type: daily
+              use_12hour_format: false
+            units:
+              pressure: ''
+              speed: ''
+            locale: de
+            title: Aktuelles Wetter
+            show_last_changed: true
+            use_12hour_format: false
+            description: sensor.openweathermap_condition
+            current_temp_size: '28'
+            feels_like: sensor.openweathermap_feels_like_temperature
+          - type: custom:weather-chart-card
+            entity: weather.home
+            show_main: false
+            show_temperature: false
+            show_current_condition: false
+            show_attributes: false
+            show_time: false
+            show_day: false
+            show_date: false
+            show_humidity: false
+            show_pressure: false
+            show_wind_direction: false
+            show_wind_speed: false
+            show_sun: false
+            show_feels_like: false
+            icons_size: 25
+            animated_icons: true
+            icon_style: style1
+            forecast:
+              precipitation_type: rainfall
+              labels_font_size: '11'
+              precip_bar_size: '100'
+              style: style2
+              show_wind_forecast: true
+              condition_icons: true
+              round_temp: true
+              type: hourly
+              use_12hour_format: false
+              disable_animation: false
+              show_probability: true
+              number_of_forecasts: '6'
+            units:
+              pressure: ''
+              speed: ''
+            locale: de
+            use_12hour_format: false
+            show_wind_gust_speed: false
+            show_visibility: false
+            show_last_changed: false
+      - type: grid
+        cards:
+          - type: heading
+            heading: Karte & Warnungen
+          - type: custom:meteoalarm-card
+            entities:
+              - entity: sensor.stadt_leverkusen_vorwarnstufe
+              - entity: sensor.stadt_leverkusen_aktuelle_warnstufe
+            integration: dwd
+            disable_swiper: false
+            hide_caption: false
+            hide_when_no_warning: false
+          - type: iframe
+            url: >-
+              https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=default&metricTemp=default&metricWind=default&zoom=8&overlay=rain&product=ecmwf&level=surface&lat=51.055&lon=7.059&detailLat=51.056070541830934&detailLon=7.053909301757813&marker=true&message=true
+            aspect_ratio: 100%
+            grid_options:
+              columns: full
+              rows: 8
+          - type: iframe
+            url: >-
+              https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=default&metricTemp=default&metricWind=default&zoom=8&overlay=snowAccu&product=ecmwf&level=surface&lat=51.018&lon=7.122&detailLat=51.049&detailLon=7.086000000000013&marker=true
+            aspect_ratio: 100%
+            grid_options:
+              columns: full
+              rows: 8
+            visibility:
+              - condition: state
+                entity: weather.home
+                state: snowy
+          - type: iframe
+            url: >-
+              https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=default&metricTemp=default&metricWind=default&zoom=8&overlay=thunder&product=ecmwf&level=surface&lat=51.018&lon=7.122&detailLat=51.049&detailLon=7.086000000000013&marker=true
+            aspect_ratio: 100%
+            grid_options:
+              columns: full
+              rows: 8
+            visibility:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity: weather.home
+                    state: lightning-rainy
+                  - condition: state
+                    entity: weather.home
+                    state: lightning
+      - type: grid
+        cards:
+          - type: heading
+            heading: Lokale Temperaturen & Luftqualität
+          - type: tile
+            entity: sensor.zion_air_pm2_5
+            vertical: false
+            name: Luftqualität
+          - type: tile
+            vertical: false
+            entity: fan.zion_air
+          - type: tile
+            vertical: false
+            name: Luftqualität Schlafen
+            entity: sensor.levoit_schlafzimmer_pm2_5
+          - type: tile
+            vertical: false
+            entity: fan.levoit_schlafzimmer
+          - graph: line
+            type: sensor
+            detail: 1
+            entity: sensor.temperatur_wohnzimmer_sonoff_temperature
+            name: Wohnzimmer
+          - graph: line
+            type: sensor
+            entity: sensor.sonoff_display_flur_temperatur_temperature
+            detail: 1
+            name: Flur
+          - graph: line
+            type: sensor
+            entity: sensor.sonoff_display_temperatur_duschbad_temperature
+            detail: 1
+            name: Gäste WC
+          - graph: line
+            type: sensor
+            entity: sensor.sonoff_display_temperatur_schlafzimmer_temperature
+            detail: 1
+            name: Büro/Schlafen
+          - graph: line
+            type: sensor
+            entity: sensor.sonoff_temperatur_emily_temperature
+            detail: 1
+            name: Emily
+          - graph: line
+            type: sensor
+            entity: sensor.sonoff_temperatur_schlafzimmer_temperature
+            detail: 1
+            name: Lia
+          - graph: line
+            type: sensor
+            detail: 1
+            name: Badezimmer
+            entity: sensor.sensor_temperatur_wannenbad_temperature
+          - graph: line
+            type: sensor
+            detail: 1
+            name: Kammer
+            entity: sensor.sonoff_abstellkammer_temperature
