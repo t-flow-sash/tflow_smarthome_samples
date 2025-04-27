@@ -1,0 +1,8 @@
+alias: All lights off
+sequence:
+  - target:
+      entity_id: all
+    data: {}
+    action: light.turn_off
+mode: single
+icon: mdi:lightbulb-alert-outline
