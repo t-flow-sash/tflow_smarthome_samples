@@ -1,0 +1,10 @@
+alias: All lights on
+sequence:
+  - data:
+      color_temp: 400
+      brightness_pct: 100
+    target:
+      entity_id: all
+    action: light.turn_on
+mode: single
+icon: mdi:lightbulb-alert
