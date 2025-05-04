@@ -1,0 +1,20 @@
+sequence:
+  - action: kia_uvo.start_climate
+    metadata: {}
+    data:
+      duration: 10
+      climate: true
+      temperature: 21
+      heating: "0"
+      device_id: 6b04c64c33976313de1c7f3c66022346
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 20
+      milliseconds: 0
+  - action: kia_uvo.force_update
+    metadata: {}
+    data:
+      device_id: 6b04c64c33976313de1c7f3c66022346
+alias: EV6 Klima starten
+description: ""
