@@ -1,0 +1,468 @@
+vehicle_image_type: upload
+status_image_type: none
+layout_type: single
+formatted_entities: true
+show_location: true
+show_mileage: true
+show_car_state: false
+show_info_icons: true
+sections_order:
+  - title
+  - info
+  - image
+  - bar_0
+  - icon_row_tc2mw18
+  - icon_row_whmc6ve
+bars:
+  - left_title: Reichweite
+    left_entity: sensor.ev6_ev_range
+    right_title: Ladezeit
+    right_entity: sensor.ev6_estimated_portable_charge_duration
+    bar_color: "var(--primary-color, #3498db)"
+    background_color: "var(--card-background-color, #121212)"
+    border_color: "var(--divider-color, #555555)"
+    left_title_color: "var(--secondary-text-color, #999999)"
+    left_text_color: "var(--primary-text-color, #ffffff)"
+    right_title_color: "var(--secondary-text-color, #999999)"
+    right_text_color: "var(--primary-text-color, #ffffff)"
+    limit_indicator_color: "var(--error-color, #ff0000)"
+    left_title_size: 14
+    left_text_size: 14
+    right_title_size: 14
+    right_text_size: 14
+    percentage_text_size: 14
+    bar_size: regular
+    bar_radius: round
+    bar_style: metallic
+    show_left: true
+    show_right: true
+    show_percentage: true
+    percentage_type: entity
+    percentage_amount_entity: ""
+    percentage_total_entity: ""
+    alignment: space-between
+    width: "100"
+    use_gradient: true
+    gradient_display_mode: value_based
+    gradient_stops:
+      - id: "1"
+        position: 0
+        color: "#ff0000"
+      - id: "2"
+        position: 100
+        color: "#00ff00"
+    animation_entity: binary_sensor.ev6_ev_battery_charge
+    animation_state: "on"
+    animation_type: shimmer
+    action_animation_entity: ""
+    action_animation_state: ""
+    action_animation: none
+    entity: sensor.ev6_ev_battery_level
+    right_condition:
+      type: show
+      entity: binary_sensor.ev6_ev_battery_charge
+      state: "on"
+    limit_entity: number.ev6_ac_charging_limit
+    left_condition:
+      type: none
+      entity: ""
+      state: ""
+icon_rows:
+  - id: tc2mw18
+    width: "100"
+    alignment: center
+    spacing: none
+    columns: 0
+    icons:
+      - entity: sensor.ev6_car_battery_level
+        icon_inactive: mdi:car-battery
+        icon_active: mdi:car-battery
+        color_inactive: var(--secondary-text-color)
+        color_active: var(--primary-color)
+        name_color_inactive: var(--primary-text-color)
+        name_color_active: var(--primary-text-color)
+        state_color_inactive: var(--secondary-text-color)
+        state_color_active: var(--primary-text-color)
+        inactive_state: "off"
+        active_state: "on"
+        inactive_template_mode: false
+        active_template_mode: false
+        inactive_template: ""
+        active_template: ""
+        active_state_text: ""
+        inactive_state_text: ""
+        show_state: true
+        show_name: false
+        show_name_active: false
+        show_name_inactive: false
+        show_state_active: true
+        show_state_inactive: true
+        show_units: true
+        show_icon_active: true
+        show_icon_inactive: true
+        name: ""
+        on_click_action: more-info
+        text_position: bottom
+        vertical_alignment: center
+        text_alignment: center
+        icon_size: 24
+        text_size: 14
+        icon_background: none
+        icon_background_color: var(--secondary-background-color)
+        container_background: none
+        container_background_color: var(--secondary-background-color)
+        draggable: true
+        action: ""
+        service_data: {}
+      - entity: number.ev6_dc_charging_limit
+        icon_inactive: mdi:ev-plug-ccs2
+        icon_active: mdi:ev-plug-ccs2
+        color_inactive: var(--secondary-text-color)
+        color_active: var(--primary-color)
+        name_color_inactive: var(--primary-text-color)
+        name_color_active: var(--primary-text-color)
+        state_color_inactive: var(--secondary-text-color)
+        state_color_active: var(--primary-text-color)
+        inactive_state: "off"
+        active_state: "on"
+        inactive_template_mode: false
+        active_template_mode: false
+        inactive_template: ""
+        active_template: ""
+        active_state_text: ""
+        inactive_state_text: ""
+        show_state: true
+        show_name: false
+        show_name_active: false
+        show_name_inactive: false
+        show_state_active: true
+        show_state_inactive: true
+        show_units: true
+        show_icon_active: true
+        show_icon_inactive: true
+        name: ""
+        on_click_action: more-info
+        text_position: bottom
+        vertical_alignment: center
+        text_alignment: center
+        icon_size: 24
+        text_size: 14
+        icon_background: none
+        icon_background_color: var(--secondary-background-color)
+        container_background: none
+        container_background_color: var(--secondary-background-color)
+        draggable: true
+        action: ""
+        service_data: {}
+      - entity: number.ev6_ac_charging_limit
+        icon_inactive: mdi:ev-plug-type2
+        icon_active: mdi:ev-plug-type2
+        color_inactive: var(--secondary-text-color)
+        color_active: var(--primary-color)
+        name_color_inactive: var(--primary-text-color)
+        name_color_active: var(--primary-text-color)
+        state_color_inactive: var(--secondary-text-color)
+        state_color_active: var(--primary-text-color)
+        inactive_state: "off"
+        active_state: "on"
+        inactive_template_mode: false
+        active_template_mode: false
+        inactive_template: ""
+        active_template: ""
+        active_state_text: ""
+        inactive_state_text: ""
+        show_state: true
+        show_name: false
+        show_name_active: false
+        show_name_inactive: false
+        show_state_active: true
+        show_state_inactive: true
+        show_units: true
+        show_icon_active: true
+        show_icon_inactive: true
+        name: ""
+        on_click_action: more-info
+        text_position: bottom
+        vertical_alignment: center
+        text_alignment: center
+        icon_size: 24
+        text_size: 14
+        icon_background: none
+        icon_background_color: var(--secondary-background-color)
+        container_background: none
+        container_background_color: var(--secondary-background-color)
+        draggable: true
+        action: ""
+        service_data: {}
+      - entity: binary_sensor.ev6_turen_und_fenster
+        icon_inactive: mdi:car-door
+        icon_active: mdi:car-door
+        color_inactive: var(--secondary-text-color)
+        color_active: var(--primary-color)
+        name_color_inactive: var(--primary-text-color)
+        name_color_active: var(--primary-text-color)
+        state_color_inactive: var(--secondary-text-color)
+        state_color_active: var(--primary-text-color)
+        inactive_state: "off"
+        active_state: "on"
+        inactive_template_mode: false
+        active_template_mode: false
+        inactive_template: ""
+        active_template: ""
+        inactive_state_text: Geschl.
+        show_state: true
+        show_name: false
+        show_name_active: false
+        show_name_inactive: false
+        show_state_active: true
+        show_state_inactive: true
+        show_units: true
+        show_icon_active: true
+        show_icon_inactive: true
+        name: ""
+        on_click_action: more-info
+        text_position: bottom
+        vertical_alignment: center
+        text_alignment: center
+        icon_size: 24
+        text_size: 14
+        icon_background: none
+        icon_background_color: var(--secondary-background-color)
+        container_background: none
+        container_background_color: var(--secondary-background-color)
+        draggable: true
+        action: ""
+        service_data: {}
+        active_state_text: Offen
+      - entity: binary_sensor.ev6_air_conditioner
+        icon_inactive: mdi:air-conditioner
+        icon_active: mdi:air-conditioner
+        color_inactive: var(--secondary-text-color)
+        color_active: var(--primary-color)
+        name_color_inactive: var(--primary-text-color)
+        name_color_active: var(--primary-text-color)
+        state_color_inactive: var(--secondary-text-color)
+        state_color_active: var(--primary-text-color)
+        inactive_state: "off"
+        active_state: "on"
+        inactive_template_mode: false
+        active_template_mode: false
+        inactive_template: ""
+        active_template: ""
+        active_state_text: ""
+        inactive_state_text: ""
+        show_state: true
+        show_name: false
+        show_name_active: false
+        show_name_inactive: false
+        show_state_active: true
+        show_state_inactive: true
+        show_units: true
+        show_icon_active: true
+        show_icon_inactive: true
+        name: ""
+        on_click_action: more-info
+        text_position: bottom
+        vertical_alignment: center
+        text_alignment: center
+        icon_size: 24
+        text_size: 14
+        icon_background: none
+        icon_background_color: var(--secondary-background-color)
+        container_background: none
+        container_background_color: var(--secondary-background-color)
+        draggable: true
+        action: ""
+        service_data: {}
+    confirmation_mode: false
+  - id: whmc6ve
+    width: "100"
+    alignment: center
+    spacing: small
+    columns: 0
+    icons:
+      - entity: lock.ev6_door_lock
+        icon_inactive: mdi:lock
+        icon_active: mdi:lock
+        color_inactive: var(--secondary-text-color)
+        color_active: var(--primary-color)
+        name_color_inactive: var(--primary-text-color)
+        name_color_active: var(--primary-text-color)
+        state_color_inactive: var(--secondary-text-color)
+        state_color_active: var(--primary-text-color)
+        inactive_state: "off"
+        active_state: "on"
+        inactive_template_mode: false
+        active_template_mode: false
+        inactive_template: ""
+        active_template: ""
+        active_state_text: ""
+        inactive_state_text: ""
+        show_state: true
+        show_name: false
+        show_name_active: false
+        show_name_inactive: false
+        show_state_active: true
+        show_state_inactive: true
+        show_units: true
+        show_icon_active: true
+        show_icon_inactive: true
+        name: ""
+        on_click_action: trigger
+        text_position: bottom
+        vertical_alignment: center
+        text_alignment: center
+        icon_size: 24
+        text_size: 14
+        icon_background: none
+        icon_background_color: var(--secondary-background-color)
+        container_background: rounded-square
+        container_background_color: "#4b2626"
+        draggable: true
+        action: ""
+        service_data: {}
+      - entity: script.ev6_klima_starten
+        icon_inactive: mdi:air-conditioner
+        icon_active: mdi:air-conditioner
+        color_inactive: var(--secondary-text-color)
+        color_active: var(--primary-color)
+        name_color_inactive: var(--primary-text-color)
+        name_color_active: var(--primary-text-color)
+        state_color_inactive: var(--secondary-text-color)
+        state_color_active: var(--primary-text-color)
+        inactive_state: "off"
+        active_state: "on"
+        inactive_template_mode: false
+        active_template_mode: false
+        inactive_template: ""
+        active_template: ""
+        active_state_text: ""
+        inactive_state_text: ""
+        show_state: true
+        show_name: false
+        show_name_active: false
+        show_name_inactive: false
+        show_state_active: true
+        show_state_inactive: true
+        show_units: true
+        show_icon_active: true
+        show_icon_inactive: true
+        on_click_action: trigger
+        text_position: bottom
+        vertical_alignment: center
+        text_alignment: center
+        icon_size: 24
+        text_size: 14
+        icon_background: none
+        icon_background_color: var(--secondary-background-color)
+        container_background: rounded-square
+        container_background_color: "#263450"
+        draggable: true
+        action: ""
+        service_data: {}
+    confirmation_mode: false
+title: EV6
+image_url: /api/image/serve/2f4ff3905cfce2f5bb9d87d49d74da4b/original
+charging_image_url: ""
+image_url_type: image
+charging_image_url_type: none
+vehicle_type: EV
+unit_type: mi
+level_entity: ""
+range_entity: ""
+charging_status_entity: binary_sensor.ev6_ev_battery_charge
+location_entity: device_tracker.ev6_location
+mileage_entity: sensor.ev6_odometer
+show_level: true
+show_range: true
+show_charge_limit: true
+icon_grid_entities:
+  - row-separator
+  - number.ev6_dc_charging_limit
+  - number.ev6_ac_charging_limit
+  - binary_sensor.ev6_tire_pressure_all
+  - sensor.ev6_car_battery_level
+custom_icons:
+  number.ev6_dc_charging_limit:
+    inactiveState: default
+    activeState: default
+  number.ev6_ac_charging_limit:
+    inactiveState: default
+    activeState: default
+  binary_sensor.ev6_tire_pressure_all:
+    inactiveState: default
+    activeState: default
+  sensor.ev6_car_battery_level:
+    inactiveState: default
+    activeState: default
+icon_interactions:
+  sensor.ev6_car_battery_level:
+    type: more-info
+icon_styles:
+  binary_sensor.ev6_tire_pressure_all: round
+  number.ev6_ac_charging_limit: round
+  number.ev6_dc_charging_limit: round
+  sensor.ev6_car_battery_level: round
+icon_labels:
+  number.ev6_dc_charging_limit: bottom
+  number.ev6_ac_charging_limit: bottom
+  binary_sensor.ev6_tire_pressure_all: bottom
+  sensor.ev6_car_battery_level: bottom
+hybrid_display_order: fuel_first
+car_state_entity: binary_sensor.ev6_turen_und_fenster
+charge_limit_entity: number.ev6_ac_charging_limit
+icon_size: 24
+icon_gap: 12
+showEntityInformation: true
+carStateTextColor: var(--primary-text-color)
+rangeTextColor: var(--primary-text-color)
+percentageTextColor: var(--primary-text-color)
+icon_sizes: {}
+engine_on_entity: ""
+row_separator_color: Default
+row_separator_height: 1
+row_separators:
+  "0":
+    color: transparent
+iconActiveColor: var(--primary-color)
+iconInactiveColor: var(--primary-text-color)
+useFormattedEntities: true
+mainImageHeight: 140px
+chargingImageHeight: 140px
+showTitle: true
+layoutType: single
+useBarGradient: true
+barGradientStops:
+  - percentage: 0
+    color: "#ff0000"
+  - percentage: 100
+    color: "#00ff00"
+cardTitleColor: var(--primary-text-color)
+cardBackgroundColor: "var(--ha-card-background, var(--card-background-color, #fff))"
+barBackgroundColor: var(--secondary-text-color)
+barBorderColor: "var(--ha-card-background, var(--card-background-color, #fff))"
+barFillColor: "#4bcd13"
+limitIndicatorColor: "#ff0000"
+infoTextColor: var(--secondary-text-color)
+show_engine_animation: true
+show_charging_animation: true
+show_charging_status: true
+show_engine_on: true
+engine_on_image_url_type: none
+type: custom:ultra-vehicle-card
+battery_level_entity: sensor.ev6_ev_battery_level
+battery_range_entity: sensor.ev6_ev_range
+fuel_level_entity: ""
+fuel_range_entity: ""
+show_battery: true
+show_battery_range: true
+show_fuel: true
+show_fuel_range: true
+custom_labels: {}
+charging_image_entity: ""
+vehicle_image_width: 100
+action_image_width: 100
+show_units: true
+action_image_type: none
+vehicle_image: /api/image/serve/2d60f11498a723ee5787126b62b6f8c6
+card_background: "#383838"
