@@ -1,0 +1,20 @@
+# Beispiel ist aufgebaut auf einer Mushroom Light Card - jede andere Karte ist aber nutzbar
+- type: custom:mushroom-light-card
+  show_brightness_control: true
+  show_color_control: true
+  show_color_temp_control: true
+  use_light_color: true
+  double_tap_action:
+    action: call-service
+    perform_action: light.turn_on
+    target:
+      entity_id: light.licht_gaste_wc
+    data:
+      rgb_color:
+        - 255
+        - 255
+        - 255
+  entity: light.licht_gaste_wc
+  tap_action:
+    action: navigate
+    navigation_path: /showcase-slider-button/0#hue_card:gunther_openHueScreen # hier den Pfad zum API Hook zu deiner Hue-Like Light Card angeben
