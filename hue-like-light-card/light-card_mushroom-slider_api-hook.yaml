@@ -1,0 +1,4 @@
+type: custom:hue-like-light-card
+area: Büro Hue
+slider: mushroom # Du musst hierfür mushroom cards installiert haben
+apiId: gunther #API Hook Name ist frei wählbar
