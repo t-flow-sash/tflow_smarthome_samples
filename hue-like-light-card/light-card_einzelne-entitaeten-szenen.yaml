@@ -1,0 +1,11 @@
+type: custom:hue-like-light-card
+title: Büro
+entities:
+  - light.neon_light_desk_2
+  - light.hue_play_1
+  - light.schreibtisch_rechts
+  - light.string_schlafzimmer
+scenes:
+  - scene.ambient_full
+  - scene.buro_ambiente_nur_tisch
+  - scene.buro_ambiente_2025
