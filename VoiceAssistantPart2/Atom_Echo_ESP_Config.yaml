@@ -1,0 +1,29 @@
+substitutions:
+  name: m5stack-atom-echo-a024cc
+  friendly_name: M5Stack Atom Echo a024cc
+packages:
+  m5stack.atom-echo-wake-word-voice-assistant: github://esphome/wake-word-voice-assistants/m5stack-atom-echo/m5stack-atom-echo.yaml@main
+esphome:
+  name: ${name}
+  name_add_mac_suffix: false
+  friendly_name: ${friendly_name}
+api:
+  encryption:
+    key: <EUER API KEY>
+
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+voice_assistant:
+  noise_suppression_level: 4     # increase noise suppression to 3 -or- 4 from default 2 for better sound floor suppression
+  volume_multiplier: 5.0     # increase multiplier from 2.0 to 5.0 to give the mic a little boost...going above 5.0 with Atom Echo resulted in distorted audio for me 
+  on_tts_end:
+     - homeassistant.service:
+         service: media_player.play_media
+         data:
+           entity_id: media_player.wohnzimmer # <- this to be changed to actual media_player
+           media_content_id: !lambda 'return x;'
+           media_content_type: music
+           announce: "false"
