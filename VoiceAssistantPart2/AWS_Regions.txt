@@ -1,0 +1,36 @@
+Regions-Code	Region (Land/Stadt)
+us-east-1	US East (Northern Virginia) – USA
+us-east-2	US East (Ohio) – USA
+us-west-1	US West (Northern California) – USA
+us-west-2	US West (Oregon) – USA
+ca-central-1	Canada (Central) – Kanada
+ca-west-1	Canada West (Calgary) – Kanada
+us-gov-west-1	GovCloud (US-West) – USA
+us-gov-east-1	GovCloud (US-East) – USA
+me-mex-1	Mexico (Central) – Mexiko
+sa-east-1	South America (São Paulo) – Brasilien
+eu-west-1	Europe (Ireland) – Irland
+eu-central-1	Europe (Frankfurt) – Deutschland
+eu-west-2	Europe (London) – UK
+eu-west-3	Europe (Paris) – Frankreich
+eu-north-1	Europe (Stockholm) – Schweden
+eu-south-1	Europe (Milan) – Italien
+eu-ch-1	Europe (Zurich) – Schweiz
+eu-south-2	Europe (Spain) – Spanien
+me-south-1	Middle East (Bahrain) – Bahrain
+me-west-1	Middle East (UAE) – VAE
+il-central-1	Israel (Tel Aviv) – Israel
+af-south-1	Africa (Cape Town) – Südafrika
+ap-southeast-1	Asia Pacific (Singapore)
+ap-northeast-1	Asia Pacific (Tokyo) – Japan
+ap-northeast-2	Asia Pacific (Seoul) – Südkorea
+ap-south-1	Asia Pacific (Mumbai) – Indien
+ap-east-1	Asia Pacific (Hong Kong)
+ap-northeast-3	Asia Pacific (Osaka) – Japan
+ap-southeast-3	Asia Pacific (Jakarta) – Indonesien
+ap-south-2	Asia Pacific (Hyderabad) – Indien
+ap-southeast-4	Asia Pacific (Malaysia)
+ap-southeast-5	Asia Pacific (Thailand)
+ap-north-4	Asia Pacific (Taipei) – Taiwan
+ap-southeast-2	Australia (Sydney)
+ap-southeast-3	Australia (Melbourne)
