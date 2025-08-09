@@ -1,0 +1,16 @@
+type: custom:clock-weather-card
+entity: weather.openweathermap
+temperature_sensor: sensor.temperatur_balkon_sonoff_temperature
+humidity_sensor: sensor.wohnzimmer_wohnzimmer_wohnzimmer_balkon_humidity
+show_humidity: true
+weather_icon_type: fill
+forecast_rows: 7
+card_mod: # Der Abschnitt dient der Transparenz
+  style: |
+    ha-card { background: transparent;
+      --border-style: none;
+      --border: 0px;
+      --ha-card-header-font-size: 20px;
+      --bar-card-border-radius: 51px;
+      --ha-card-border-width: 0px;
+    }
