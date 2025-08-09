@@ -1,0 +1,22 @@
+/* ==== Den Teil in Custom Styles & JS Templates einfügen ==== */
+/* ==== Dynamische Hintergrundfarbe + transparente Karte ==== */
+
+/* Hintergrund der Bubble mit Transparenz einfärben */
+.bubble-button-background {
+  opacity: 1 !important; /* volle Sichtbarkeit der Farbe */
+  background-color: ${(() => {
+    const s = hass.states['sensor.wohnzimmer_co2'];
+    const v = s ? parseFloat(s.state) : NaN;
+    if (isNaN(v)) return 'transparent'; // kein Fallback-Farbblock
+
+    if (v >= 1500) return 'rgba(255, 0, 0, 0.4)';          // Rot, 40% sichtbar
+    if (v >= 700)  return 'rgba(255, 255, 0, 0.4)';        // Gelb, 40% sichtbar
+    return 'rgba(0, 180, 0, 0.4)';                         // Grün, 40% sichtbar
+  })()} !important;
+}
+
+ha-card {
+  --bubble-main-background-color: rgba(18, 18, 18, 0.6); /* 0.0 = komplett transparent */
+  background: transparent !important; /* sicherstellen, dass nix drunter blockiert */  
+  box-shadow: none !important; /* falls der Schatten auch weg soll */
+}
