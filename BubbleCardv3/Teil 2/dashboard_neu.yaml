@@ -1,0 +1,1940 @@
+kiosk_mode:
+  user_settings:
+    - users:
+        - wall-unit
+      kiosk: true
+      hide_header: true
+      hide_sidebar: true
+      hide_menu_button: true
+      hide_overflow: true
+views:
+  - title: Home
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Haupträume
+            heading_style: title
+            icon: mdi:sofa
+          - type: custom:bubble-card
+            card_type: button
+            button_type: state
+            entity: light.wohnzimmer_und_highboard
+            rows: '2.1'
+            sub_button:
+              - entity: cover.rollladen_kuche_wohnzimmer
+                show_state: false
+                double_tap_action:
+                  action: toggle
+                tap_action:
+                  action: navigate
+                  navigation_path: '#cover_wz-kuche'
+                show_attribute: true
+                attribute: current_position
+                show_icon: false
+              - entity: fan.zion_air
+                double_tap_action:
+                  action: toggle
+                select_attribute: preset_modes
+                show_state: true
+              - entity: media_player.apple_tv_wohnzimmer_2
+                name: TV
+                show_name: true
+                show_state: false
+              - entity: sensor.zion_pad_2_battery_state
+                icon: mdi:tablet-cellphone
+                state_background: false
+              - entity: input_boolean.spulmaschine_an_aus
+                visibility:
+                  - condition: state
+                    entity: input_boolean.spulmaschine_an_aus
+                    state: 'on'
+            use_accent_color: false
+            name: Wohnzimmer/Küche
+            show_icon: true
+            modules:
+              - subbutton_below
+              - get_state_attribute
+              - icon_border_progress
+              - card_text_style
+              - rmn_conditional_background_color
+              - custom_select
+              - badges
+            card_layout: large-sub-buttons-grid
+            badges:
+              main_icon:
+                badge_1:
+                  icon: mdi:window-open-variant
+                  condition:
+                    - condition: state
+                      entity_id: binary_sensor.fenster_gruppe_wohnzimmer
+                      state: 'on'
+                  color: red
+                badge_2:
+                  color: indigo
+                  icon: mdi:motion-sensor
+                  condition:
+                    - condition: state
+                      entity_id: binary_sensor.wohnzimmer_presence_gruppe
+                      state: 'on'
+              sub_button:
+                badge_1:
+                  attribute: current_position
+                  color: red
+                  icon: mdi:window-shutter
+                sub_button_index: 1
+            get_state_attribute:
+              - entity: sensor.temperatur_wohnzimmer_sonoff_temperature
+              - entity: sensor.temperatur_wohnzimmer_sonoff_humidity
+              - entity: sensor.wohnzimmer_co2
+            button_action:
+              tap_action:
+                action: navigate
+                navigation_path: '#wohnzimmer'
+            light_transition: false
+            icon_border_progress:
+              - color_stops:
+                  '0':
+                    color: green
+                    percent: 15
+                  '1':
+                    color: green
+                    percent: 70
+                remaining_color: dark-grey
+                button: sub-button-4
+                source: sensor.zion_pad_2_battery_level
+                interpolate_colors: true
+            card_text_style:
+              name:
+                font_size: 18px
+                opacity: 1
+                font_weight: bold
+              state:
+                color: white
+                font_weight: bold
+            rmn_conditional_background_color:
+              background_1:
+                color_preset: red
+                color_mode: preset
+                conditions:
+                  - condition: numeric_state
+                    entity_id: sensor.wohnzimmer_co2
+                    above: 1500
+              opacity: 50
+            styles: |-
+              /* ==== Dynamische Hintergrundfarbe + transparente Karte ==== */
+
+              /* Hintergrund der Bubble mit Transparenz einfärben */
+              .bubble-button-background {
+                opacity: 1 !important; /* volle Sichtbarkeit der Farbe */
+                background-color: ${(() => {
+                  const s = hass.states['sensor.wohnzimmer_co2'];
+                  const v = s ? parseFloat(s.state) : NaN;
+                  if (isNaN(v)) return 'transparent'; // kein Fallback-Farbblock
+
+                  if (v >= 1500) return 'rgba(255, 0, 0, 0.4)';          // Rot, 40% sichtbar
+                  if (v >= 700)  return 'rgba(255, 255, 0, 0.4)';        // Gelb, 40% sichtbar
+                  return 'rgba(0, 180, 0, 0.4)';                         // Grün, 40% sichtbar
+                })()} !important;
+              }
+
+              ha-card {
+                --bubble-main-background-color: rgba(18, 18, 18, 0.6); /* 0.0 = komplett transparent */
+                background: transparent !important; /* sicherstellen, dass nix drunter blockiert */  
+                box-shadow: none !important; /* falls der Schatten auch weg soll */
+              }
+            sub_button_wheel:
+              wheel_opener: sub-button-2
+              layout_options:
+                wheel_layout: fixed-position
+              animation_options:
+                wheel_animation: staggered-scale
+                animation_delay: 1
+                animation_duration: 1
+              wheel_buttons:
+                '0':
+                  sub_button: '1'
+                '1':
+                  sub_button: '2'
+                '2':
+                  sub_button: '3'
+                '3':
+                  sub_button: '4'
+            custom_select:
+              sub_button_3:
+                - position: 1
+                  name: TV an/aus
+                  icon: mdi:power-standby
+                  action:
+                    - action: media_player.turn_on
+                      target:
+                        entity_id: media_player.sony_kd_65xg9505_2
+                    - action: media_player.turn_off
+                      target:
+                        entity_id: media_player.sony_kd_65xg9505_2
+                - position: 2
+                  name: AppleTV an/aus
+                  icon: mdi:power-standby
+                  action:
+                    - action: media_player.turn_on
+                      target:
+                        entity_id: media_player.apple_tv_wohnzimmer_2
+                    - action: media_player.turn_off
+                      target:
+                        entity_id: media_player.apple_tv_wohnzimmer_2
+          - type: custom:bubble-card
+            card_type: button
+            button_type: state
+            entity: light.lichtgruppe_buro_schlafen
+            rows: '2.1'
+            sub_button:
+              - entity: cover.rolllade_kleines_kuchenfenster
+                show_state: false
+                double_tap_action:
+                  action: toggle
+                tap_action:
+                  action: more-info
+                show_attribute: true
+                attribute: current_position
+                show_icon: false
+              - entity: binary_sensor.kuchengerate_status
+                double_tap_action:
+                  action: toggle
+                show_state: false
+              - select_attribute: source_list
+                name: ''
+                show_name: true
+                entity: input_boolean.waschmaschine_an_aus
+                show_arrow: false
+            use_accent_color: false
+            name: Büro/Schlafen
+            show_icon: true
+            modules:
+              - subbutton_below
+              - badges
+              - get_state_attribute
+              - icon_border_progress
+              - card_text_style
+              - rmn_conditional_background_color
+            card_layout: large-sub-buttons-grid
+            badges:
+              main_icon:
+                badge_1:
+                  icon: mdi:window-open-variant
+                  condition:
+                    - condition: state
+                      entity_id: binary_sensor.fenster_buro_aqara_contact
+                      state: 'on'
+                  color: red
+                badge_2:
+                  color: indigo
+                  icon: mdi:motion-sensor
+                  condition:
+                    - condition: state
+                      entity_id: binary_sensor.wohnzimmer_presence_gruppe
+                      state: 'on'
+              sub_button:
+                badge_1:
+                  attribute: current_position
+                  color: red
+                  icon: mdi:window-shutter
+                sub_button_index: 1
+            get_state_attribute:
+              - entity: sensor.switchbot_meter_pro_temperatur
+              - entity: sensor.switchbot_meter_pro_luftfeuchtigkeit
+              - entity: sensor.switchbot_meter_pro_kohlendioxid
+            button_action:
+              tap_action:
+                action: navigate
+                navigation_path: '#buroschlafen'
+            light_transition: false
+            icon_border_progress:
+              - color_stops:
+                  '0':
+                    color: green
+                    percent: 15
+                  '1':
+                    color: green
+                    percent: 70
+                remaining_color: dark-grey
+                button: sub-button-4
+                source: sensor.zion_pad_2_battery_level
+                interpolate_colors: true
+            card_text_style:
+              name:
+                font_size: 18px
+                opacity: 1
+                font_weight: bold
+              state:
+                color: white
+                font_weight: bold
+            rmn_conditional_background_color:
+              background_1:
+                color_preset: red
+                color_mode: preset
+                conditions:
+                  - condition: numeric_state
+                    entity_id: sensor.meter_pro_co2_ba_temperatur
+                    above: 1500
+              opacity: 50
+            styles: |-
+              /* ==== Dynamische Hintergrundfarbe + transparente Karte ==== */
+
+              /* Hintergrund der Bubble mit Transparenz einfärben */
+              .bubble-button-background {
+                opacity: 1 !important; /* volle Sichtbarkeit der Farbe */
+                background-color: ${(() => {
+                  const s = hass.states['sensor.switchbot_meter_pro_kohlendioxid'];
+                  const v = s ? parseFloat(s.state) : NaN;
+                  if (isNaN(v)) return 'transparent'; // kein Fallback-Farbblock
+
+                  if (v >= 1500) return 'rgba(255, 0, 0, 0.4)';          // Rot, 40% sichtbar
+                  if (v >= 700)  return 'rgba(255, 255, 0, 0.4)';        // Gelb, 40% sichtbar
+                  return 'rgba(0, 180, 0, 0.4)';                         // Grün, 40% sichtbar
+                })()} !important;
+              }
+
+              ha-card {
+                --bubble-main-background-color: rgba(18, 18, 18, 0.6); /* 0.0 = komplett transparent */
+                background: transparent !important; /* sicherstellen, dass nix drunter blockiert */
+                box-shadow: none !important; /* falls der Schatten auch weg soll */
+              }
+          - type: custom:bubble-card
+            card_type: button
+            button_type: state
+            entity: light.emilys_zimmer_gruppe
+            rows: '2.1'
+            sub_button:
+              - entity: cover.rolllade_emily
+                show_state: false
+                double_tap_action:
+                  action: toggle
+                tap_action:
+                  action: more-info
+                show_icon: false
+                show_attribute: true
+                attribute: current_position
+              - entity: media_player.echo_emily
+              - entity: binary_sensor.toniebox
+                icon: hue:sync-music
+            use_accent_color: false
+            name: Emily
+            show_icon: true
+            modules:
+              - subbutton_below
+              - badges
+              - get_state_attribute
+              - icon_border_progress
+              - card_text_style
+              - rmn_conditional_background_color
+            card_layout: large-sub-buttons-grid
+            badges:
+              main_icon:
+                badge_1:
+                  icon: mdi:window-open-variant
+                  condition:
+                    - condition: state
+                      entity_id: binary_sensor.fenster_emily_aqara_contact
+                      state: 'on'
+                  color: red
+                badge_2:
+                  color: indigo
+                  icon: mdi:motion-sensor
+                  condition:
+                    - condition: state
+                      entity_id: binary_sensor.fp2_emily_presence_sensor_1
+                      state: 'on'
+                badge_3:
+                  icon: mdi:sleep
+                  condition:
+                    - condition: state
+                      entity_id: input_boolean.good_night_emily
+                      state: 'on'
+              sub_button:
+                badge_1:
+                  attribute: current_position
+                  color: red
+                  icon: mdi:window-shutter
+                sub_button_index: 1
+            get_state_attribute:
+              - entity: sensor.sonoff_temperatur_emily_temperature
+              - entity: sensor.sonoff_temperatur_emily_humidity
+              - entity: sensor.wohnzimmer_wohnzimmer_wohnzimmer_emilys_zimmer_co2
+            button_action:
+              tap_action:
+                action: navigate
+                navigation_path: '#wohnzimmer'
+            light_transition: false
+            icon_border_progress:
+              - color_stops:
+                  '0':
+                    color: green
+                    percent: 15
+                  '1':
+                    color: green
+                    percent: 70
+                remaining_color: dark-grey
+                button: sub-button-4
+                source: sensor.zion_pad_2_battery_level
+                interpolate_colors: true
+            card_text_style:
+              name:
+                font_size: 18px
+                opacity: 1
+                font_weight: bold
+              state:
+                color: white
+                font_weight: bold
+            rmn_conditional_background_color:
+              background_1:
+                color_preset: red
+                color_mode: preset
+                conditions:
+                  - condition: numeric_state
+                    entity_id: sensor.wohnzimmer_wohnzimmer_wohnzimmer_emilys_zimmer_co2
+                    above: 1500
+              opacity: 50
+            show_attribute: false
+            styles: |-
+              /* ==== Dynamische Hintergrundfarbe + transparente Karte ==== */
+
+              /* Hintergrund der Bubble mit Transparenz einfärben */
+              .bubble-button-background {
+                opacity: 1 !important; /* volle Sichtbarkeit der Farbe */
+                background-color: ${(() => {
+                  const s = hass.states['sensor.wohnzimmer_wohnzimmer_wohnzimmer_emilys_zimmer_co2'];
+                  const v = s ? parseFloat(s.state) : NaN;
+                  if (isNaN(v)) return 'transparent'; // kein Fallback-Farbblock
+
+                  if (v >= 1500) return 'rgba(255, 0, 0, 0.4)';          // Rot, 40% sichtbar
+                  if (v >= 700)  return 'rgba(255, 255, 0, 0.4)';        // Gelb, 40% sichtbar
+                  return 'rgba(0, 180, 0, 0.4)';                         // Grün, 40% sichtbar
+                })()} !important;
+              }
+
+              ha-card {
+                --bubble-main-background-color: rgba(18, 18, 18, 0.6); /* 0.0 = komplett transparent */
+                box-shadow: none !important; /* falls der Schatten auch weg soll */
+              }
+          - type: custom:bubble-card
+            card_type: button
+            button_type: state
+            entity: light.lias_zimmer_gruppe_2
+            rows: '2.1'
+            sub_button:
+              - entity: cover.rolllade_schlafzimmer
+                show_state: false
+                double_tap_action:
+                  action: toggle
+                tap_action:
+                  action: more-info
+                show_attribute: true
+                attribute: current_position
+                show_icon: false
+            use_accent_color: false
+            name: Lia
+            show_icon: true
+            modules:
+              - subbutton_below
+              - badges
+              - get_state_attribute
+              - icon_border_progress
+              - card_text_style
+              - rmn_conditional_background_color
+            card_layout: large-sub-buttons-grid
+            badges:
+              main_icon:
+                badge_1:
+                  icon: mdi:window-open-variant
+                  condition:
+                    - condition: state
+                      entity_id: binary_sensor.fenster_lia_aqara_contact
+                      state: 'on'
+                  color: red
+                badge_2:
+                  color: indigo
+                badge_3:
+                  icon: mdi:sleep
+                  condition:
+                    - condition: state
+                      entity_id: input_boolean.good_night_lia
+                      state: 'on'
+              sub_button:
+                badge_1:
+                  attribute: current_position
+                  color: red
+                  icon: mdi:window-shutter
+                sub_button_index: 1
+            get_state_attribute:
+              - entity: sensor.sonoff_temperatur_schlafzimmer_temperature
+              - entity: sensor.sonoff_temperatur_schlafzimmer_humidity
+              - entity: sensor.wohnzimmer_wohnzimmer_wohnzimmer_schlafzimmer_co2
+            button_action:
+              tap_action:
+                action: navigate
+                navigation_path: '#wohnzimmer'
+            light_transition: false
+            icon_border_progress:
+              - color_stops:
+                  '0':
+                    color: green
+                    percent: 15
+                  '1':
+                    color: green
+                    percent: 70
+                remaining_color: dark-grey
+                button: sub-button-4
+                source: sensor.zion_pad_2_battery_level
+                interpolate_colors: true
+            card_text_style:
+              name:
+                font_size: 18px
+                opacity: 1
+                font_weight: bold
+              state:
+                color: white
+                font_weight: bold
+            rmn_conditional_background_color:
+              background_1:
+                color_preset: red
+                color_mode: preset
+                conditions:
+                  - condition: numeric_state
+                    entity_id: sensor.wohnzimmer_wohnzimmer_wohnzimmer_schlafzimmer_co2
+                    above: 1500
+              opacity: 50
+            styles: |-
+              /* ==== Dynamische Hintergrundfarbe + transparente Karte ==== */
+
+              /* Hintergrund der Bubble mit Transparenz einfärben */
+              .bubble-button-background {
+                opacity: 1 !important; /* volle Sichtbarkeit der Farbe */
+                background-color: ${(() => {
+                  const s = hass.states['sensor.wohnzimmer_wohnzimmer_wohnzimmer_schlafzimmer_co2'];
+                  const v = s ? parseFloat(s.state) : NaN;
+                  if (isNaN(v)) return 'transparent'; // kein Fallback-Farbblock
+
+                  if (v >= 1500) return 'rgba(255, 0, 0, 0.4)';          // Rot, 40% sichtbar
+                  if (v >= 700)  return 'rgba(255, 255, 0, 0.4)';        // Gelb, 40% sichtbar
+                  return 'rgba(0, 180, 0, 0.4)';                         // Grün, 40% sichtbar
+                })()} !important;
+              }
+
+              ha-card {
+                --bubble-main-background-color: rgba(18, 18, 18, 0.6); /* 0.0 = komplett transparent */
+                background: transparent !important; /* sicherstellen, dass nix drunter blockiert */
+                box-shadow: none !important; /* falls der Schatten auch weg soll */
+              }
+          - type: heading
+            heading: Nebenräume
+            heading_style: title
+            icon: mdi:account-group
+          - type: custom:bubble-card
+            card_type: button
+            button_type: state
+            entity: light.flur_gruppe
+            rows: '2.1'
+            sub_button:
+              - show_state: true
+                double_tap_action:
+                  action: toggle
+                tap_action:
+                  action: toggle
+                entity: binary_sensor.haustur_aqara_contact
+              - entity: alarm_control_panel.alarmo
+                state_background: true
+                show_state: true
+            use_accent_color: false
+            name: Flur
+            show_icon: true
+            modules:
+              - get_state_attribute
+              - card_text_style
+              - badges
+            card_layout: normal
+            badges:
+              main_icon:
+                badge_1:
+                  icon: mdi:window-open-variant
+                  condition:
+                    - condition: state
+                      entity_id: binary_sensor.fenster_badezimmer_contact
+                      state: 'on'
+                  color: red
+                badge_2:
+                  color: indigo
+                  icon: mdi:motion-sensor
+                  condition:
+                    - condition: state
+                      entity_id: binary_sensor.flur_sensor_kombiniert
+                      state: 'on'
+            tap_action:
+              action: navigate
+              navigation_path: '#wohnzimmer'
+            get_state_attribute:
+              - entity: sensor.sonoff_display_flur_temperatur_temperature
+              - entity: sensor.sonoff_display_flur_temperatur_humidity
+            card_text_style:
+              name:
+                font_size: 18px
+            icon_border_progress:
+              - color_stops:
+                  '0':
+                    color: green
+                    percent: 0
+                button: sub-button-2
+                source: sensor.eaton_3s_akku_ladung
+            button_action:
+              tap_action:
+                action: navigate
+                navigation_path: '#flur'
+          - type: custom:bubble-card
+            card_type: button
+            button_type: state
+            entity: light.abstellraum
+            rows: '2.1'
+            sub_button:
+              - entity: fan.steckdose_beluftung_kammer
+                show_state: false
+                double_tap_action:
+                  action: toggle
+                tap_action:
+                  action: toggle
+              - entity: sensor.eaton_3s_akku_ladung
+                state_background: false
+            use_accent_color: false
+            name: Abstellkammer
+            show_icon: true
+            modules:
+              - get_state_attribute
+              - card_text_style
+              - icon_border_progress
+            card_layout: normal
+            badges:
+              main_icon:
+                badge_1:
+                  icon: mdi:motion-sensor
+                  condition:
+                    - condition: state
+                      entity_id: binary_sensor.wohnzimmer_presence_gruppe
+                      state: 'on'
+            tap_action:
+              action: navigate
+              navigation_path: '#wohnzimmer'
+            get_state_attribute:
+              - entity: sensor.sonoff_abstellkammer_temperature
+              - entity: sensor.sonoff_abstellkammer_humidity
+            card_text_style:
+              name:
+                font_size: 18px
+            icon_border_progress:
+              - color_stops:
+                  '0':
+                    color: green
+                    percent: 0
+                button: sub-button-2
+                source: sensor.eaton_3s_akku_ladung
+          - type: custom:bubble-card
+            card_type: button
+            button_type: state
+            entity: light.wannenbad_gruppe
+            rows: '2.1'
+            sub_button:
+              - entity: input_boolean.waschmaschine_an_aus
+                show_state: false
+                double_tap_action:
+                  action: toggle
+                tap_action:
+                  action: toggle
+              - entity: input_boolean.trocker_an_aus
+                state_background: false
+            use_accent_color: false
+            name: Badezimmer
+            show_icon: true
+            modules:
+              - get_state_attribute
+              - card_text_style
+              - badges
+            card_layout: normal
+            badges:
+              main_icon:
+                badge_1:
+                  icon: mdi:window-open-variant
+                  condition:
+                    - condition: state
+                      entity_id: binary_sensor.fenster_badezimmer_contact
+                      state: 'on'
+                  color: red
+                badge_2:
+                  color: indigo
+                  icon: mdi:motion-sensor
+                  condition:
+                    - condition: state
+                      entity_id: binary_sensor.fp2_badezimmer_presence_sensor_1
+                      state: 'on'
+            tap_action:
+              action: navigate
+              navigation_path: '#wohnzimmer'
+            get_state_attribute:
+              - entity: sensor.sensor_temperatur_wannenbad_temperature
+              - entity: sensor.sensor_temperatur_wannenbad_humidity
+            card_text_style:
+              name:
+                font_size: 18px
+            icon_border_progress:
+              - color_stops:
+                  '0':
+                    color: green
+                    percent: 0
+                button: sub-button-2
+                source: sensor.eaton_3s_akku_ladung
+          - type: custom:bubble-card
+            card_type: button
+            button_type: state
+            entity: light.licht_gaste_wc
+            rows: '2.1'
+            sub_button:
+              - entity: media_player.badezimmer_2
+                state_background: false
+            use_accent_color: false
+            name: Gäste WC
+            show_icon: true
+            modules:
+              - get_state_attribute
+              - card_text_style
+              - badges
+            card_layout: normal
+            badges:
+              main_icon:
+                badge_1:
+                  icon: mdi:window-open-variant
+                  condition:
+                    - condition: state
+                      entity_id: binary_sensor.fenster_badezimmer_contact
+                      state: 'on'
+                  color: red
+                badge_2:
+                  color: indigo
+                  icon: mdi:motion-sensor
+                  condition:
+                    - condition: state
+                      entity_id: binary_sensor.fp2_badezimmer_presence_sensor_1
+                      state: 'on'
+            tap_action:
+              action: navigate
+              navigation_path: '#wohnzimmer'
+            get_state_attribute:
+              - entity: sensor.sonoff_display_temperatur_duschbad_temperature
+              - entity: sensor.sonoff_display_temperatur_duschbad_humidity
+            card_text_style:
+              name:
+                font_size: 18px
+            icon_border_progress:
+              - color_stops:
+                  '0':
+                    color: green
+                    percent: 0
+                button: sub-button-2
+                source: sensor.eaton_3s_akku_ladung
+        column_span: 2
+      - type: grid
+        cards:
+          - type: heading
+            heading: Klima
+            heading_style: title
+            icon: mdi:weather-partly-cloudy
+            badges:
+              - type: entity
+                entity: sensor.temperatur_balkon_sonoff_temperature
+              - type: entity
+                entity: sensor.wohnzimmer_wohnzimmer_wohnzimmer_balkon_humidity
+          - type: custom:clock-weather-card
+            entity: weather.openweathermap
+            temperature_sensor: sensor.temperatur_balkon_sonoff_temperature
+            humidity_sensor: sensor.wohnzimmer_wohnzimmer_wohnzimmer_balkon_humidity
+            show_humidity: true
+            weather_icon_type: fill
+            forecast_rows: 7
+            card_mod:
+              style: |
+                ha-card { background: transparent;
+                  --border-style: none;
+                  --border: 0px;
+                  --ha-card-header-font-size: 20px;
+                  --bar-card-border-radius: 51px;
+                  --ha-card-border-width: 0px;
+                }
+          - type: heading
+            icon: mdi:multimedia
+            heading: Medien
+            heading_style: title
+          - type: custom:bubble-card
+            card_type: media-player
+            entity: media_player.apple_tv_wohnzimmer_2
+            visibility:
+              - condition: state
+                entity: media_player.apple_tv_wohnzimmer_2
+                state_not: standby
+              - condition: state
+                entity: media_player.apple_tv_wohnzimmer_2
+                state_not: 'off'
+          - type: custom:bubble-card
+            card_type: media-player
+            entity: media_player.sony_kd_65xg9505_2
+            visibility:
+              - condition: state
+                entity: media_player.sony_kd_65xg9505_2
+                state_not: standby
+              - condition: state
+                entity: media_player.sony_kd_65xg9505_2
+                state_not: 'off'
+          - type: custom:bubble-card
+            card_type: media-player
+            entity: media_player.badezimmer
+            visibility:
+              - condition: state
+                entity: media_player.badezimmer
+                state_not: standby
+              - condition: state
+                entity: media_player.badezimmer
+                state_not: 'off'
+              - condition: state
+                entity: media_player.badezimmer
+                state_not: idle
+          - type: custom:bubble-card
+            card_type: button
+            button_type: switch
+            modules:
+              - timer_progress
+            timer_progress:
+              timer_entity: timer.sleep_shutdown
+            entity: timer.sleep_shutdown
+            visibility:
+              - condition: state
+                entity: input_boolean.good_night_switch
+                state: 'on'
+              - condition: state
+                entity: media_player.apple_tv_wohnzimmer_2
+                state_not: 'off'
+            tap_action:
+              action: perform-action
+              perform_action: timer.start
+              target:
+                entity_id: timer.sleep_shutdown
+            sub_button:
+              - entity: timer.sleep_shutdown
+                show_last_changed: false
+                show_icon: false
+                state_background: false
+                show_background: false
+                show_state: false
+                show_attribute: true
+                attribute: finishes_at
+              - entity: timer.sleep_shutdown
+                tap_action:
+                  action: perform-action
+                  perform_action: timer.pause
+                  target:
+                    entity_id: timer.sleep_shutdown
+                icon: mdi:pause
+        column_span: 1
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: Pop Up Container
+            visibility:
+              - condition: numeric_state
+                entity: sensor.abstellkammer_sensor_temperature
+                below: 2
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#wohnzimmer'
+                button_type: slider
+                name: Wohnzimmer
+                show_icon: true
+                entity: light.wohnzimmer_und_highboard
+                card_layout: normal
+                auto_close: ''
+                width_desktop: 800px
+                modules: []
+                cover_gradient_background_indicator:
+                  highlight_closed: false
+              - type: custom:bubble-card
+                card_type: separator
+                sub_button:
+                  - entity: sensor.temperatur_wohnzimmer_sonoff_temperature
+                    show_state: true
+                    show_icon: false
+                    show_background: false
+                  - entity: sensor.temperatur_wohnzimmer_sonoff_humidity
+                    show_icon: false
+                    show_state: true
+                    show_background: false
+              - show_state: false
+                show_name: false
+                camera_view: live
+                fit_mode: cover
+                type: picture-entity
+                image: https://demo.home-assistant.io/stub_config/bedroom.png
+                camera_image: camera.reolink_wohnzimmer_flussig
+                entity: camera.reolink_wohnzimmer_flussig
+              - type: custom:bubble-card
+                card_type: separator
+              - type: custom:bubble-card
+                card_type: button
+                button_type: state
+                name: Wetter
+                icon: ''
+                sub_button:
+                  - entity: sensor.openweathermap_temperature
+                    show_state: true
+                    show_icon: false
+                    state_background: false
+                    show_background: false
+                  - entity: sensor.openweathermap_humidity
+                    show_state: true
+                    show_icon: false
+                    state_background: false
+                    show_background: false
+                  - entity: sensor.openweathermap_rain
+                    state_background: false
+                    show_background: false
+                    show_state: true
+                    icon: mdi:molecule-co2
+                  - entity: sensor.openweathermap_wind_speed
+                    show_state: true
+                    show_name: false
+                    show_icon: false
+                    state_background: false
+                    show_background: false
+                entity: weather.home
+                card_layout: large-2-rows
+                rows: '1.2'
+              - type: custom:bubble-card
+                card_type: separator
+              - type: horizontal-stack
+                cards:
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: light.lowboard_links
+                    card_layout: normal
+                    rows: '0.9'
+                    slider_live_update: true
+                    tap_to_slide: false
+                    light_transition: false
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: light.lowboard_rechts
+                    card_layout: normal
+                    slider_live_update: true
+              - type: horizontal-stack
+                cards:
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: light.sideboard
+                    card_layout: normal
+                    rows: '0.9'
+                    slider_live_update: true
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: light.hue_lightguide_bulb_1
+                    card_layout: normal
+                    slider_live_update: true
+              - type: horizontal-stack
+                cards:
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: light.sofa_links
+                    card_layout: normal
+                    rows: '0.9'
+                    slider_live_update: true
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: light.sofa_rechts
+                    card_layout: normal
+                    slider_live_update: true
+              - type: horizontal-stack
+                cards:
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: light.sofa_unten_wled
+                    card_layout: normal
+                    rows: '0.9'
+                    use_accent_color: false
+                    slider_live_update: true
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: light.beleuchtung_highboard
+                    card_layout: normal
+                    slider_live_update: true
+              - type: custom:bubble-card
+                card_type: separator
+                name: Multimedia
+                icon: mdi:television
+              - type: custom:bubble-card
+                card_type: media-player
+                entity: media_player.apple_tv_wohnzimmer_2
+              - type: custom:bubble-card
+                card_type: media-player
+                entity: media_player.denon_wohnzimmer_airplay
+              - type: custom:bubble-card
+                card_type: media-player
+                entity: media_player.saschas_echo_show
+              - type: custom:bubble-card
+                card_type: separator
+                name: Rollladen
+                icon: mdi:window-shutter
+                sub_button:
+                  - entity: scene.blinds_tv_gaming_new
+                    tap_action:
+                      action: toggle
+                    icon: mdi:window-shutter
+                  - entity: scene.blinds_living_room_all_up
+                    tap_action:
+                      action: toggle
+              - type: horizontal-stack
+                cards:
+                  - type: custom:bubble-card
+                    card_type: cover
+                    entity: cover.rolllade_balkon
+                    show_name: true
+                    show_icon: false
+                    name: Balkon
+                    modules:
+                      - cover_gradient_background_indicator
+                  - type: custom:bubble-card
+                    card_type: cover
+                    entity: cover.rolllade_sofa
+                    show_icon: false
+                    name: Sofa
+                    modules:
+                      - cover_gradient_background_indicator
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#buroschlafen'
+                button_type: slider
+                name: Büro/Schlafen
+                show_icon: true
+                entity: light.lichtgruppe_buro_schlafen
+                card_layout: normal
+                auto_close: '10000'
+                icon: mdi:bed-outline
+                width_desktop: 800px
+              - type: custom:bubble-card
+                card_type: separator
+                name: Licht
+                icon: hue:beyond-solid
+              - type: horizontal-stack
+                cards:
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: light.neon_light_desk_2
+                    card_layout: normal
+                    rows: '0.9'
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: switch
+                    entity: light.schreibtisch_rechts
+                    card_layout: normal
+              - type: horizontal-stack
+                cards:
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: light.string_schlafzimmer
+                    card_layout: normal
+                    rows: '0.9'
+                    name: Schrank
+                    icon: mdi:led-strip-variant
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: light.hue_play_1
+                    card_layout: normal
+              - type: custom:bubble-card
+                card_type: separator
+                name: Rollladen
+                icon: mdi:window-shutter
+              - type: custom:bubble-card
+                card_type: cover
+                entity: cover.rolllade_buro
+                name: Schlafzimmer
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#shortcuts'
+                button_type: slider
+                name: Küche
+                show_icon: true
+                entity: light.kuche
+                card_layout: normal
+                auto_close: '10000'
+                icon: mdi:table-chair
+                show_header: false
+              - type: custom:bubble-card
+                card_type: separator
+                name: Routinen
+                icon: mdi:progress-check
+                sub_button: []
+              - type: horizontal-stack
+                cards:
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: switch
+                    entity: input_boolean.good_night_emily
+                    card_layout: normal
+                    rows: '0.9'
+                    show_state: true
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: switch
+                    entity: input_boolean.good_night_lia
+                    card_layout: normal
+                    show_state: true
+              - type: custom:bubble-card
+                card_type: button
+                button_type: switch
+                entity: input_boolean.lias_nickerchen
+                card_layout: normal
+                show_state: true
+              - type: custom:bubble-card
+                card_type: button
+                button_type: switch
+                entity: input_boolean.good_night_switch
+                card_layout: normal
+                show_state: true
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#lightshortcuts'
+                button_type: slider
+                name: Küche
+                show_icon: true
+                entity: light.kuche
+                card_layout: normal
+                auto_close: '10000'
+                icon: mdi:table-chair
+                show_header: false
+                styles: ''
+              - type: custom:bubble-card
+                card_type: separator
+                name: Licht Schnellwahl
+                icon: mdi:progress-check
+                sub_button: []
+              - type: horizontal-stack
+                cards:
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: light.esstisch_unten
+                    card_layout: normal
+                    rows: '0.9'
+                    show_state: true
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: light.schreibtisch_links
+                    card_layout: normal
+              - type: custom:bubble-card
+                card_type: button
+                button_type: switch
+                entity: input_button.licht_arbeitsplatte
+                card_layout: normal
+                show_state: false
+                styles: |2-
+                    button:
+                      background-color: >
+                        [[[
+                          return states['light.arbeitsplatte'].state === 'on'
+                            ? '#fdd835'
+                            : '#424242';
+                        ]]]
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#flur'
+                button_type: slider
+                name: Flur
+                show_icon: true
+                entity: light.flur_gruppe
+                card_layout: normal
+                auto_close: '10000'
+                icon: mdi:hanger
+                width_desktop: 800px
+              - type: custom:bubble-card
+                card_type: separator
+                name: Licht
+                icon: hue:beyond-solid
+              - type: horizontal-stack
+                cards:
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: light.garderobe
+                    card_layout: normal
+                    rows: '0.9'
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: light.spiegel
+                    card_layout: normal
+              - type: horizontal-stack
+                cards:
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: light.ecke_flur
+                    card_layout: normal
+                    rows: '0.9'
+                    name: ''
+                    icon: mdi:led-strip-variant
+                  - type: custom:bubble-card
+                    card_type: button
+                    button_type: slider
+                    entity: light.hue_lightstrip_plus_1
+                    card_layout: normal
+              - type: custom:bubble-card
+                card_type: button
+                button_type: slider
+                entity: light.hue_color_lamp_1
+                card_layout: normal
+              - type: custom:bubble-card
+                card_type: separator
+                name: Sicherheit
+                icon: mdi:security
+              - show_state: false
+                show_name: false
+                camera_view: live
+                fit_mode: cover
+                type: picture-entity
+                entity: light.arbeitsplatte
+                image: https://demo.home-assistant.io/stub_config/bedroom.png
+                camera_image: camera.flur_ptz_standardauflosung
+              - type: custom:alarmo-card
+                entity: alarm_control_panel.alarmo
+                name: ''
+                keep_keypad_visible: false
+                use_clear_icon: true
+                button_scale_actions: 1
+                button_scale_keypad: 1
+                states:
+                  armed_away:
+                    state_label: Abwesend
+                    button_label: Abwesend
+                  armed_home:
+                    button_label: Zu Hause
+                  armed_vacation:
+                    button_label: Urlaub
+                show_messages: true
+                show_ready_indicator: true
+                show_bypassed_sensors: true
+                use_code_dialog: false
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#doorbell'
+                button_type: state
+                entity: binary_sensor.eingangstur_ding
+                trigger_close: false
+                trigger:
+                  - condition: state
+                    entity: input_boolean.test_doorbell
+                    state: 'on'
+              - show_state: false
+                show_name: false
+                camera_view: live
+                fit_mode: cover
+                type: picture-entity
+                image: https://demo.home-assistant.io/stub_config/bedroom.png
+                camera_image: camera.cam_eingang_fliessend
+                entity: camera.cam_eingang_fliessend
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#alarm'
+                button_type: name
+                width_desktop: 800px
+              - type: custom:alarmo-card
+                entity: alarm_control_panel.alarmo
+              - show_state: false
+                show_name: false
+                camera_view: live
+                fit_mode: cover
+                type: picture-entity
+                entity: camera.cam_eingang_fliessend
+                image: https://demo.home-assistant.io/stub_config/bedroom.png
+              - show_state: false
+                show_name: false
+                camera_view: live
+                fit_mode: cover
+                type: picture-entity
+                entity: camera.flur_ptz_standardauflosung
+                image: https://demo.home-assistant.io/stub_config/bedroom.png
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#wetter'
+                button_type: state
+                entity: weather.openweathermap
+                slide_to_close_distance: '400'
+                width_desktop: 800px
+              - type: custom:weather-chart-card
+                entity: weather.home
+                show_main: true
+                show_temperature: true
+                show_current_condition: true
+                show_attributes: true
+                show_time: false
+                show_day: false
+                show_date: false
+                show_humidity: true
+                show_pressure: true
+                show_wind_direction: true
+                show_wind_speed: true
+                show_sun: true
+                show_feels_like: true
+                icons_size: '40'
+                animated_icons: true
+                icon_style: style1
+                forecast:
+                  precipitation_type: rainfall
+                  labels_font_size: '11'
+                  precip_bar_size: '100'
+                  style: style2
+                  show_wind_forecast: true
+                  condition_icons: true
+                  round_temp: false
+                  type: daily
+                  use_12hour_format: false
+                units:
+                  pressure: ''
+                  speed: ''
+                locale: de
+                title: Aktuelles Wetter
+                show_last_changed: true
+                use_12hour_format: false
+                description: sensor.openweathermap_condition
+                current_temp_size: '28'
+                feels_like: sensor.openweathermap_feels_like_temperature
+              - type: iframe
+                url: >-
+                  https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=default&metricTemp=default&metricWind=default&zoom=8&overlay=rain&product=ecmwf&level=surface&lat=51.055&lon=7.059&detailLat=51.056070541830934&detailLon=7.053909301757813&marker=true&message=true
+                aspect_ratio: 100%
+                grid_options:
+                  columns: full
+                  rows: 8
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#ev6'
+                button_type: state
+                entity: sensor.ev6_ev_battery_level
+                icon_border_progress:
+                  - button: sub-button-1
+                    source: sensor.ev6_ev_battery_level
+                modules:
+                  - rmn_conditional_background_color
+                width_desktop: 800px
+              - vehicle_image_type: upload
+                status_image_type: none
+                layout_type: single
+                formatted_entities: true
+                show_location: true
+                show_mileage: true
+                show_car_state: false
+                show_info_icons: true
+                help_highlight: true
+                sections_order:
+                  - title
+                  - info_row_wrhey5h
+                  - info_row_o9u21x2
+                  - image
+                  - info
+                  - icon_row_tc2mw18
+                  - icon_row_whmc6ve
+                bars: []
+                icon_rows:
+                  - id: tc2mw18
+                    width: '100'
+                    alignment: center
+                    spacing: none
+                    columns: 0
+                    icons:
+                      - entity: sensor.ev6_car_battery_level
+                        icon_inactive: mdi:car-battery
+                        icon_active: mdi:car-battery
+                        color_inactive: var(--secondary-text-color)
+                        color_active: var(--primary-color)
+                        name_color_inactive: var(--primary-text-color)
+                        name_color_active: var(--primary-text-color)
+                        state_color_inactive: var(--secondary-text-color)
+                        state_color_active: var(--primary-text-color)
+                        inactive_state: 'off'
+                        active_state: 'on'
+                        inactive_template_mode: false
+                        active_template_mode: false
+                        inactive_template: ''
+                        active_template: ''
+                        active_state_text: ''
+                        inactive_state_text: ''
+                        show_state: true
+                        show_name: false
+                        show_name_active: false
+                        show_name_inactive: false
+                        show_state_active: true
+                        show_state_inactive: true
+                        show_units: true
+                        show_icon_active: true
+                        show_icon_inactive: true
+                        name: ''
+                        on_click_action: more-info
+                        text_position: bottom
+                        vertical_alignment: center
+                        text_alignment: center
+                        icon_size: 24
+                        text_size: 14
+                        icon_background: none
+                        icon_background_color: var(--secondary-background-color)
+                        container_background: none
+                        container_background_color: var(--secondary-background-color)
+                        draggable: true
+                        action: ''
+                        service_data: {}
+                      - entity: number.ev6_dc_charging_limit
+                        icon_inactive: mdi:ev-plug-ccs2
+                        icon_active: mdi:ev-plug-ccs2
+                        color_inactive: var(--secondary-text-color)
+                        color_active: var(--primary-color)
+                        name_color_inactive: var(--primary-text-color)
+                        name_color_active: var(--primary-text-color)
+                        state_color_inactive: var(--secondary-text-color)
+                        state_color_active: var(--primary-text-color)
+                        inactive_state: 'off'
+                        active_state: 'on'
+                        inactive_template_mode: false
+                        active_template_mode: false
+                        inactive_template: ''
+                        active_template: ''
+                        active_state_text: ''
+                        inactive_state_text: ''
+                        show_state: true
+                        show_name: false
+                        show_name_active: false
+                        show_name_inactive: false
+                        show_state_active: true
+                        show_state_inactive: true
+                        show_units: true
+                        show_icon_active: true
+                        show_icon_inactive: true
+                        name: ''
+                        on_click_action: more-info
+                        text_position: bottom
+                        vertical_alignment: center
+                        text_alignment: center
+                        icon_size: 24
+                        text_size: 14
+                        icon_background: none
+                        icon_background_color: var(--secondary-background-color)
+                        container_background: none
+                        container_background_color: var(--secondary-background-color)
+                        draggable: true
+                        action: ''
+                        service_data: {}
+                      - entity: number.ev6_ac_charging_limit
+                        icon_inactive: mdi:ev-plug-type2
+                        icon_active: mdi:ev-plug-type2
+                        color_inactive: var(--secondary-text-color)
+                        color_active: var(--primary-color)
+                        name_color_inactive: var(--primary-text-color)
+                        name_color_active: var(--primary-text-color)
+                        state_color_inactive: var(--secondary-text-color)
+                        state_color_active: var(--primary-text-color)
+                        inactive_state: 'off'
+                        active_state: 'on'
+                        inactive_template_mode: false
+                        active_template_mode: false
+                        inactive_template: ''
+                        active_template: ''
+                        active_state_text: ''
+                        inactive_state_text: ''
+                        show_state: true
+                        show_name: false
+                        show_name_active: false
+                        show_name_inactive: false
+                        show_state_active: true
+                        show_state_inactive: true
+                        show_units: true
+                        show_icon_active: true
+                        show_icon_inactive: true
+                        name: ''
+                        on_click_action: more-info
+                        text_position: bottom
+                        vertical_alignment: center
+                        text_alignment: center
+                        icon_size: 24
+                        text_size: 14
+                        icon_background: none
+                        icon_background_color: var(--secondary-background-color)
+                        container_background: none
+                        container_background_color: var(--secondary-background-color)
+                        draggable: true
+                        action: ''
+                        service_data: {}
+                      - entity: binary_sensor.ev6_turen_und_fenster
+                        icon_inactive: mdi:car-door
+                        icon_active: mdi:car-door
+                        color_inactive: var(--secondary-text-color)
+                        color_active: var(--primary-color)
+                        name_color_inactive: var(--primary-text-color)
+                        name_color_active: var(--primary-text-color)
+                        state_color_inactive: var(--secondary-text-color)
+                        state_color_active: var(--primary-text-color)
+                        inactive_state: 'off'
+                        active_state: 'on'
+                        inactive_template_mode: false
+                        active_template_mode: false
+                        inactive_template: ''
+                        active_template: ''
+                        inactive_state_text: Geschl.
+                        show_state: true
+                        show_name: false
+                        show_name_active: false
+                        show_name_inactive: false
+                        show_state_active: true
+                        show_state_inactive: true
+                        show_units: true
+                        show_icon_active: true
+                        show_icon_inactive: true
+                        name: ''
+                        on_click_action: more-info
+                        text_position: bottom
+                        vertical_alignment: center
+                        text_alignment: center
+                        icon_size: 24
+                        text_size: 14
+                        icon_background: none
+                        icon_background_color: var(--secondary-background-color)
+                        container_background: none
+                        container_background_color: var(--secondary-background-color)
+                        draggable: true
+                        action: ''
+                        service_data: {}
+                        active_state_text: Offen
+                      - entity: binary_sensor.ev6_air_conditioner
+                        icon_inactive: mdi:air-conditioner
+                        icon_active: mdi:air-conditioner
+                        color_inactive: var(--secondary-text-color)
+                        color_active: var(--primary-color)
+                        name_color_inactive: var(--primary-text-color)
+                        name_color_active: var(--primary-text-color)
+                        state_color_inactive: var(--secondary-text-color)
+                        state_color_active: var(--primary-text-color)
+                        inactive_state: 'off'
+                        active_state: 'on'
+                        inactive_template_mode: false
+                        active_template_mode: false
+                        inactive_template: ''
+                        active_template: ''
+                        active_state_text: ''
+                        inactive_state_text: ''
+                        show_state: true
+                        show_name: false
+                        show_name_active: false
+                        show_name_inactive: false
+                        show_state_active: true
+                        show_state_inactive: true
+                        show_units: true
+                        show_icon_active: true
+                        show_icon_inactive: true
+                        name: ''
+                        on_click_action: more-info
+                        text_position: bottom
+                        vertical_alignment: center
+                        text_alignment: center
+                        icon_size: 24
+                        text_size: 14
+                        icon_background: none
+                        icon_background_color: var(--secondary-background-color)
+                        container_background: none
+                        container_background_color: var(--secondary-background-color)
+                        draggable: true
+                        action: ''
+                        service_data: {}
+                    confirmation_mode: false
+                  - id: whmc6ve
+                    width: '100'
+                    alignment: center
+                    spacing: small
+                    columns: 0
+                    icons:
+                      - entity: lock.ev6_door_lock
+                        icon_inactive: mdi:lock
+                        icon_active: mdi:lock
+                        color_inactive: var(--secondary-text-color)
+                        color_active: var(--primary-color)
+                        name_color_inactive: var(--primary-text-color)
+                        name_color_active: var(--primary-text-color)
+                        state_color_inactive: var(--secondary-text-color)
+                        state_color_active: var(--primary-text-color)
+                        inactive_state: 'off'
+                        active_state: 'on'
+                        inactive_template_mode: false
+                        active_template_mode: false
+                        inactive_template: ''
+                        active_template: ''
+                        active_state_text: ''
+                        inactive_state_text: ''
+                        show_state: true
+                        show_name: false
+                        show_name_active: false
+                        show_name_inactive: false
+                        show_state_active: true
+                        show_state_inactive: true
+                        show_units: true
+                        show_icon_active: true
+                        show_icon_inactive: true
+                        name: ''
+                        on_click_action: trigger
+                        text_position: bottom
+                        vertical_alignment: center
+                        text_alignment: center
+                        icon_size: 24
+                        text_size: 14
+                        icon_background: none
+                        icon_background_color: var(--secondary-background-color)
+                        container_background: rounded-square
+                        container_background_color: '#4b2626'
+                        draggable: true
+                        action: ''
+                        service_data: {}
+                      - entity: script.ev6_klima_starten
+                        icon_inactive: mdi:air-conditioner
+                        icon_active: mdi:air-conditioner
+                        color_inactive: var(--secondary-text-color)
+                        color_active: var(--primary-color)
+                        name_color_inactive: var(--primary-text-color)
+                        name_color_active: var(--primary-text-color)
+                        state_color_inactive: var(--secondary-text-color)
+                        state_color_active: var(--primary-text-color)
+                        inactive_state: 'off'
+                        active_state: 'on'
+                        inactive_template_mode: false
+                        active_template_mode: false
+                        inactive_template: ''
+                        active_template: ''
+                        active_state_text: ''
+                        inactive_state_text: ''
+                        show_state: true
+                        show_name: false
+                        show_name_active: false
+                        show_name_inactive: false
+                        show_state_active: true
+                        show_state_inactive: true
+                        show_units: true
+                        show_icon_active: true
+                        show_icon_inactive: true
+                        on_click_action: trigger
+                        text_position: bottom
+                        vertical_alignment: center
+                        text_alignment: center
+                        icon_size: 24
+                        text_size: 14
+                        icon_background: none
+                        icon_background_color: var(--secondary-background-color)
+                        container_background: rounded-square
+                        container_background_color: '#263450'
+                        draggable: true
+                        action: ''
+                        service_data: {}
+                    confirmation_mode: false
+                title: EV6
+                image_url: /api/image/serve/2f4ff3905cfce2f5bb9d87d49d74da4b/original
+                charging_image_url: ''
+                image_url_type: image
+                charging_image_url_type: none
+                vehicle_type: EV
+                unit_type: mi
+                level_entity: ''
+                range_entity: ''
+                charging_status_entity: binary_sensor.ev6_ev_battery_charge
+                location_entity: device_tracker.ev6_location
+                mileage_entity: sensor.ev6_odometer
+                show_level: true
+                show_range: true
+                show_charge_limit: true
+                icon_grid_entities:
+                  - row-separator
+                  - number.ev6_dc_charging_limit
+                  - number.ev6_ac_charging_limit
+                  - binary_sensor.ev6_tire_pressure_all
+                  - sensor.ev6_car_battery_level
+                custom_icons:
+                  number.ev6_dc_charging_limit:
+                    inactiveState: default
+                    activeState: default
+                  number.ev6_ac_charging_limit:
+                    inactiveState: default
+                    activeState: default
+                  binary_sensor.ev6_tire_pressure_all:
+                    inactiveState: default
+                    activeState: default
+                  sensor.ev6_car_battery_level:
+                    inactiveState: default
+                    activeState: default
+                icon_interactions:
+                  sensor.ev6_car_battery_level:
+                    type: more-info
+                icon_styles:
+                  binary_sensor.ev6_tire_pressure_all: round
+                  number.ev6_ac_charging_limit: round
+                  number.ev6_dc_charging_limit: round
+                  sensor.ev6_car_battery_level: round
+                icon_labels:
+                  number.ev6_dc_charging_limit: bottom
+                  number.ev6_ac_charging_limit: bottom
+                  binary_sensor.ev6_tire_pressure_all: bottom
+                  sensor.ev6_car_battery_level: bottom
+                hybrid_display_order: fuel_first
+                car_state_entity: binary_sensor.ev6_turen_und_fenster
+                charge_limit_entity: number.ev6_ac_charging_limit
+                icon_size: 24
+                icon_gap: 12
+                showEntityInformation: true
+                carStateTextColor: var(--primary-text-color)
+                rangeTextColor: var(--primary-text-color)
+                percentageTextColor: var(--primary-text-color)
+                icon_sizes: {}
+                engine_on_entity: ''
+                row_separator_color: Default
+                row_separator_height: 1
+                row_separators:
+                  '0':
+                    color: transparent
+                iconActiveColor: var(--primary-color)
+                iconInactiveColor: var(--primary-text-color)
+                useFormattedEntities: true
+                mainImageHeight: 140px
+                chargingImageHeight: 140px
+                showTitle: true
+                layoutType: single
+                useBarGradient: true
+                barGradientStops:
+                  - percentage: 0
+                    color: '#ff0000'
+                  - percentage: 100
+                    color: '#00ff00'
+                cardTitleColor: var(--primary-text-color)
+                cardBackgroundColor: 'var(--ha-card-background, var(--card-background-color, #fff))'
+                barBackgroundColor: var(--secondary-text-color)
+                barBorderColor: 'var(--ha-card-background, var(--card-background-color, #fff))'
+                barFillColor: '#4bcd13'
+                limitIndicatorColor: '#ff0000'
+                infoTextColor: var(--secondary-text-color)
+                show_engine_animation: true
+                show_charging_animation: true
+                show_charging_status: true
+                show_engine_on: true
+                engine_on_image_url_type: none
+                type: custom:ultra-vehicle-card
+                battery_level_entity: sensor.ev6_ev_battery_level
+                battery_range_entity: sensor.ev6_ev_range
+                fuel_level_entity: ''
+                fuel_range_entity: ''
+                show_battery: true
+                show_battery_range: true
+                show_fuel: true
+                show_fuel_range: true
+                custom_labels: {}
+                charging_image_entity: ''
+                vehicle_image_width: 100
+                action_image_width: 100
+                show_units: true
+                action_image_type: none
+                vehicle_image: /api/image/serve/2d60f11498a723ee5787126b62b6f8c6
+                card_background: '#383838'
+                images:
+                  - name: Vehicle Image
+                    image_type: upload
+                    image: /api/image/serve/2d60f11498a723ee5787126b62b6f8c6
+                    image_width: 100
+                    priority: 0
+                info_rows:
+                  - id: wrhey5h
+                    info_entities:
+                      - id: 9rms7uv
+                        entity: device_tracker.ev6_location
+                        name: ''
+                        show_icon: true
+                        icon: mdi:map-marker-outline
+                        text_color: ''
+                      - id: zgl6k4g
+                        entity: sensor.ev6_odometer
+                        name: ''
+                        show_icon: true
+                        icon: mdi:counter
+                        text_color: ''
+                    alignment: left
+                    spacing: medium
+                  - id: o9u21x2
+                    info_entities:
+                      - id: svv8b6y
+                        entity: binary_sensor.ev6_turen_und_fenster
+                        name: ''
+                        show_icon: false
+                        icon: mdi:car-info
+                        text_color: ''
+                    alignment: left
+                    spacing: medium
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#windows'
+                button_type: slider
+                entity: sensor.offene_fenster_turen
+                min_value: 0
+                max_value: 8
+              - type: entities
+                entities:
+                  - entity: binary_sensor.haustur_aqara_contact
+                  - entity: binary_sensor.balkontur_aqara_contact
+                  - entity: binary_sensor.fenster_badezimmer_contact
+                    name: Badezimmer
+                  - entity: binary_sensor.fenster_buro_aqara_contact
+                    secondary_info: none
+                    name: Büro/Schlafen
+                  - entity: binary_sensor.fenster_lia_aqara_contact
+                    secondary_info: none
+                    name: Lia
+                  - entity: binary_sensor.fenster_emily_aqara_contact
+                    secondary_info: none
+                    name: Emily
+                  - entity: binary_sensor.sensor_fenster_sofa_neu_contact
+                    name: Sofa
+                  - entity: binary_sensor.fenster_kuche_aqara_contact
+                    name: Küche
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#cover_wz-kuche'
+                button_type: slider
+                entity: cover.rollladen_kuche_wohnzimmer
+              - type: custom:bubble-card
+                card_type: cover
+                entity: cover.rolllade_balkon
+                name: Balkon
+              - type: custom:bubble-card
+                card_type: cover
+                entity: cover.rolllade_sofa
+                name: Sofa
+              - type: custom:bubble-card
+                card_type: cover
+                entity: cover.rolllade_kleines_kuchenfenster
+                name: Küche
+        column_span: 3
+      - type: grid
+        cards:
+          - type: custom:bubble-card
+            card_type: horizontal-buttons-stack
+            1_link: '#shortcuts'
+            1_name: Routinen
+            1_icon: mdi:progress-check
+            2_link: '#lightshortcuts'
+            2_name: Licht Schnellwahl
+            2_icon: mdi:lamps
+            2_entity: light.esstisch_arbeitsplatte
+            3_entity: alarm_control_panel.alarmo
+            3_link: '#alarm'
+            3_name: Sicherheit
+            3_icon: mdi:shield-home
+            3_pir_sensor: binary_sensor.wohnzimmer_presence_gruppe
+            auto_order: true
+            hide_gradient: false
+            highlight_current_view: true
+            styles: ''
+            modules:
+              - icon_color
+              - rmn_conditional_background_color
+            rmn_conditional_background_color:
+              background_1:
+                color_mode: preset
+                conditions:
+                  - condition: state
+                    entity_id: alarm_control_panel.alarmo
+                    state: disarmed
+                color_wheel: '#80ff00'
+    badges:
+      - type: entity
+        show_name: false
+        show_state: true
+        show_icon: true
+        entity: sensor.offene_fenster_turen
+        visibility:
+          - condition: state
+            entity: sensor.offene_fenster_turen
+            state_not: '0'
+        tap_action:
+          action: navigate
+          navigation_path: '#windows'
+      - type: entity
+        show_name: false
+        show_state: true
+        show_icon: true
+        entity: sensor.lights_turned_on
+        visibility:
+          - condition: state
+            entity: sensor.lights_turned_on
+            state_not: '0'
+      - type: entity
+        show_name: false
+        show_state: true
+        show_icon: true
+        entity: sensor.current_consumption
+        icon: mdi:transmission-tower-import
+      - type: entity
+        show_name: false
+        show_state: true
+        show_icon: true
+        entity: sensor.ev6_ev_battery_level
+        icon: mdi:car-electric
+        tap_action:
+          action: navigate
+          navigation_path: '#ev6'
+      - type: entity
+        show_name: false
+        show_state: true
+        show_icon: true
+        entity: weather.openweathermap
+        tap_action:
+          action: navigate
+          navigation_path: '#wetter'
+    background:
+      opacity: 33
+      alignment: center
+      size: cover
+      repeat: repeat
+      attachment: fixed
+      image: /api/image/serve/161c49b7a8d5a15b192cb66bd6ccb0ac/original
+    cards: []
