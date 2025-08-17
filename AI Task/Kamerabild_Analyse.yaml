@@ -1,0 +1,34 @@
+alias: Eingangskamera beschreiben (AI Task)
+description: ""
+triggers:
+  - trigger: state
+    entity_id:
+      - binary_sensor.eingangstur_ding
+    to: "on"
+actions:
+  - action: ai_task.generate_data
+    data:
+      task_name: kamera-beschreibung-eingang
+      instructions: >-
+        Beschreibe das Bild der Eingangskamera in 1–2 Sätzen auf Deutsch. Nenne
+        Personen, erkennbare Objekte, grobe Stimmung/Wetter und ob etwas
+        Ungewöhnliches passiert. Keine Fantasie dazudichten.
+      attachments:
+        media_content_id: media-source://camera/camera.cam_eingang_fliessend
+        media_content_type: image/jpeg
+      entity_id: ai_task.openai_ai_task
+    response_variable: ai_out
+  - action: notify.persistent_notification
+    data:
+      title: Eingang – KI-Beschreibung
+      message: "{{ ai_out.data }}"
+  - action: notify.mobile_app_zion_ios_14
+    metadata: {}
+    data:
+      message: "{{ ai_out.data }}"
+      title: Vor der Tür
+  - action: notify.alexa_media_saschas_echo_show
+    metadata: {}
+    data:
+      message: "{{ ai_out.data }}"
+mode: queued
