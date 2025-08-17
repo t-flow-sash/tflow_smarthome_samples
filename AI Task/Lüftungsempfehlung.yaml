@@ -1,0 +1,99 @@
+alias: "AI: Luftqualität bewerten & Helper setzen (Innen vs. Außen)"
+description: ""
+triggers:
+  - trigger: time_pattern
+    minutes: /5
+    enabled: false
+actions:
+  - action: ai_task.generate_data
+    data:
+      entity_id: ai_task.google_ai_task
+      task_name: Air Quality with Indoor/Outdoor Heuristics
+      instructions: >
+        Du bewertest die Luftqualität im INNENRAUM und sprichst eine klare
+        Lüftungsempfehlung aus (Fenster öffnen ja/nein). Du bekommst Innen- und
+        Außenwerte. Triff eine Entscheidung NUR für den Innenraum.
+
+        Messwerte (Zahlen als Strings): - innen_temp_c: "{{
+        states('sensor.temperatur_wohnzimmer_sonoff_temperature') }}" -
+        innen_humidity_pct: "{{
+        states('sensor.temperatur_wohnzimmer_sonoff_humidity') }}" -
+        innen_co2_ppm: "{{ states('sensor.wohnzimmer_co2') }}" - aussen_temp_c:
+        "{{ states('sensor.temperatur_balkon_sonoff_temperature') }}" -
+        aussen_humidity_pct: "{{
+        states('sensor.wohnzimmer_wohnzimmer_wohnzimmer_balkon_humidity') }}"
+
+        Heuristik (konkret befolgen): 1) CO2-Priorität:
+           - Wenn innen_co2_ppm >= 1500 → ventilation_needed = true (auch wenn draußen feuchter/kälter),
+             außer aussen_temp_c < -5°C oder > 35°C → dann nur "kurz stosslüften" oder "Ventilator".
+           - Wenn 1000 <= innen_co2_ppm < 1500 → lüften, sofern Außenbedingungen nicht deutlich schlechter sind.
+        2) Feuchte-Logik:
+           - Wenn innen_humidity_pct - aussen_humidity_pct >= 5 → Lüften begünstigt Trocknung (pro Lüften).
+           - Wenn aussen_humidity_pct - innen_humidity_pct >= 5 → Lüften erhöht Feuchte (contra Lüften),
+             es sei denn CO2 >= 1500 → dann kurz lüften.
+        3) Temperatur-Logik:
+           - Wenn innen_temp_c > 24 und aussen_temp_c < innen_temp_c → pro Lüften (Abkühlung möglich).
+           - Wenn aussen_temp_c << innen_temp_c (Delta <= -10 K) → nur kurzes Stosslüften empfehlen.
+           - Wenn aussen_temp_c >> innen_temp_c (Delta >= +8 K) → eher nicht lüften; Ventilator/AC bevorzugen.
+        4) Finale Entscheidung:
+           - Setze boolean ventilation_needed = true/false.
+           - Empfiehl eine klare Maßnahme (Fenster öffnen / kurz Stosslüften / nicht lüften, Ventilator/AC).
+           - Gib eine knappe Begründung (Reason) und ggf. empfohlene Lüftungsdauer in Minuten.
+        Antworte auf Deutsch, sachlich und knapp.
+      structure:
+        summary:
+          selector:
+            text: {}
+          description: Ein-Satz-Bewertung der Innenluft (knapp).
+          required: true
+        recommendation:
+          selector:
+            text: {}
+          description: >-
+            Konkrete Maßnahme (z. B. 'Fenster 5 Min öffnen' oder 'nicht lüften,
+            Ventilator einschalten').
+          required: true
+        ventilation_needed:
+          selector:
+            boolean: {}
+          description: true = lüften; false = nicht lüften.
+          required: true
+        reason:
+          selector:
+            text: {}
+          description: Kurze Begründung (CO₂/Feuchte/Temperatur-Delta).
+          required: false
+        suggested_duration_min:
+          selector:
+            number:
+              min: 0
+              max: 30
+              step: 1
+          description: Empfohlene Lüftungsdauer in Minuten, falls sinnvoll.
+          required: false
+    response_variable: air
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ air.data.ventilation_needed | default(false) }}"
+        sequence:
+          - action: input_boolean.turn_on
+            target:
+              entity_id: input_boolean.ventilation_needed
+            data: {}
+      - conditions:
+          - condition: template
+            value_template: "{{ not air.data.ventilation_needed | default(false) }}"
+        sequence:
+          - action: input_boolean.turn_off
+            target:
+              entity_id: input_boolean.ventilation_needed
+            data: {}
+  - action: notify.persistent_notification
+    data:
+      message: >
+        {{ air.data.summary }} – {{ air.data.recommendation }} {%- if
+        air.data.reason %} (Grund: {{ air.data.reason }}){%- endif %} {%- if
+        air.data.suggested_duration_min is not none %} (≈ {{
+        air.data.suggested_duration_min }} min){%- endif %}
+mode: single
