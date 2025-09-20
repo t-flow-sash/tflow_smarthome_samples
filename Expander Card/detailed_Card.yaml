@@ -1,0 +1,143 @@
+type: custom:expander-card
+child-margin-top: 0.6em
+padding: 0
+clear: true
+title-card-button-overlay: true
+title-card-clickable: true
+title-card:
+  type: custom:room-card
+  title: Wohnen
+  icon: mdi:sofa
+  show_icon: true
+  content_alignment: center
+  tap_action:
+    action: navigate
+    navigation_path: /dashboard-raumaufteilung/areas-wohnzimmer_hue
+  double_tap_action:
+    action: toggle
+  info_entities:
+    - entity: cover.rollladen_wohnzimmer
+      show_icon: true
+      icon:
+        conditions:
+          - icon: mdi:window-shutter
+            condition: below
+            attribute: current_position
+            value: 50
+            styles:
+              color: orange
+          - icon: mdi:window-shutter-open
+            condition: above
+            attribute: current_position
+            value: 50
+            styles:
+              color: grey
+    - entity: binary_sensor.fenster_gruppe_wohnzimmer
+      show_icon: true
+      state_color: true
+    - entity: sensor.temperatur_wohnzimmer_sonoff_temperature
+      format: precision1
+      styles:
+        template: >
+          if (entity.state < 20) return 'color: lightblue';  if (entity.state >=
+          25)return 'color: red';  if (entity.state >= 23) return 'color:
+          orange'; if (entity.state >= 21) return 'color: lightgreen';  
+    - entity: sensor.temperatur_wohnzimmer_sonoff_humidity
+      format: precision1
+      styles:
+        template: >
+          if (entity.state < 40) return 'color: lightblue';  if (entity.state >=
+          70)return 'color: red';  if (entity.state >= 60) return 'color:
+          orange'; if (entity.state >= 40) return 'color: lightgreen';          
+    - entity: sensor.wohnzimmer_co2
+      show_icon: true
+      icon:
+        conditions:
+          - icon: mdi:check-circle
+            condition: below
+            value: 1000
+            styles:
+              color: lightgreen
+          - icon: mdi:alert-circle
+            condition: above
+            value: 1000
+            styles:
+              color: orange
+          - icon: mdi:alert-circle
+            condition: above
+            value: 1500
+            styles:
+              color: red
+  entities:
+    - entity: media_player.sony_kd_65xg9505_2
+      name: TV
+      state_color: true
+    - entity: media_player.apple_tv_wohnzimmer_2
+      name: Apple TV
+      show_icon: true
+      icon: mdi:set-top-box
+      state_color: true
+    - entity: media_player.echo_show_wohnzimmer
+      name: Echo
+      show_icon: true
+      state_color: true
+      icon: mdi:speaker-wireless
+    - entity: vacuum.roborock_s8_maxv_ultra
+      state_color: true
+      name: Staubi
+    - entity: sensor.zion_pad_2_battery_level
+      name: Emilys iPad
+      state_color: true
+    - entity: binary_sensor.wohnzimmer_presence_gruppe
+      name: Anw.
+      icon: mdi:motion-sensor
+      show_icon: true
+      state_color: true
+cards:
+  - type: heading
+    icon: mdi:fridge
+    heading: Licht _______________________________
+    heading_style: subtitle
+  - type: tile
+    entity: light.lichtgruppe_kuche_wz
+    features_position: inline
+    vertical: false
+    features:
+      - type: light-brightness
+  - type: heading
+    icon: mdi:fridge
+    heading: Klima _______________________________
+    heading_style: subtitle
+  - features:
+      - type: trend-graph
+    type: tile
+    entity: sensor.temperatur_wohnzimmer_sonoff_temperature
+    features_position: inline
+    vertical: false
+    name: Temperatur
+  - features:
+      - type: trend-graph
+    type: tile
+    entity: sensor.temperatur_wohnzimmer_sonoff_humidity
+    features_position: inline
+    vertical: false
+    name: Luftfeuchtigkeit
+  - type: custom:expander-card
+    title: Medien
+    child-margin-top: 0.6em
+    padding: 0
+    clear: true
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: custom:mini-media-player
+            entity: media_player.airplay_wz
+          - type: custom:mini-media-player
+            entity: media_player.sony_kd_65xg9505_2
+          - type: custom:mini-media-player
+            entity: media_player.apple_tv_wohnzimmer_2
+          - type: custom:mini-media-player
+            entity: media_player.denon_wohnzimmer_airplay
+            toggle_power: true
+            volume_stateless: false
+            artwork: cover-fit
