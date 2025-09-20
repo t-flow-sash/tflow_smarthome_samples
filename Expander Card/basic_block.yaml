@@ -1,0 +1,12 @@
+type: custom:expander-card
+child-margin-top: 0.6em
+padding: 0
+clear: true
+title: Emily
+cards:
+  - type: tile
+    entity: light.emilys_zimmer_gruppe
+    features_position: inline
+    vertical: false
+    features:
+      - type: light-brightness
