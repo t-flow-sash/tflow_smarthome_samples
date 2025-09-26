@@ -1,0 +1,523 @@
+type: custom:ultra-card
+layout:
+  rows:
+    - id: row1
+      columns:
+        - id: col-1758720356711-biuj1fjvd
+          modules:
+            - id: horizontal-1758721161743-b6gjz01nv
+              type: horizontal
+              alignment: center
+              vertical_alignment: center
+              gap: 0.7
+              wrap: false
+              modules:
+                - id: text-1758720384265-f9enp2p94
+                  type: text
+                  text: Wohnzimmer
+                  font_size: 13
+                  color: var(--primary-text-color)
+                  icon: mdi:sofa
+                  design:
+                    text_align: left
+                  margin_bottom: "0"
+                  margin:
+                    top: 0
+                    bottom: 0
+                    left: 0
+                    right: 0
+                  padding_bottom: "0"
+                  padding:
+                    top: 0
+                    bottom: 0
+                    left: 0
+                    right: 0
+                  border_radius: "0"
+                  border:
+                    radius: 0
+                    style: none
+                    width: ""
+                    color: var(--divider-color)
+                  border_width: ""
+                  tap_action:
+                    action: default
+                  hold_action:
+                    action: default
+                  double_tap_action:
+                    action: default
+                - id: info-1758720363679-xsfuqw20v
+                  type: info
+                  info_entities:
+                    - entity: sensor.temperatur_wohnzimmer_sonoff_temperature
+                      name: Temperatur Wohnzimmer Sonoff Temperatur
+                      icon: mdi:thermometer
+                      show_name: false
+                      show_icon: false
+                      text_size: 12
+                  margin_top: "16"
+                  margin:
+                    top: 16
+                    bottom: 0
+                    left: 0
+                    right: 0
+                - id: info-1758720368297-vi0vrlj80
+                  type: info
+                  info_entities:
+                    - entity: sensor.temperatur_wohnzimmer_sonoff_humidity
+                      name: Temperatur Wohnzimmer Sonoff Luftfeuchtigkeit
+                      icon: mdi:water-percent
+                      show_name: false
+                      show_icon: false
+                  margin_top: "16"
+                  margin:
+                    top: 16
+                    bottom: 0
+                    left: 0
+                    right: 0
+                - id: info-1758720371343-7y8m2tjx1
+                  type: info
+                  info_entities:
+                    - entity: sensor.wohnzimmer_co2
+                      name: Multimeter Wohnzimmer CO2
+                      icon: mdi:molecule-co2
+                      show_name: false
+                      show_icon: false
+                  margin_top: "16"
+                  margin:
+                    top: 16
+                    bottom: 0
+                    left: 0
+                    right: 0
+              tap_action:
+                action: nothing
+              hold_action:
+                action: nothing
+              double_tap_action:
+                action: nothing
+              display_mode: always
+              display_conditions: []
+              margin_top: "0"
+              margin:
+                top: 0
+                bottom: 0
+                left: 0
+                right: 0
+              padding_top: "0"
+              padding:
+                top: 0
+                bottom: 0
+                left: 0
+                right: 0
+              border_radius: "0"
+              border:
+                radius: 0
+                style: none
+                width: 1px
+                color: var(--divider-color)
+          vertical_alignment: center
+          horizontal_alignment: left
+      gap: 0
+      tap_action:
+        action: default
+      hold_action:
+        action: default
+      double_tap_action:
+        action: default
+      design:
+        border_radius: "0"
+        margin_top: "0"
+        margin_right: "0"
+        margin_bottom: "0"
+        margin_left: "0"
+        padding_left: "0"
+        padding_bottom: "0"
+        padding_right: "0"
+        padding_top: "0"
+        background_image_type: entity
+        position: ""
+      column_layout: 1-col
+    - id: row-1758749621460
+      columns:
+        - id: col-1758749664702-xsr4krffk
+          modules:
+            - id: horizontal-1758749224116-v6teuqsav
+              type: horizontal
+              alignment: center
+              vertical_alignment: baseline
+              gap: 1.6
+              wrap: false
+              modules:
+                - id: icon-1758750039324-t09rbbm1s
+                  type: icon
+                  icons:
+                    - id: icon-item-1758750039324-5pwpsvid6
+                      entity: media_player.sony_kd_65xg9505_2
+                      name: ""
+                      icon_inactive: mdi:television-off
+                      icon_active: mdi:television
+                      inactive_state: ""
+                      active_state: ""
+                      custom_inactive_state_text: ""
+                      custom_active_state_text: ""
+                      custom_inactive_name_text: ""
+                      custom_active_name_text: ""
+                      inactive_template_mode: false
+                      inactive_template: ""
+                      active_template_mode: false
+                      active_template: ""
+                      use_entity_color_for_icon: false
+                      use_state_color_for_inactive_icon: true
+                      use_state_color_for_active_icon: false
+                      color_inactive: var(--secondary-text-color)
+                      color_active: var(--primary-color)
+                      inactive_icon_color: var(--secondary-text-color)
+                      active_icon_color: var(--success-color)
+                      inactive_name_color: var(--primary-text-color)
+                      active_name_color: var(--primary-text-color)
+                      inactive_state_color: var(--secondary-text-color)
+                      active_state_color: var(--secondary-text-color)
+                      show_name_when_inactive: false
+                      show_state_when_inactive: false
+                      show_icon_when_inactive: true
+                      show_name_when_active: false
+                      show_state_when_active: false
+                      show_icon_when_active: true
+                      show_state: true
+                      show_name: true
+                      show_units: true
+                      enable_hover_effect: false
+                      icon_size: 26
+                      text_size: 14
+                      name_icon_gap: 8
+                      name_state_gap: 2
+                      icon_state_gap: 4
+                      active_icon_size: 26
+                      inactive_icon_size: 26
+                      active_text_size: 14
+                      inactive_text_size: 14
+                      state_size: 14
+                      active_state_size: 14
+                      inactive_state_size: 14
+                      icon_size_locked: true
+                      text_size_locked: true
+                      state_size_locked: true
+                      active_icon_locked: false
+                      active_icon_color_locked: false
+                      active_icon_background_locked: true
+                      active_icon_background_color_locked: true
+                      active_name_locked: true
+                      active_name_color_locked: true
+                      active_state_locked: false
+                      active_state_color_locked: true
+                      icon_background: none
+                      use_entity_color_for_icon_background: false
+                      icon_background_color: transparent
+                      inactive_icon_animation: none
+                      active_icon_animation: pulse
+                      vertical_alignment: center
+                      container_background_shape: none
+                      container_background_color: "#808080"
+                      tap_action:
+                        action: nothing
+                      hold_action:
+                        action: nothing
+                      double_tap_action:
+                        action: nothing
+                      click_action: toggle
+                      double_click_action: none
+                      hold_action_legacy: none
+                      navigation_path: ""
+                      url: ""
+                      service: ""
+                      service_data: {}
+                      template_mode: false
+                      template: ""
+                      dynamic_icon_template_mode: false
+                      dynamic_icon_template: ""
+                      dynamic_color_template_mode: false
+                      dynamic_color_template: ""
+                  columns: 3
+                  gap: 16
+                  tap_action:
+                    action: nothing
+                  hold_action:
+                    action: nothing
+                  double_tap_action:
+                    action: nothing
+                  display_mode: always
+                  display_conditions: []
+                - id: icon-1758750215342-j7d5zyii0
+                  type: icon
+                  icons:
+                    - id: icon-item-1758750215342-lfjppugmf
+                      entity: binary_sensor.wohnzimmer_presence_gruppe
+                      name: ""
+                      icon_inactive: mdi:motion-sensor-off
+                      icon_active: mdi:motion-sensor
+                      inactive_state: "off"
+                      active_state: "on"
+                      custom_inactive_state_text: ""
+                      custom_active_state_text: ""
+                      custom_inactive_name_text: ""
+                      custom_active_name_text: ""
+                      inactive_template_mode: false
+                      inactive_template: ""
+                      active_template_mode: false
+                      active_template: ""
+                      use_entity_color_for_icon: false
+                      use_state_color_for_inactive_icon: true
+                      use_state_color_for_active_icon: false
+                      color_inactive: var(--secondary-text-color)
+                      color_active: var(--primary-color)
+                      inactive_icon_color: var(--secondary-text-color)
+                      active_icon_color: var(--success-color)
+                      inactive_name_color: var(--primary-text-color)
+                      active_name_color: var(--primary-text-color)
+                      inactive_state_color: var(--secondary-text-color)
+                      active_state_color: var(--secondary-text-color)
+                      show_name_when_inactive: false
+                      show_state_when_inactive: false
+                      show_icon_when_inactive: true
+                      show_name_when_active: false
+                      show_state_when_active: false
+                      show_icon_when_active: true
+                      show_state: true
+                      show_name: true
+                      show_units: true
+                      enable_hover_effect: false
+                      icon_size: 26
+                      text_size: 14
+                      name_icon_gap: 8
+                      name_state_gap: 2
+                      icon_state_gap: 4
+                      active_icon_size: 26
+                      inactive_icon_size: 26
+                      active_text_size: 14
+                      inactive_text_size: 14
+                      state_size: 14
+                      active_state_size: 14
+                      inactive_state_size: 14
+                      icon_size_locked: true
+                      text_size_locked: true
+                      state_size_locked: true
+                      active_icon_locked: false
+                      active_icon_color_locked: false
+                      active_icon_background_locked: false
+                      active_icon_background_color_locked: true
+                      active_name_locked: true
+                      active_name_color_locked: true
+                      active_state_locked: false
+                      active_state_color_locked: true
+                      icon_background: none
+                      use_entity_color_for_icon_background: false
+                      icon_background_color: transparent
+                      inactive_icon_animation: none
+                      active_icon_animation: none
+                      vertical_alignment: center
+                      container_background_shape: none
+                      container_background_color: "#808080"
+                      tap_action:
+                        action: nothing
+                      hold_action:
+                        action: nothing
+                      double_tap_action:
+                        action: nothing
+                      click_action: toggle
+                      double_click_action: none
+                      hold_action_legacy: none
+                      navigation_path: ""
+                      url: ""
+                      service: ""
+                      service_data: {}
+                      template_mode: false
+                      template: ""
+                      dynamic_icon_template_mode: false
+                      dynamic_icon_template: ""
+                      dynamic_color_template_mode: false
+                      dynamic_color_template: ""
+                      inactive_icon_background_color: "#FF0000"
+                      active_icon_background_color: "#FF0000"
+                  columns: 3
+                  gap: 16
+                  tap_action:
+                    action: nothing
+                  hold_action:
+                    action: nothing
+                  double_tap_action:
+                    action: nothing
+                  display_mode: always
+                  display_conditions: []
+              tap_action:
+                action: nothing
+              hold_action:
+                action: nothing
+              double_tap_action:
+                action: nothing
+              display_mode: always
+              display_conditions: []
+              margin_top: "0"
+              margin:
+                top: 0
+                bottom: 0
+                left: 20
+                right: 0
+              margin_right: "0"
+              margin_bottom: "0"
+              margin_left: "20"
+              padding_top: "0"
+              padding:
+                top: 0
+                bottom: 0
+                left: 0
+                right: 0
+              padding_right: "0"
+              border_radius: 0x
+              border:
+                radius: 0
+                style: none
+                width: 1px
+                color: var(--divider-color)
+              position: absolute
+              top: "0"
+              bottom: "0"
+          vertical_alignment: top
+          horizontal_alignment: left
+      column_layout: 1-2-1-2
+      gap: 0
+    - id: row-1758749706896
+      columns:
+        - id: col-1758749727995-d3iay5c7c
+          modules:
+            - id: horizontal-1758738057572-49fnmmman
+              type: horizontal
+              alignment: center
+              vertical_alignment: center
+              gap: -0.8
+              wrap: false
+              modules:
+                - id: button-1758720965496-s8t5ufd7p
+                  type: button
+                  action:
+                    action_type: none
+                  style: embossed
+                  icon: mdi:lightbulb-group
+                  icon_position: before
+                  show_icon: true
+                  background_color: var(--divider-color)
+                  text_color: white
+                  tap_action:
+                    action: more-info
+                    entity: light.lichtgruppe_kuche_wz
+                  hold_action:
+                    action: default
+                  double_tap_action:
+                    action: default
+                  display_mode: always
+                  display_conditions: []
+                  button_text: Click Me
+                  margin_top: "0"
+                  margin:
+                    top: 0
+                    bottom: 0
+                    left: 0
+                    right: 0
+                - id: button-1758720965496-s8t5ufd7p
+                  type: button
+                  action:
+                    action_type: none
+                  style: embossed
+                  icon: mdi:window-shutter
+                  icon_position: before
+                  show_icon: true
+                  background_color: var(--divider-color)
+                  text_color: white
+                  tap_action:
+                    action: more-info
+                    entity: cover.rollladen_wz_kuche
+                  hold_action:
+                    action: default
+                  double_tap_action:
+                    action: default
+                  display_mode: always
+                  display_conditions: []
+                  button_text: Click Me
+                  margin_top: "0"
+                  margin:
+                    top: 0
+                    bottom: 0
+                    left: 0
+                    right: 0
+                - id: button-1758720965496-s8t5ufd7p
+                  type: button
+                  action:
+                    action_type: none
+                  style: embossed
+                  icon: mdi:multimedia
+                  icon_position: before
+                  show_icon: true
+                  background_color: var(--divider-color)
+                  text_color: white
+                  tap_action:
+                    action: perform-action
+                    perform_action: browser_mod.popup
+                    target: {}
+                    data:
+                      dismissable: true
+                      autoclose: false
+                      title: Multimedia
+                      content:
+                        type: vertical-stack
+                        cards:
+                          - type: custom:mini-media-player
+                            entity: media_player.denon_wohnzimmer_airplay
+                            group: false
+                          - type: custom:mini-media-player
+                            entity: media_player.sony_kd_65xg9505_2
+                          - type: custom:mini-media-player
+                            entity: media_player.echo_show_wz_neu
+                          - type: custom:mini-media-player
+                            entity: media_player.apple_tv_wohnzimmer_2
+                  hold_action:
+                    action: default
+                  double_tap_action:
+                    action: default
+                  display_mode: always
+                  display_conditions: []
+                  button_text: Click Me
+                  margin_top: "0"
+                  margin:
+                    top: 0
+                    bottom: 0
+                    left: 0
+                    right: 0
+              tap_action:
+                action: nothing
+              hold_action:
+                action: nothing
+              double_tap_action:
+                action: nothing
+              display_mode: always
+              display_conditions: []
+              margin_top: "0"
+              margin:
+                top: 0
+                bottom: 0
+                left: 0
+                right: 0
+              padding_top: "0"
+              padding:
+                top: 0
+                bottom: 0
+                left: 0
+                right: 0
+              border_radius: "0"
+              border:
+                radius: 0
+                style: none
+                width: 1px
+                color: var(--divider-color)
+          vertical_alignment: center
+          horizontal_alignment: center
+      column_layout: 1-col
+card_padding: 0
+card_border_radius: 15
