@@ -1,0 +1,2 @@
+{% set v = states('sensor.stream_ultra_x_0734_power_grid') | float(0) %}
+          {{ v if v > 0 else 0 }}
