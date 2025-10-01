@@ -1,0 +1,214 @@
+  - type: sections
+    max_columns: 3
+    icon: mdi:solar-power-variant-outline
+    path: ''
+    dense_section_placement: true
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: System Metriken
+            heading_style: title
+            icon: mdi:solar-power-variant
+          - features:
+              - type: trend-graph
+            type: tile
+            entity: sensor.stream_ultra_x_0734_power_pv_sum
+            features_position: inline
+            vertical: false
+            icon: mdi:solar-power-variant
+            show_entity_picture: false
+            color: green
+            name: PV Leistung
+          - type: heading
+            icon: mdi:transmission-tower
+            heading: Netz
+            heading_style: subtitle
+          - features:
+              - type: trend-graph
+            type: tile
+            entity: sensor.strom_netzbezug
+            features_position: inline
+            vertical: false
+            icon: mdi:solar-power-variant
+            show_entity_picture: false
+            color: accent
+            name: Netzbezug
+          - features:
+              - type: trend-graph
+            type: tile
+            entity: sensor.strom_netzeinspeisung
+            features_position: inline
+            vertical: false
+            icon: mdi:solar-power-variant
+            show_entity_picture: false
+            color: red
+            name: Netzeinspeisung
+          - type: heading
+            icon: mdi:battery-charging-100
+            heading_style: subtitle
+            heading: Speicher
+          - features:
+              - type: trend-graph
+            type: tile
+            entity: sensor.ultra_x_batterieladung
+            features_position: inline
+            vertical: false
+            icon: mdi:battery-charging-100
+            show_entity_picture: false
+            color: green
+            name: Ladung
+          - features:
+              - type: trend-graph
+            type: tile
+            entity: sensor.ultra_x_batterieentladung
+            features_position: inline
+            vertical: false
+            icon: mdi:battery-charging-20
+            show_entity_picture: false
+            color: red
+            name: Entladung
+      - type: grid
+        cards:
+          - type: heading
+            heading_style: title
+            heading: STREAM ULTRA X
+            icon: mdi:battery-charging-100
+          - type: custom:modern-circular-gauge
+            entity: sensor.stream_ultra_x_0734_power_battery_2
+            secondary:
+              entity: sensor.stream_ultra_x_0734_power_ac_sys
+              show_gauge: inner
+              state_size: small
+              min: 0
+              max: 799.9
+              adaptive_state_color: true
+              gauge_foreground_style:
+                opacity: 1
+              segments:
+                - from: 0
+                  color:
+                    - 255
+                    - 0
+                    - 0
+                - from: 500
+                  color:
+                    - 255
+                    - 162
+                    - 0
+                - from: 700
+                  color:
+                    - 3
+                    - 163
+                    - 0
+            tertiary:
+              entity: sensor.stream_ultra_x_0734_state_of_health
+              show_gauge: inner
+              min: 0
+              max: 100
+              segments:
+                - from: 0
+                  color:
+                    - 255
+                    - 0
+                    - 0
+                - from: 50
+                  color:
+                    - 255
+                    - 200
+                    - 0
+                - from: 80
+                  color:
+                    - 18
+                    - 153
+                    - 0
+            needle: false
+            start_from_zero: true
+            adaptive_state_color: true
+            min: 0
+            max: 100
+            header_position: top
+            smooth_segments: true
+            adaptive_icon_color: true
+            gauge_type: full
+            rotate_gauge: true
+            segments:
+              - from: 0
+                color:
+                  - 226
+                  - 36
+                  - 0
+              - from: 20
+                color:
+                  - 255
+                  - 171
+                  - 1
+              - from: 70
+                color:
+                  - 118
+                  - 187
+                  - 64
+            grid_options:
+              columns: 12
+              rows: 6
+            show_header: false
+      - type: grid
+        cards:
+          - type: heading
+            heading: Aktuelle Lastverteilung
+            heading_style: title
+            icon: mdi:home-battery
+          - type: custom:power-flow-card-plus
+            entities:
+              battery:
+                entity: sensor.stream_ultra_x_0734_power_battery
+                state_of_charge: sensor.stream_ultra_x_0734_power_battery_soc
+                color_state_of_charge_value: true
+                show_state_of_charge: true
+                state_of_charge_unit_white_space: false
+                invert_state: true
+              grid:
+                entity: sensor.stream_ultra_x_0734_power_grid
+                secondary_info: {}
+                invert_state: false
+                display_zero_tolerance: 0
+              solar:
+                entity: sensor.stream_ultra_x_0734_power_pv_sum
+                display_zero_state: true
+                secondary_info: {}
+                invert_state: false
+                use_metadata: false
+                display_zero_tolerance: 0
+              home:
+                secondary_info: {}
+                override_state: true
+                hide: false
+                subtract_individual: false
+                entity: sensor.stream_ultra_x_0734_power_sys_load
+              individual: []
+            clickable_entities: true
+            display_zero_lines:
+              mode: show
+              transparency: 50
+              grey_color:
+                - 189
+                - 189
+                - 189
+            use_new_flow_rate_model: true
+            w_decimals: 0
+            kw_decimals: 1
+            min_flow_rate: 0.75
+            max_flow_rate: 6
+            max_expected_power: 2000
+            min_expected_power: 0.01
+            watt_threshold: 1000
+            transparency_zero_lines: 0
+            sort_individual_devices: false
+      - type: grid
+        cards:
+          - type: energy-sankey
+            layout: auto
+            grid_options:
+              columns: 48
+        column_span: 4
+    cards: []
