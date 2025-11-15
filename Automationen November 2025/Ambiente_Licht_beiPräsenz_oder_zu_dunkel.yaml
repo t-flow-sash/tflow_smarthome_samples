@@ -1,0 +1,104 @@
+alias: Turn on lights if too dark
+description: ""
+triggers:
+  - entity_id:
+      - binary_sensor.wohnzimmer_hue_sensor_motion
+    from: "off"
+    to: "on"
+    trigger: state
+    enabled: false
+  - entity_id:
+      - cover.rollladen_wohnzimmer
+    attribute: current_position
+    above: 70
+    trigger: numeric_state
+  - entity_id:
+      - binary_sensor.wohnzimmer_motion_aqara_occupancy
+    from: "off"
+    to: "on"
+    trigger: state
+    enabled: false
+  - trigger: numeric_state
+    entity_id:
+      - sensor.lichtintensitat_wohnzimmer
+    below: 20
+  - trigger: state
+    entity_id:
+      - binary_sensor.wohnzimmer_presence_gruppe
+    to: "on"
+    from: "off"
+conditions:
+  - condition: and
+    conditions:
+      - condition: state
+        state: "off"
+        entity_id: light.beleuchtung_highboard
+      - condition: not
+        conditions:
+          - condition: or
+            conditions:
+              - condition: state
+                entity_id: alarm_control_panel.alarmo
+                state: armed_home
+              - condition: state
+                entity_id: alarm_control_panel.alarmo
+                state: armed_away
+              - condition: state
+                entity_id: alarm_control_panel.alarmo
+                state: armed_vacation
+      - condition: state
+        entity_id: light.sideboard
+        state: "off"
+      - condition: device
+        device_id: c14d12a8e88850e6b427a8502f43117a
+        domain: cover
+        entity_id: 61ff29bd27cf0a2b893c6b74014da2ae
+        type: is_position
+        above: 90
+      - condition: numeric_state
+        entity_id: sensor.lichtintensitat_wohnzimmer
+        below: 20
+      - condition: state
+        entity_id: binary_sensor.wohnzimmer_presence_gruppe
+        state: "on"
+actions:
+  - if:
+      - condition: state
+        entity_id: light.arbeitsplatte_rechts
+        state: "on"
+    then:
+      - action: switch.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.wz_ambiente_2025_stateful_scene
+      - if:
+          - condition: not
+            conditions:
+              - condition: state
+                entity_id: media_player.sony_kd_65xg9505_2
+                state: "off"
+        then:
+          - data:
+              sync: true
+            action: huesyncbox.set_sync_state
+    else:
+      - action: switch.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id:
+            - switch.arbeitsplatte_ambiente_2025_stateful_scene
+            - switch.wz_ambiente_2025_stateful_scene
+      - if:
+          - condition: not
+            conditions:
+              - condition: state
+                entity_id: media_player.sony_kd_65xg9505_2
+                state: "off"
+        then:
+          - data: {}
+            target:
+              entity_id: switch.sync_box_light_sync
+            action: switch.turn_on
+mode: single
