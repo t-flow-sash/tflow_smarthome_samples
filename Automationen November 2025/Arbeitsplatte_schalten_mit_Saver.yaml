@@ -1,0 +1,84 @@
+alias: Küche schalten
+description: ""
+triggers:
+  - entity_id:
+      - input_button.licht_arbeitsplatte
+    trigger: state
+  - domain: mqtt
+    device_id: 6e71da3b1a497215437cf54182685264
+    type: action
+    subtype: single
+    trigger: device
+  - device_id: 31721116bf456008dcbb2ce09f9eaf9e
+    domain: hue
+    type: initial_press
+    subtype: 1
+    unique_id: cbb959df-9b30-44f8-9e38-b00a26dbb99e
+    trigger: device
+  - domain: mqtt
+    device_id: 11ca901623c17ea23bcb35dcee1ee43c
+    type: action
+    subtype: "off"
+    trigger: device
+conditions: []
+actions:
+  - if:
+      - condition: device
+        type: is_off
+        device_id: d6b776814f0f0fd06d291fce6214ca0a
+        entity_id: light.arbeitsplatte_rechts
+        domain: light
+    then:
+      - action: saver.save_state
+        metadata: {}
+        data:
+          entity_id:
+            - light.arbeitsplatte_links
+            - light.arbeitsplatte_rechts
+            - light.dimmable_light_1
+            - light.abzugshaube_links
+            - light.abzugshaube_rechts
+      - action: scene.turn_on
+        metadata: {}
+        data:
+          transition: 1
+        target:
+          entity_id: scene.arbeitsplatte_voll_an
+    else:
+      - if:
+          - condition: template
+            value_template: "{{ saver_entity(\"light.arbeitsplatte_links\") == 'off' }}"
+        then:
+          - action: light.turn_off
+            metadata: {}
+            data: {}
+            target:
+              entity_id:
+                - light.arbeitsplatte_links
+                - light.arbeitsplatte_rechts
+                - light.dimmable_light_1
+                - light.abzugshaube_links
+                - light.abzugshaube_rechts
+        else:
+          - action: light.turn_on
+            metadata: {}
+            data:
+              color_temp: "{{ saver_entity(\"light.arbeitsplatte_links\", \"color_temp\") }}"
+              brightness: "{{ saver_entity(\"light.arbeitsplatte_links\", \"brightness\") }}"
+            target:
+              entity_id: light.arbeitsplatte_links
+          - action: light.turn_on
+            metadata: {}
+            data:
+              brightness: "{{ saver_entity(\"light.dimmable_light_1\", \"brightness\") }}"
+            target:
+              entity_id: light.dimmable_light_1
+          - action: light.turn_off
+            metadata: {}
+            data: {}
+            target:
+              entity_id:
+                - light.abzugshaube_links
+                - light.abzugshaube_rechts
+                - light.arbeitsplatte_rechts
+mode: restart
