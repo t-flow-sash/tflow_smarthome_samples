@@ -1,0 +1,63 @@
+alias: Gäste WC Spiegel bei Präsenz
+description: ""
+triggers:
+  - trigger: state
+    entity_id:
+      - binary_sensor.presence_gaste_wc_spiegel
+    from: "off"
+    to: "on"
+    id: mirroron
+  - trigger: state
+    entity_id:
+      - binary_sensor.presence_gaste_wc_spiegel
+    to: "off"
+    from: "on"
+    id: mirroroff
+conditions: []
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id:
+              - mirroron
+        sequence:
+          - action: scene.turn_on
+            metadata: {}
+            data: {}
+            target:
+              entity_id: scene.gwc_spiegel_hell
+      - conditions:
+          - condition: trigger
+            id:
+              - mirroroff
+          - condition: or
+            conditions:
+              - condition: state
+                entity_id: input_boolean.good_night_lia
+                state: "on"
+              - condition: state
+                entity_id: input_boolean.good_night_emily
+                state: "on"
+        sequence:
+          - action: scene.turn_on
+            metadata: {}
+            data: {}
+            target:
+              entity_id: scene.gwc_spiegel_ambiente_abend
+      - conditions:
+          - condition: trigger
+            id:
+              - mirroroff
+          - condition: state
+            entity_id: input_boolean.good_night_lia
+            state: "off"
+          - condition: state
+            entity_id: input_boolean.good_night_emily
+            state: "off"
+        sequence:
+          - action: scene.turn_on
+            metadata: {}
+            data: {}
+            target:
+              entity_id: scene.gwc_spiegel_ambiente_tag
+mode: single
