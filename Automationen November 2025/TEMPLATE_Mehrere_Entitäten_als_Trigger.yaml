@@ -1,0 +1,4 @@
+trigger: template
+value_template: >-
+  {{ is_state('person.sascha_thiebach', 'not_home') and
+  is_state('person.janine', 'not_home') }}
