@@ -1,0 +1,100 @@
+alias: "SWITCH|Lia Button Rotation "
+description: ""
+triggers:
+  - entity_id:
+      - event.hue_dimmer_switch_1_button_1
+    id: cycle-scenes
+    attribute: event_type
+    to: initial_press
+    trigger: state
+  - entity_id:
+      - event.hue_dimmer_switch_1_button_1
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 10
+    id: reset-cycle
+    trigger: state
+  - entity_id:
+      - event.hue_dimmer_switch_1_button_4
+    id: turn-off
+    attribute: event_type
+    to: initial_press
+    trigger: state
+  - trigger: state
+    entity_id:
+      - event.lichtschalter_lia_taste_2
+    attribute: event_type
+    to: initial_press
+  - trigger: state
+    entity_id:
+      - event.lichtschalter_lia_taste_2
+    id: cycle3
+conditions: []
+actions:
+  - alias: If on button is pressed
+    if:
+      - condition: trigger
+        id:
+          - cycle-scenes
+          - cycle3
+    then:
+      - if:
+          - condition: template
+            value_template: >-
+              {{states('input_number.emilys_switch_button_cycle') | int(0) ==
+              1}}
+            alias: If cycle is 1
+        then:
+          - data: {}
+            target:
+              entity_id: input_number.emilys_switch_button_cycle
+            action: input_number.increment
+          - data: {}
+            target:
+              entity_id:
+                - scene.knubbelchen_wickeltisch_dunkel
+            action: hue.activate_scene
+          - stop: ""
+      - if:
+          - condition: template
+            value_template: >-
+              {{states('input_number.emilys_switch_button_cycle') | int(0) ==
+              2}}
+            alias: If cycle is 2
+        then:
+          - data:
+              value: 1
+            target:
+              entity_id: input_number.emilys_switch_button_cycle
+            enabled: true
+            action: input_number.set_value
+          - data: {}
+            target:
+              entity_id:
+                - scene.knubbelchen_wickeltisch_hell
+            action: hue.activate_scene
+  - if:
+      - condition: trigger
+        id:
+          - turn-off
+    then:
+      - data: {}
+        target:
+          device_id:
+            - a3dcdd1bb0b00762bc7bde03fe19fc3d
+            - a15d1c61dfdb3e605ac49f39f78373d9
+        action: light.turn_off
+    alias: "If off button is pressed "
+  - if:
+      - condition: trigger
+        id:
+          - reset-cycle
+    then:
+      - data:
+          value: 1
+        target:
+          entity_id: input_number.emilys_switch_button_cycle
+        action: input_number.set_value
+    alias: Reset cycle after 10 sec
+mode: single
