@@ -1,0 +1,41 @@
+alias: Sauger – Räume ohne Präsenz reinigen
+mode: single
+sequence:
+  - variables:
+      free_rooms: |
+        {% set rooms = {
+          "16": 'binary_sensor.presencesenvmkii_presence',
+          "17": 'binary_sensor.wohnzimmer_presence_gruppe',
+          "23": 'binary_sensor.wohnzimmer_presence_gruppe',
+          "18": 'binary_sensor.fp2_emily_presence_sensor_1',
+          "19": 'binary_sensor.fp300_schlafzimmer_belegung',
+          "20": 'binary_sensor.presence_gaste_wc',
+          "21": 'binary_sensor.fp2_badezimmer_presence_sensor_1',
+          "22": 'binary_sensor.flur_presence_gruppe'
+        } %}
+        {% set ns = namespace(free=[]) %}
+        {% for room, sensor in rooms.items() %}
+          {% if states(sensor) == 'off' %}
+            {% set ns.free = ns.free + [ room | int ] %}
+          {% endif %}
+        {% endfor %}
+        {{ ns.free }}
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ free_rooms | length == 0 }}"
+        sequence:
+          - data:
+              message: Saugi wollte loslegen, aber alle Räume sind belegt.
+            action: notify.mobile_app_sascha
+    default:
+      - target:
+          entity_id: vacuum.s8_maxv_ultra
+        data:
+          command: app_segment_clean
+          params:
+            - segments: "{{ free_rooms }}"
+        action: vacuum.send_command
+      - data:
+          message: "Saugi reinigt jetzt: {{ free_rooms }}"
+        action: notify.mobile_app_sascha
