@@ -1,0 +1,16 @@
+  - sensor:
+      - name: "Wohnen/Essen Verschmutzungsgrad"
+        unique_id: wohnen-essen_verschmutzungsgrad_a73a939d
+        unit_of_measurement: "%"
+        state: >
+          {% set minuten = states('input_number.wohnen_essen_schmutz_counter') | float(0) %}
+          {% set grenze_stunden = states('input_number.grenze_verschmutzung_wohnen_essen') | float(1) %}
+          {% set grenze_minuten = grenze_stunden * 60 %}
+
+          {% if grenze_minuten <= 0 %}
+            0
+          {% else %}
+            {% set roh = (minuten / grenze_minuten) * 100 %}
+            {{ [ roh | round(1), 100 ] | min }}
+          {% endif %}
+        icon: mdi:broom
