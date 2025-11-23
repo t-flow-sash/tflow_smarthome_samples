@@ -1,0 +1,999 @@
+  - type: sections
+    max_columns: 2
+    path: roborock-new
+    dense_section_placement: true
+    subview: true
+    title: Roborock
+    icon: mdi:robot-vacuum
+    sections:
+      - type: grid
+        cards:
+          - type: custom:ultra-card
+            card_background: var(--card-background-color, var(--ha-card-background, white))
+            card_border_radius: 12
+            card_border_color: var(--divider-color)
+            card_border_width: 1
+            card_padding: 16
+            layout:
+              rows:
+                - id: row1
+                  columns:
+                    - id: col-1763724978213-qhpevgg5r
+                      modules:
+                        - id: horizontal-1763724985622-euibc1oo8
+                          type: horizontal
+                          gap: 0.7
+                          wrap: false
+                          modules:
+                            - id: gauge-1763724994413-eehtqd7xv
+                              type: gauge
+                              entity: sensor.wohnen_essen_verschmutzungsgrad
+                              value_type: entity
+                              min_value: 0
+                              max_value: 100
+                              gauge_style: block
+                              gauge_size: 160
+                              gauge_thickness: 12
+                              pointer_enabled: true
+                              pointer_style: needle
+                              pointer_color: var(--primary-color)
+                              pointer_length: 80
+                              pointer_width: 6
+                              pointer_icon: mdi:gauge
+                              pointer_icon_color: '#FFFFFF'
+                              pointer_icon_size: 24
+                              gauge_color_mode: gradient
+                              gauge_color: var(--primary-color)
+                              gauge_background_color: '#424242'
+                              use_gradient: true
+                              gradient_stops:
+                                - id: stop-1763724994413-0gao9rcc4
+                                  position: 0
+                                  color: '#4CAF50'
+                                - id: stop-1763724994413-fy4m41dux
+                                  position: 100
+                                  color: '#5b3a29'
+                              show_value: true
+                              value_position: bottom
+                              value_font_size: 16
+                              value_color: var(--primary-text-color)
+                              value_bold: false
+                              value_italic: false
+                              value_underline: false
+                              value_uppercase: false
+                              value_strikethrough: false
+                              show_name: true
+                              name_position: top
+                              name_font_size: 16
+                              name_color: var(--secondary-text-color)
+                              name_bold: false
+                              name_italic: false
+                              name_underline: false
+                              name_uppercase: false
+                              name_strikethrough: false
+                              show_min_max: true
+                              min_max_font_size: 12
+                              min_max_color: var(--secondary-text-color)
+                              show_ticks: true
+                              tick_count: 10
+                              tick_color: var(--divider-color)
+                              show_tick_labels: false
+                              tick_label_font_size: 10
+                              animation_enabled: true
+                              animation_duration: 1000ms
+                              animation_easing: ease-out
+                              segments:
+                                - id: segment-1763724994413-hbaxwukgg
+                                  from: 0
+                                  to: 30
+                                  color: '#4CAF50'
+                                  label: Low
+                                - id: segment-1763724994413-bing6gbtm
+                                  from: 30
+                                  to: 70
+                                  color: '#FFC107'
+                                  label: Medium
+                                - id: segment-1763724994413-h4k43txcc
+                                  from: 70
+                                  to: 100
+                                  color: '#F44336'
+                                  label: High
+                              display_mode: always
+                              display_conditions: []
+                              unified_template_mode: false
+                              unified_template: ''
+                              name: Wohnen-Essen
+                              value_format: '%.1f%'
+                              tap_action:
+                                action: more-info
+                                entity: sensor.kuche_verschmutzungsgrad_2
+                          tap_action:
+                            action: nothing
+                          hold_action:
+                            action: nothing
+                          double_tap_action:
+                            action: nothing
+                          display_mode: always
+                          display_conditions: []
+                      vertical_alignment: stretch
+                      horizontal_alignment: stretch
+                    - id: col-1763728545603-34m4vohdy
+                      modules:
+                        - id: vertical-1763728266590-nyu8k07fc
+                          type: vertical
+                          alignment: bottom
+                          horizontal_alignment: right
+                          gap: -0.3
+                          modules:
+                            - id: dropdown-1763725512507-66097pkcn
+                              type: dropdown
+                              source_mode: manual
+                              placeholder: Choose an option...
+                              options:
+                                - id: option-1763725512507-bcvax0asm
+                                  label: Saugen/Wischen
+                                  action:
+                                    action: perform-action
+                                    target:
+                                      entity_id: script.roborock_vac_mop
+                                    perform_action: script.turn_on
+                                  icon: mdi:water
+                                - id: option-1763728226535-3bfmf4rac
+                                  label: Nur saugen
+                                  action:
+                                    action: perform-action
+                                    target:
+                                      entity_id: script.roborock_vac_only
+                                    perform_action: script.turn_on
+                                  icon: mdi:water
+                              entity_option_customization: {}
+                              current_selection: Turn On Lights
+                              track_state: true
+                              closed_title_mode: custom
+                              closed_title_custom: '-- bitte auswählen - '
+                              unified_template_mode: false
+                              unified_template: ''
+                              tap_action:
+                                action: nothing
+                              hold_action:
+                                action: nothing
+                              double_tap_action:
+                                action: nothing
+                              display_mode: always
+                              display_conditions: []
+                              enable_hover_effect: false
+                              hover_background_color: var(--primary-color)
+                            - id: button-1763725309386-mt4eiirn8
+                              type: button
+                              button_text: Click Me
+                              tap_action:
+                                action: perform-action
+                                perform_action: vacuum.send_command
+                                target:
+                                  device_id: f22bc6bdb98041e0221f87351e32ee10
+                                data:
+                                  command: app_segment_clean
+                                  params:
+                                    - 17
+                                    - 23
+                              alignment: justify
+                              icon: mdi:vacuum
+                              show_icon: true
+                              icon_position: before
+                              label: Wohnzimmer/Küche reinigen
+                          tap_action:
+                            action: nothing
+                          hold_action:
+                            action: nothing
+                          double_tap_action:
+                            action: nothing
+                          display_mode: always
+                          display_conditions: []
+                      vertical_alignment: center
+                      horizontal_alignment: stretch
+                  column_layout: 1-2-1-2
+          - type: custom:mushroom-number-card
+            entity: input_number.grenze_verschmutzung_wohnen_essen
+            display_mode: buttons
+            layout: horizontal
+            name: Grenzwert
+          - type: heading
+            icon: ''
+            heading_style: title
+      - type: grid
+        cards:
+          - type: custom:ultra-card
+            card_background: var(--card-background-color, var(--ha-card-background, white))
+            card_border_radius: 12
+            card_border_color: var(--divider-color)
+            card_border_width: 1
+            card_padding: 16
+            layout:
+              rows:
+                - id: row1
+                  columns:
+                    - id: col-1763724978213-qhpevgg5r
+                      modules:
+                        - id: horizontal-1763724985622-euibc1oo8
+                          type: horizontal
+                          gap: 0.7
+                          wrap: false
+                          modules:
+                            - id: gauge-1763724994413-eehtqd7xv
+                              type: gauge
+                              entity: sensor.kuche_verschmutzungsgrad_2
+                              value_type: entity
+                              min_value: 0
+                              max_value: 100
+                              gauge_style: block
+                              gauge_size: 160
+                              gauge_thickness: 12
+                              pointer_enabled: true
+                              pointer_style: needle
+                              pointer_color: var(--primary-color)
+                              pointer_length: 80
+                              pointer_width: 6
+                              pointer_icon: mdi:gauge
+                              pointer_icon_color: '#FFFFFF'
+                              pointer_icon_size: 24
+                              gauge_color_mode: gradient
+                              gauge_color: var(--primary-color)
+                              gauge_background_color: '#424242'
+                              use_gradient: true
+                              gradient_stops:
+                                - id: stop-1763724994413-0gao9rcc4
+                                  position: 0
+                                  color: '#4CAF50'
+                                - id: stop-1763724994413-fy4m41dux
+                                  position: 100
+                                  color: '#5b3a29'
+                              show_value: true
+                              value_position: bottom
+                              value_font_size: 16
+                              value_color: var(--primary-text-color)
+                              value_bold: false
+                              value_italic: false
+                              value_underline: false
+                              value_uppercase: false
+                              value_strikethrough: false
+                              show_name: true
+                              name_position: top
+                              name_font_size: 16
+                              name_color: var(--secondary-text-color)
+                              name_bold: false
+                              name_italic: false
+                              name_underline: false
+                              name_uppercase: false
+                              name_strikethrough: false
+                              show_min_max: true
+                              min_max_font_size: 12
+                              min_max_color: var(--secondary-text-color)
+                              show_ticks: true
+                              tick_count: 10
+                              tick_color: var(--divider-color)
+                              show_tick_labels: false
+                              tick_label_font_size: 10
+                              animation_enabled: true
+                              animation_duration: 1000ms
+                              animation_easing: ease-out
+                              segments:
+                                - id: segment-1763724994413-hbaxwukgg
+                                  from: 0
+                                  to: 30
+                                  color: '#4CAF50'
+                                  label: Low
+                                - id: segment-1763724994413-bing6gbtm
+                                  from: 30
+                                  to: 70
+                                  color: '#FFC107'
+                                  label: Medium
+                                - id: segment-1763724994413-h4k43txcc
+                                  from: 70
+                                  to: 100
+                                  color: '#F44336'
+                                  label: High
+                              display_mode: always
+                              display_conditions: []
+                              unified_template_mode: false
+                              unified_template: ''
+                              name: Küche
+                              value_format: '%.1f%'
+                              tap_action:
+                                action: more-info
+                                entity: sensor.kuche_verschmutzungsgrad_2
+                          tap_action:
+                            action: nothing
+                          hold_action:
+                            action: nothing
+                          double_tap_action:
+                            action: nothing
+                          display_mode: always
+                          display_conditions: []
+                      vertical_alignment: stretch
+                      horizontal_alignment: stretch
+                    - id: col-1763728545603-34m4vohdy
+                      modules:
+                        - id: vertical-1763728266590-nyu8k07fc
+                          type: vertical
+                          alignment: bottom
+                          horizontal_alignment: right
+                          gap: -0.3
+                          modules:
+                            - id: dropdown-1763725512507-66097pkcn
+                              type: dropdown
+                              source_mode: manual
+                              placeholder: Choose an option...
+                              options:
+                                - id: option-1763725512507-bcvax0asm
+                                  label: Saugen/Wischen
+                                  action:
+                                    action: perform-action
+                                    target:
+                                      entity_id: script.roborock_vac_mop
+                                    perform_action: script.turn_on
+                                  icon: mdi:water
+                                - id: option-1763728226535-3bfmf4rac
+                                  label: Nur saugen
+                                  action:
+                                    action: perform-action
+                                    target:
+                                      entity_id: script.roborock_vac_only
+                                    perform_action: script.turn_on
+                                  icon: mdi:water
+                              entity_option_customization: {}
+                              current_selection: Turn On Lights
+                              track_state: true
+                              closed_title_mode: custom
+                              closed_title_custom: '-- bitte auswählen - '
+                              unified_template_mode: false
+                              unified_template: ''
+                              tap_action:
+                                action: nothing
+                              hold_action:
+                                action: nothing
+                              double_tap_action:
+                                action: nothing
+                              display_mode: always
+                              display_conditions: []
+                              enable_hover_effect: false
+                              hover_background_color: var(--primary-color)
+                            - id: button-1763725309386-mt4eiirn8
+                              type: button
+                              button_text: Click Me
+                              tap_action:
+                                action: perform-action
+                                perform_action: script.turn_on
+                                target:
+                                  entity_id: script.kuchenzeile_drucken
+                              alignment: justify
+                              icon: mdi:vacuum
+                              show_icon: true
+                              icon_position: before
+                              label: Küchenzeile reinigen
+                            - id: button-1763827025919-yz5awn3b3
+                              type: button
+                              button_text: Click Me
+                              tap_action:
+                                action: perform-action
+                                perform_action: script.turn_on
+                                target:
+                                  entity_id: script.esstisch_drucken
+                              alignment: justify
+                              icon: mdi:vacuum
+                              show_icon: true
+                              icon_position: before
+                              label: Esstisch reinigen
+                          tap_action:
+                            action: nothing
+                          hold_action:
+                            action: nothing
+                          double_tap_action:
+                            action: nothing
+                          display_mode: always
+                          display_conditions: []
+                      vertical_alignment: center
+                      horizontal_alignment: stretch
+                  column_layout: 1-2-1-2
+          - type: custom:mushroom-number-card
+            entity: input_number.grenze_verschmutzung_kuche
+            display_mode: buttons
+            layout: horizontal
+            name: Grenzwert
+          - type: heading
+            icon: ''
+            heading_style: title
+      - type: grid
+        cards: []
+        column_span: 2
+      - type: grid
+        cards:
+          - type: custom:ultra-card
+            card_background: var(--card-background-color, var(--ha-card-background, white))
+            card_border_radius: 12
+            card_border_color: var(--divider-color)
+            card_border_width: 1
+            card_padding: 16
+            layout:
+              rows:
+                - id: row1
+                  columns:
+                    - id: col-1763724978213-qhpevgg5r
+                      modules:
+                        - id: horizontal-1763724985622-euibc1oo8
+                          type: horizontal
+                          gap: 0.7
+                          wrap: false
+                          modules:
+                            - id: gauge-1763724994413-eehtqd7xv
+                              type: gauge
+                              entity: sensor.emily_verschmutzungsgrad
+                              value_type: entity
+                              min_value: 0
+                              max_value: 100
+                              gauge_style: block
+                              gauge_size: 160
+                              gauge_thickness: 12
+                              pointer_enabled: true
+                              pointer_style: needle
+                              pointer_color: var(--primary-color)
+                              pointer_length: 80
+                              pointer_width: 6
+                              pointer_icon: mdi:gauge
+                              pointer_icon_color: '#FFFFFF'
+                              pointer_icon_size: 24
+                              gauge_color_mode: gradient
+                              gauge_color: var(--primary-color)
+                              gauge_background_color: '#424242'
+                              use_gradient: true
+                              gradient_stops:
+                                - id: stop-1763724994413-0gao9rcc4
+                                  position: 0
+                                  color: '#4CAF50'
+                                - id: stop-1763724994413-fy4m41dux
+                                  position: 100
+                                  color: '#5b3a29'
+                              show_value: true
+                              value_position: bottom
+                              value_font_size: 16
+                              value_color: var(--primary-text-color)
+                              value_bold: false
+                              value_italic: false
+                              value_underline: false
+                              value_uppercase: false
+                              value_strikethrough: false
+                              show_name: true
+                              name_position: top
+                              name_font_size: 16
+                              name_color: var(--secondary-text-color)
+                              name_bold: false
+                              name_italic: false
+                              name_underline: false
+                              name_uppercase: false
+                              name_strikethrough: false
+                              show_min_max: true
+                              min_max_font_size: 12
+                              min_max_color: var(--secondary-text-color)
+                              show_ticks: true
+                              tick_count: 10
+                              tick_color: var(--divider-color)
+                              show_tick_labels: false
+                              tick_label_font_size: 10
+                              animation_enabled: true
+                              animation_duration: 1000ms
+                              animation_easing: ease-out
+                              segments:
+                                - id: segment-1763724994413-hbaxwukgg
+                                  from: 0
+                                  to: 30
+                                  color: '#4CAF50'
+                                  label: Low
+                                - id: segment-1763724994413-bing6gbtm
+                                  from: 30
+                                  to: 70
+                                  color: '#FFC107'
+                                  label: Medium
+                                - id: segment-1763724994413-h4k43txcc
+                                  from: 70
+                                  to: 100
+                                  color: '#F44336'
+                                  label: High
+                              display_mode: always
+                              display_conditions: []
+                              unified_template_mode: false
+                              unified_template: ''
+                              name: Emily
+                              value_format: '%.1f%'
+                          tap_action:
+                            action: nothing
+                          hold_action:
+                            action: nothing
+                          double_tap_action:
+                            action: nothing
+                          display_mode: always
+                          display_conditions: []
+                      vertical_alignment: stretch
+                      horizontal_alignment: stretch
+                    - id: col-1763728545603-34m4vohdy
+                      modules:
+                        - id: vertical-1763728266590-nyu8k07fc
+                          type: vertical
+                          alignment: bottom
+                          horizontal_alignment: right
+                          gap: -0.3
+                          modules:
+                            - id: dropdown-1763725512507-66097pkcn
+                              type: dropdown
+                              source_mode: manual
+                              placeholder: Choose an option...
+                              options:
+                                - id: option-1763725512507-bcvax0asm
+                                  label: Saugen/Wischen
+                                  action:
+                                    action: perform-action
+                                    target:
+                                      entity_id: script.roborock_vac_mop
+                                    perform_action: script.turn_on
+                                  icon: mdi:water
+                                - id: option-1763728226535-3bfmf4rac
+                                  label: Nur saugen
+                                  action:
+                                    action: perform-action
+                                    target:
+                                      entity_id: script.roborock_vac_only
+                                    perform_action: script.turn_on
+                                  icon: mdi:water
+                              entity_option_customization: {}
+                              current_selection: Turn On Lights
+                              track_state: true
+                              closed_title_mode: custom
+                              closed_title_custom: '-- bitte auswählen - '
+                              unified_template_mode: false
+                              unified_template: ''
+                              tap_action:
+                                action: nothing
+                              hold_action:
+                                action: nothing
+                              double_tap_action:
+                                action: nothing
+                              display_mode: always
+                              display_conditions: []
+                              enable_hover_effect: false
+                              hover_background_color: var(--primary-color)
+                            - id: button-1763725309386-mt4eiirn8
+                              type: button
+                              button_text: Click Me
+                              tap_action:
+                                action: perform-action
+                                perform_action: vacuum.send_command
+                                target:
+                                  entity_id: vacuum.s8_maxv_ultra
+                                data:
+                                  command: app_segment_clean
+                                  params:
+                                    - 18
+                              alignment: justify
+                              icon: mdi:vacuum
+                              show_icon: true
+                              icon_position: before
+                              label: Emilys Zimmer reinigen
+                          tap_action:
+                            action: nothing
+                          hold_action:
+                            action: nothing
+                          double_tap_action:
+                            action: nothing
+                          display_mode: always
+                          display_conditions: []
+                      vertical_alignment: center
+                      horizontal_alignment: stretch
+                  column_layout: 1-2-1-2
+          - type: custom:mushroom-number-card
+            entity: input_number.grenze_verschmutzung_emily
+            display_mode: buttons
+            layout: horizontal
+            name: Grenzwert
+          - type: heading
+            icon: ''
+            heading_style: title
+      - type: grid
+        cards:
+          - type: custom:ultra-card
+            card_background: var(--card-background-color, var(--ha-card-background, white))
+            card_border_radius: 12
+            card_border_color: var(--divider-color)
+            card_border_width: 1
+            card_padding: 16
+            layout:
+              rows:
+                - id: row1
+                  columns:
+                    - id: col-1763724978213-qhpevgg5r
+                      modules:
+                        - id: horizontal-1763724985622-euibc1oo8
+                          type: horizontal
+                          gap: 0.7
+                          wrap: false
+                          modules:
+                            - id: gauge-1763724994413-eehtqd7xv
+                              type: gauge
+                              entity: sensor.lia_verschmutzungsgrad
+                              value_type: entity
+                              min_value: 0
+                              max_value: 100
+                              gauge_style: block
+                              gauge_size: 160
+                              gauge_thickness: 12
+                              pointer_enabled: true
+                              pointer_style: needle
+                              pointer_color: var(--primary-color)
+                              pointer_length: 80
+                              pointer_width: 6
+                              pointer_icon: mdi:gauge
+                              pointer_icon_color: '#FFFFFF'
+                              pointer_icon_size: 24
+                              gauge_color_mode: gradient
+                              gauge_color: var(--primary-color)
+                              gauge_background_color: '#424242'
+                              use_gradient: true
+                              gradient_stops:
+                                - id: stop-1763724994413-0gao9rcc4
+                                  position: 0
+                                  color: '#4CAF50'
+                                - id: stop-1763724994413-fy4m41dux
+                                  position: 100
+                                  color: '#5b3a29'
+                              show_value: true
+                              value_position: bottom
+                              value_font_size: 16
+                              value_color: var(--primary-text-color)
+                              value_bold: false
+                              value_italic: false
+                              value_underline: false
+                              value_uppercase: false
+                              value_strikethrough: false
+                              show_name: true
+                              name_position: top
+                              name_font_size: 16
+                              name_color: var(--secondary-text-color)
+                              name_bold: false
+                              name_italic: false
+                              name_underline: false
+                              name_uppercase: false
+                              name_strikethrough: false
+                              show_min_max: true
+                              min_max_font_size: 12
+                              min_max_color: var(--secondary-text-color)
+                              show_ticks: true
+                              tick_count: 10
+                              tick_color: var(--divider-color)
+                              show_tick_labels: false
+                              tick_label_font_size: 10
+                              animation_enabled: true
+                              animation_duration: 1000ms
+                              animation_easing: ease-out
+                              segments:
+                                - id: segment-1763724994413-hbaxwukgg
+                                  from: 0
+                                  to: 30
+                                  color: '#4CAF50'
+                                  label: Low
+                                - id: segment-1763724994413-bing6gbtm
+                                  from: 30
+                                  to: 70
+                                  color: '#FFC107'
+                                  label: Medium
+                                - id: segment-1763724994413-h4k43txcc
+                                  from: 70
+                                  to: 100
+                                  color: '#F44336'
+                                  label: High
+                              display_mode: always
+                              display_conditions: []
+                              unified_template_mode: false
+                              unified_template: ''
+                              name: Lia
+                              value_format: '%.1f%'
+                          tap_action:
+                            action: nothing
+                          hold_action:
+                            action: nothing
+                          double_tap_action:
+                            action: nothing
+                          display_mode: always
+                          display_conditions: []
+                      vertical_alignment: stretch
+                      horizontal_alignment: stretch
+                    - id: col-1763728545603-34m4vohdy
+                      modules:
+                        - id: vertical-1763728266590-nyu8k07fc
+                          type: vertical
+                          alignment: bottom
+                          horizontal_alignment: right
+                          gap: -0.3
+                          modules:
+                            - id: dropdown-1763725512507-66097pkcn
+                              type: dropdown
+                              source_mode: manual
+                              placeholder: Choose an option...
+                              options:
+                                - id: option-1763725512507-bcvax0asm
+                                  label: Saugen/Wischen
+                                  action:
+                                    action: perform-action
+                                    target:
+                                      entity_id: script.roborock_vac_mop
+                                    perform_action: script.turn_on
+                                  icon: mdi:water
+                                - id: option-1763728226535-3bfmf4rac
+                                  label: Nur saugen
+                                  action:
+                                    action: perform-action
+                                    target:
+                                      entity_id: script.roborock_vac_only
+                                    perform_action: script.turn_on
+                                  icon: mdi:water
+                              entity_option_customization: {}
+                              current_selection: Turn On Lights
+                              track_state: true
+                              closed_title_mode: custom
+                              closed_title_custom: '-- bitte auswählen - '
+                              unified_template_mode: false
+                              unified_template: ''
+                              tap_action:
+                                action: nothing
+                              hold_action:
+                                action: nothing
+                              double_tap_action:
+                                action: nothing
+                              display_mode: always
+                              display_conditions: []
+                              enable_hover_effect: false
+                              hover_background_color: var(--primary-color)
+                            - id: button-1763725309386-mt4eiirn8
+                              type: button
+                              button_text: Click Me
+                              tap_action:
+                                action: perform-action
+                                perform_action: vacuum.send_command
+                                target:
+                                  entity_id: vacuum.s8_maxv_ultra
+                                data:
+                                  command: app_segment_clean
+                                  params:
+                                    - 16
+                              alignment: justify
+                              icon: mdi:vacuum
+                              show_icon: true
+                              icon_position: before
+                              label: Lias Zimmer reinigen
+                          tap_action:
+                            action: nothing
+                          hold_action:
+                            action: nothing
+                          double_tap_action:
+                            action: nothing
+                          display_mode: always
+                          display_conditions: []
+                      vertical_alignment: center
+                      horizontal_alignment: stretch
+                  column_layout: 1-2-1-2
+          - type: custom:mushroom-number-card
+            entity: input_number.grenze_verschmutzung_lia
+            display_mode: buttons
+            layout: horizontal
+            name: Grenzwert
+          - type: heading
+            icon: ''
+            heading_style: title
+      - type: grid
+        cards:
+          - type: custom:ultra-card
+            card_background: var(--card-background-color, var(--ha-card-background, white))
+            card_border_radius: 12
+            card_border_color: var(--divider-color)
+            card_border_width: 1
+            card_padding: 16
+            layout:
+              rows:
+                - id: row1
+                  columns:
+                    - id: col-1763724978213-qhpevgg5r
+                      modules:
+                        - id: horizontal-1763724985622-euibc1oo8
+                          type: horizontal
+                          gap: 0.7
+                          wrap: false
+                          modules:
+                            - id: gauge-1763724994413-eehtqd7xv
+                              type: gauge
+                              entity: sensor.flur_verschmutzungsgrad
+                              value_type: entity
+                              min_value: 0
+                              max_value: 100
+                              gauge_style: block
+                              gauge_size: 160
+                              gauge_thickness: 12
+                              pointer_enabled: true
+                              pointer_style: needle
+                              pointer_color: var(--primary-color)
+                              pointer_length: 80
+                              pointer_width: 6
+                              pointer_icon: mdi:gauge
+                              pointer_icon_color: '#FFFFFF'
+                              pointer_icon_size: 24
+                              gauge_color_mode: gradient
+                              gauge_color: var(--primary-color)
+                              gauge_background_color: '#424242'
+                              use_gradient: true
+                              gradient_stops:
+                                - id: stop-1763724994413-0gao9rcc4
+                                  position: 0
+                                  color: '#4CAF50'
+                                - id: stop-1763724994413-fy4m41dux
+                                  position: 100
+                                  color: '#5b3a29'
+                              show_value: true
+                              value_position: bottom
+                              value_font_size: 16
+                              value_color: var(--primary-text-color)
+                              value_bold: false
+                              value_italic: false
+                              value_underline: false
+                              value_uppercase: false
+                              value_strikethrough: false
+                              show_name: true
+                              name_position: top
+                              name_font_size: 16
+                              name_color: var(--secondary-text-color)
+                              name_bold: false
+                              name_italic: false
+                              name_underline: false
+                              name_uppercase: false
+                              name_strikethrough: false
+                              show_min_max: true
+                              min_max_font_size: 12
+                              min_max_color: var(--secondary-text-color)
+                              show_ticks: true
+                              tick_count: 10
+                              tick_color: var(--divider-color)
+                              show_tick_labels: false
+                              tick_label_font_size: 10
+                              animation_enabled: true
+                              animation_duration: 1000ms
+                              animation_easing: ease-out
+                              segments:
+                                - id: segment-1763724994413-hbaxwukgg
+                                  from: 0
+                                  to: 30
+                                  color: '#4CAF50'
+                                  label: Low
+                                - id: segment-1763724994413-bing6gbtm
+                                  from: 30
+                                  to: 70
+                                  color: '#FFC107'
+                                  label: Medium
+                                - id: segment-1763724994413-h4k43txcc
+                                  from: 70
+                                  to: 100
+                                  color: '#F44336'
+                                  label: High
+                              display_mode: always
+                              display_conditions: []
+                              unified_template_mode: false
+                              unified_template: ''
+                              name: Flur
+                              value_format: '%.1f%'
+                          tap_action:
+                            action: nothing
+                          hold_action:
+                            action: nothing
+                          double_tap_action:
+                            action: nothing
+                          display_mode: always
+                          display_conditions: []
+                      vertical_alignment: stretch
+                      horizontal_alignment: stretch
+                    - id: col-1763728545603-34m4vohdy
+                      modules:
+                        - id: vertical-1763728266590-nyu8k07fc
+                          type: vertical
+                          alignment: bottom
+                          horizontal_alignment: right
+                          gap: -0.3
+                          modules:
+                            - id: dropdown-1763725512507-66097pkcn
+                              type: dropdown
+                              source_mode: manual
+                              placeholder: Choose an option...
+                              options:
+                                - id: option-1763725512507-bcvax0asm
+                                  label: Saugen/Wischen
+                                  action:
+                                    action: perform-action
+                                    target:
+                                      entity_id: script.roborock_vac_mop
+                                    perform_action: script.turn_on
+                                  icon: mdi:water
+                                - id: option-1763728226535-3bfmf4rac
+                                  label: Nur saugen
+                                  action:
+                                    action: perform-action
+                                    target:
+                                      entity_id: script.roborock_vac_only
+                                    perform_action: script.turn_on
+                                  icon: mdi:water
+                              entity_option_customization: {}
+                              current_selection: Turn On Lights
+                              track_state: true
+                              closed_title_mode: custom
+                              closed_title_custom: '- bitte auswählen -'
+                              unified_template_mode: false
+                              unified_template: ''
+                              tap_action:
+                                action: nothing
+                              hold_action:
+                                action: nothing
+                              double_tap_action:
+                                action: nothing
+                              display_mode: always
+                              display_conditions: []
+                              enable_hover_effect: false
+                              hover_background_color: var(--primary-color)
+                            - id: button-1763725309386-mt4eiirn8
+                              type: button
+                              label: Flur reinigen
+                              button_text: Click Me
+                              tap_action:
+                                action: perform-action
+                                perform_action: vacuum.send_command
+                                target:
+                                  entity_id: vacuum.s8_maxv_ultra
+                                data:
+                                  command: app_segment_clean
+                                  params:
+                                    - 22
+                              alignment: justify
+                              icon: mdi:vacuum
+                              show_icon: true
+                              icon_position: before
+                          tap_action:
+                            action: nothing
+                          hold_action:
+                            action: nothing
+                          double_tap_action:
+                            action: nothing
+                          display_mode: always
+                          display_conditions: []
+                      vertical_alignment: center
+                      horizontal_alignment: stretch
+                  column_layout: 1-2-1-2
+          - type: custom:mushroom-number-card
+            entity: input_number.grenze_verschmutzung_flur
+            display_mode: buttons
+            layout: horizontal
+            name: Grenzwert
+          - type: heading
+            icon: ''
+            heading_style: title
+    badges:
+      - type: entity
+        show_name: false
+        show_state: true
+        show_icon: true
+        entity: sensor.s8_maxv_ultra_aktueller_raum
+        icon: mdi:map-marker-radius
+      - type: entity
+        show_name: false
+        show_state: true
+        show_icon: true
+        entity: vacuum.s8_maxv_ultra
+      - type: entity
+        show_name: false
+        show_state: true
+        show_icon: true
+        entity: sensor.s8_maxv_ultra_dock_dock_fehler
+        visibility:
+          - condition: state
+            entity: sensor.s8_maxv_ultra_dock_dock_fehler
+            state_not: ok
+        color: red
