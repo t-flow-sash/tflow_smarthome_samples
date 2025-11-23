@@ -1,0 +1,17 @@
+alias: Flur Verschmutzung akkumulieren
+description: ""
+triggers:
+  - minutes: /1
+    trigger: time_pattern
+conditions:
+  - condition: state
+    entity_id: binary_sensor.flur_presence_gruppe
+    state: "on"
+actions:
+  - target:
+      entity_id: input_number.flur_schmutz_counter
+    data:
+      value: |
+        {{ states('input_number.flur_schmutz_counter') | float(0) + 1 }}
+    action: input_number.set_value
+mode: single
