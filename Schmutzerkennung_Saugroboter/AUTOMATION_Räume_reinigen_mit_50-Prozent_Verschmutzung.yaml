@@ -1,0 +1,37 @@
+alias: Sauger – Schmutzige Räume reinigen (>50%)
+mode: single
+sequence:
+  - variables:
+      dirty_rooms: |
+        {% set rooms = {
+          "16": 'sensor.lia_verschmutzungsgrad',
+          "22": 'sensor.flur_verschmutzungsgrad'
+        } %}
+        {% set ns = namespace(dirty=[]) %}
+        {% for room, dirt_sensor in rooms.items() %}
+          {% set value = states(dirt_sensor) | float(0) %}
+          {% if value > 50 %}
+            {% set ns.dirty = ns.dirty + [ room | int ] %}
+          {% endif %}
+        {% endfor %}
+        {{ ns.dirty }}
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ dirty_rooms | length == 0 }}"
+        sequence:
+          - data:
+              message: Keine Räume über 50%. Saugi bleibt stehen.
+            action: notify.mobile_app_zion_ios_14
+    default:
+      - target:
+          entity_id: vacuum.s8_maxv_ultra
+        data:
+          command: app_segment_clean
+          params:
+            - segments: "{{ dirty_rooms }}"
+        action: vacuum.send_command
+      - data:
+          message: "Saugi reinigt jetzt schmutzige Räume: {{ dirty_rooms }}"
+        action: notify.mobile_app_zion_ios_14
+description: ""
