@@ -1,0 +1,21 @@
+alias: Reset Flur Schmutz Counter
+description: ""
+triggers:
+  - trigger: state
+    entity_id:
+      - sensor.s8_maxv_ultra_aktueller_raum
+    to:
+      - Flur
+    for:
+      hours: 0
+      minutes: 4
+      seconds: 0
+conditions: []
+actions:
+  - action: input_number.set_value
+    metadata: {}
+    data:
+      value: 0
+    target:
+      entity_id: input_number.flur_schmutz_counter
+mode: single
