@@ -1,0 +1,77 @@
+alias: Reset Wohnen/Essen Schmutz Counter
+description: ""
+triggers:
+  - trigger: state
+    entity_id:
+      - sensor.s8_maxv_ultra_aktueller_raum
+    to:
+      - Esszimmer
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+    id: kitchenclean
+  - trigger: state
+    entity_id:
+      - sensor.s8_maxv_ultra_aktueller_raum
+    to:
+      - Wohnzimmer
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+    id: livingclean
+conditions:
+  - condition: not
+    conditions:
+      - condition: state
+        entity_id: vacuum.s8_maxv_ultra
+        state:
+          - docked
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id:
+              - kitchenclean
+        sequence:
+          - action: input_number.set_value
+            metadata: {}
+            data:
+              value: 0
+            target:
+              entity_id: input_number.kuche_schmutz_counter
+          - action: input_number.set_value
+            metadata: {}
+            data:
+              value: >
+                {{ states('input_number.wohnen_essen_schmutz_counter') | float /
+                2 }}
+            target:
+              entity_id: input_number.wohnen_essen_schmutz_counter
+      - conditions:
+          - condition: trigger
+            id:
+              - livingclean
+        sequence:
+          - if:
+              - condition: numeric_state
+                entity_id: sensor.kuche_verschmutzungsgrad_2
+                below: 5
+            then:
+              - action: input_number.set_value
+                metadata: {}
+                data:
+                  value: "0"
+                target:
+                  entity_id: input_number.wohnen_essen_schmutz_counter
+            else:
+              - action: input_number.set_value
+                metadata: {}
+                data:
+                  value: >
+                    {{ states('input_number.wohnen_essen_schmutz_counter') |
+                    float / 2 }}
+                target:
+                  entity_id: input_number.wohnen_essen_schmutz_counter
+mode: single
