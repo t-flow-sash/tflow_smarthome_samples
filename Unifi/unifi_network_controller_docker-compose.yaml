@@ -1,0 +1,57 @@
+version: "3.8"
+
+services:
+  unifi-db:
+    image: mongo:4.4
+    container_name: unifi-db
+    restart: unless-stopped
+    command: ["mongod", "--auth"]
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: INIT-PASSWORT
+      MONGO_AUTHSOURCE: admin
+      MONGO_USER: unifi
+      MONGO_PASS: DB-PASSWORT
+      MONGO_DBNAME: unifi
+    volumes:
+      - unifi_mongo_data:/data/db
+      - /opt/stacks/unifi/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mongo --quiet --username root --password $$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase admin --eval 'db.runCommand({ ping: 1 }).ok' | grep 1 >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+
+  unifi-network-application:
+    image: lscr.io/linuxserver/unifi-network-application:latest
+    container_name: unifi-network-application
+    restart: unless-stopped
+    depends_on:
+      unifi-db:
+        condition: service_healthy
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: "Europe/Berlin"
+      MONGO_USER: unifi
+      MONGO_PASS: DB-PASSWORT
+      MONGO_HOST: unifi-db
+      MONGO_PORT: "27017"
+      MONGO_DBNAME: unifi
+      MONGO_AUTHSOURCE: admin
+    volumes:
+      - unifi_app_config:/config
+    ports:
+      - "8443:8443"
+      - "8080:8080"
+      - "3478:3478/udp"
+      - "10001:10001/udp"
+      - "1900:1900/udp"
+      - "8843:8843"
+      - "8880:8880"
+      - "6789:6789"
+      - "5514:5514/udp"
+
+volumes:
+  unifi_mongo_data:
+  unifi_app_config:
