@@ -1,0 +1,34 @@
+alias: Core Rooms Vac only
+description: ""
+triggers:
+  - trigger: calendar.event_started
+    target:
+      entity_id: calendar.saug_kalender
+    options:
+      offset:
+        hours: 0
+        minutes: 5
+        seconds: 0
+        days: 0
+      offset_type: before
+conditions:
+  - condition: template
+    value_template: "{{ 'saugen' in trigger.calendar_event.summary | lower }}"
+actions:
+  - action: notify.alexa_media_saschas_echo_show
+    metadata: {}
+    data:
+      message: >-
+        Achtung! Ich sauge und wische in 5 Minuten folgende Räume: Küche;
+        Wohnzimmer; Flur; Emilys Zimmer
+  - delay:
+      hours: 0
+      minutes: 5
+      seconds: 0
+      milliseconds: 0
+  - action: script.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: script.z60_vac_only_critical_rooms
+mode: single
