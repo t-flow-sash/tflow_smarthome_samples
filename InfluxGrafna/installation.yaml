@@ -1,0 +1,3 @@
+## in der Console vom InfluxDB Container:
+influx setup
+influx auth create --all-access --org home --description "HA Admin Token"
