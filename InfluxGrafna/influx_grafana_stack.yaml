@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  influxdb:
+    image: influxdb:latest # Prüfe ggf. auf 'influxdata/influxdb:3.0'
+    container_name: influxdb4
+    restart: unless-stopped
+    ports:
+      - "8087:8086" # passe den Port an deine Bedürfnisse an
+    volumes:
+      - influxdb_data2:/var/lib/influxdb2 # Pfad kann je nach v3-Image leicht variieren
+    environment:
+      - INFLUXD_DB_MODE=core
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana2
+    restart: unless-stopped
+    ports:
+      - "3003:3000" # passe den Port an deine Bedürfnisse an
+    depends_on:
+      - influxdb
+    volumes:
+      - grafana_data2:/var/lib/grafana
+
+volumes:
+  influxdb_data2:
+  grafana_data2:
