@@ -29,4 +29,4 @@ advanced:
   last_seen: ISO_8601_local
   log_symlink_current: true
   transmit_power: 20
-  log_level: debug
+  log_level: info
