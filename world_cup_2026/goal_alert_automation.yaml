@@ -1,0 +1,20 @@
+alias: Deutschland Goal Alert
+description: ""
+triggers:
+  - trigger: state
+    entity_id:
+      - sensor.wc_germany
+    attribute: team_score
+conditions:
+  - condition: state
+    entity_id: sensor.wc_germany
+    state:
+      - IN
+actions:
+  - action: light.turn_on
+    metadata: {}
+    target:
+      entity_id: light.tv_backlight
+    data:
+      effect: glisten
+mode: single
