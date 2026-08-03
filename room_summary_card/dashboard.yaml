@@ -1,0 +1,658 @@
+title: Hermes Dashboard
+views:
+  - title: Übersicht
+    path: uebersicht
+    icon: mdi:home-outline
+    type: sections
+    max_columns: 3
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: ⚡ Schnellzugriff
+          - type: custom:mushroom-template-card
+            primary: WZ Abends
+            secondary: Szene
+            icon: mdi:weather-sunset
+            icon_color: orange
+            entity: scene.wohnzimmer_abends
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              target:
+                entity_id: scene.wohnzimmer_abends
+            grid_options:
+              columns: 6
+              rows: 1
+          - type: custom:mushroom-template-card
+            primary: Nachtmodus
+            secondary: >-
+              {% if is_state('input_boolean.nachtmodus', 'on') %}🌙 Aktiv{% else
+              %}☀️ Inaktiv{% endif %}
+            icon: mdi:sleep
+            icon_color: >-
+              {% if is_state('input_boolean.nachtmodus', 'on') %}purple{% else
+              %}grey{% endif %}
+            entity: input_boolean.nachtmodus
+            tap_action:
+              action: toggle
+            grid_options:
+              columns: 6
+              rows: 1
+          - type: custom:mushroom-template-card
+            primary: SZ Abends
+            secondary: Szene
+            icon: mdi:weather-night
+            icon_color: indigo
+            entity: scene.schlafzimmer_abends
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              target:
+                entity_id: scene.schlafzimmer_abends
+            grid_options:
+              columns: 6
+              rows: 1
+          - type: custom:mushroom-template-card
+            primary: "{{ states('weather.forecast_home') | title }}"
+            secondary: >-
+              {{ states('sensor.wohnzimmer_temperatur') }}°C · {{
+              state_attr('weather.forecast_home','temperature') }}°C
+            icon: mdi:weather-partly-cloudy
+            icon_color: amber
+            entity: weather.forecast_home
+            tap_action:
+              action: navigate
+              navigation_path: /hermes-dashboard/wetter
+            grid_options:
+              columns: 6
+              rows: 1
+          - type: heading
+            icon: ""
+            heading_style: title
+          - type: heading
+            icon: ""
+            heading_style: title
+            heading: 🚪 Nebenräume
+          - type: custom:room-summary-card
+            area: badezimmer
+            entity:
+              entity_id: light.badezimmer_licht_badezimmer_up
+              icon: mdi:bathtub
+              tap_action:
+                action: navigate
+                navigation_path: /hermes-dashboard/buero
+            features:
+              - multi_light_background
+            icon_opacity_preset: medium
+            occupancy:
+              entities:
+                - binary_sensor.buro_buro_presence_presence_sensor_1_2
+            lights:
+              - light.badezimmer_licht_badezimmer_up
+            entities:
+              - light.badezimmer_licht_badezimmer_up
+            grid_options:
+              columns: 6
+              rows: 3
+          - type: custom:room-summary-card
+            area: gaste_wc
+            entity:
+              entity_id: light.gaste_wc_licht_gaste_wc_up
+              icon: mdi:toilet
+              tap_action:
+                action: navigate
+                navigation_path: /hermes-dashboard/buero
+            features:
+              - multi_light_background
+            icon_opacity_preset: medium
+            occupancy:
+              entities:
+                - binary_sensor.buro_buro_presence_presence_sensor_1_2
+            lights:
+              - light.gaste_wc_licht_gaste_wc_up
+            entities:
+              - light.gaste_wc_licht_gaste_wc_up
+            grid_options:
+              columns: 6
+              rows: 3
+          - type: custom:room-summary-card
+            area: buro
+            entity:
+              entity_id: light.buro_lichter
+              icon: mdi:desk
+              tap_action:
+                action: navigate
+                navigation_path: /hermes-dashboard/buero
+            features:
+              - multi_light_background
+            icon_opacity_preset: medium
+            occupancy:
+              entities:
+                - binary_sensor.buro_buro_presence_presence_sensor_1_2
+            lights:
+              - light.buro_lichter
+            entities:
+              - entity_id: climate.heizung_buro
+              - light.buro_lichter
+            grid_options:
+              columns: 12
+              rows: 3
+      - type: grid
+        cards:
+          - type: heading
+            heading: 🏢 Erdgeschoss
+          - type: custom:room-summary-card
+            area: wohnzimmer
+            entity:
+              entity_id: light.wohnzimmer_lichter
+              icon: mdi:sofa
+              tap_action:
+                action: navigate
+                navigation_path: /hermes-dashboard/wohnzimmer
+            features:
+              - multi_light_background
+            icon_opacity_preset: medium
+            occupancy:
+              entities:
+                - binary_sensor.wz_presence_gruppe
+            lights:
+              - light.wohnzimmer_lichter
+            entities:
+              - entity_id: climate.heizung_wohnzimmer
+              - entity_id: media_player.wohnzimmer_tv_wohnzimmer
+              - entity_id: fan.nebelventilator_2
+              - light.wohnzimmer_lichter
+            grid_options:
+              columns: 12
+              rows: 3
+            sensors:
+              - entity_id: binary_sensor.fenster_wohnzimmer_door
+                label: " "
+              - entity_id: binary_sensor.wohnzimmer_terrassentur_door
+                label: " "
+          - type: custom:room-summary-card
+            area: kuche
+            entity:
+              entity_id: light.kuche_lichter
+              icon: mdi:stove
+              tap_action:
+                action: navigate
+                navigation_path: /hermes-dashboard/kueche
+            features:
+              - multi_light_background
+            icon_opacity_preset: medium
+            occupancy:
+              entities:
+                - binary_sensor.kuche_presence_presence
+            lights:
+              - light.kuche_lichter
+            entities:
+              - light.kuche_lichter
+            grid_options:
+              columns: 12
+              rows: 3
+            sensors:
+              - entity_id: binary_sensor.terrassentur_kuche_door
+                label: " "
+              - entity_id: binary_sensor.fenster_kuche_door
+                label: " "
+          - type: custom:room-summary-card
+            area: flur_eg
+            entity:
+              entity_id: light.flur_lichter
+              icon: mdi:door
+              tap_action:
+                action: navigate
+                navigation_path: /hermes-dashboard/flur
+            features:
+              - multi_light_background
+            icon_opacity_preset: medium
+            occupancy:
+              entities:
+                - binary_sensor.flur_presence_presence
+            lights:
+              - light.flur_lichter
+            entities:
+              - light.flur_lichter
+              - binary_sensor.hauseingang_ding
+            grid_options:
+              columns: 12
+              rows: 3
+            sensors:
+              - entity_id: binary_sensor.lock_ultra_50_tur
+                label: " "
+      - type: grid
+        cards:
+          - type: heading
+            heading: 🛏️ 1. Etage
+          - type: custom:room-summary-card
+            area: schlafzimmer
+            entity:
+              entity_id: light.schlafzimmer_lichter
+              icon: mdi:bed
+              tap_action:
+                action: navigate
+                navigation_path: /hermes-dashboard/schlafzimmer
+            features:
+              - multi_light_background
+            icon_opacity_preset: medium
+            occupancy:
+              entities:
+                - binary_sensor.schlafzimmer_presence_presence
+            lights:
+              - light.schlafzimmer_lichter
+            entities:
+              - light.schlafzimmer_lichter
+            grid_options:
+              columns: 12
+              rows: 3
+          - type: custom:room-summary-card
+            area: emilys_zimmer
+            entity:
+              entity_id: light.emily_lichter
+              icon: mdi:teddy-bear
+              tap_action:
+                action: navigate
+                navigation_path: /hermes-dashboard/emily
+            features:
+              - multi_light_background
+            icon_opacity_preset: medium
+            lights:
+              - light.emily_lichter
+            entities:
+              - light.emily_lichter
+            grid_options:
+              columns: 12
+              rows: 3
+          - type: custom:room-summary-card
+            area: lias_zimmer
+            entity:
+              entity_id: light.lias_zimmer_lichter
+              icon: mdi:cradle
+              tap_action:
+                action: navigate
+                navigation_path: /hermes-dashboard/lia
+            features:
+              - multi_light_background
+            icon_opacity_preset: medium
+            lights:
+              - light.lias_zimmer_lichter
+            entities:
+              - light.lias_zimmer_lichter
+            grid_options:
+              columns: 12
+              rows: 3
+      - type: grid
+        cards: []
+    header:
+      card:
+        type: markdown
+        text_only: true
+        content: >-
+          # {{ now().strftime('%H:%M') }} · {% set w =
+          ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag']
+          %}{% set m =
+          ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember']
+          %}{{ w[now().weekday()] }}, {{ now().day }}. {{ m[now().month-1] }} {{
+          now().year }}
+  - title: 🛋️ Wohnzimmer
+    path: wohnzimmer
+    icon: mdi:sofa
+    type: sections
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: 💡 Beleuchtung
+          - type: custom:mushroom-light-card
+            entity: light.wohnzimmer_ambiente_sideboard
+            name: Ambiente Sideboard
+            show_brightness_control: true
+            show_color_temp_control: true
+            use_light_color: true
+          - type: custom:mushroom-light-card
+            entity: light.wohnzimmer_ecke
+            name: Ecke
+            show_brightness_control: true
+            show_color_temp_control: true
+            use_light_color: true
+      - type: grid
+        cards:
+          - type: heading
+            heading: 📺 Medien
+          - type: custom:mushroom-media-player-card
+            entity: media_player.wohnzimmer_tv_wohnzimmer
+            name: TV
+          - type: custom:mushroom-template-card
+            entity: fan.nebelventilator_2
+            primary: Ventilator
+            secondary: >-
+              {% if is_state('fan.nebelventilator_2', 'on') %}🟢 An{% else %}⬜
+              Aus{% endif %}
+            icon: mdi:fan
+            tap_action:
+              action: toggle
+      - type: grid
+        cards:
+          - type: heading
+            heading: 🌡️ Klima
+          - type: custom:mushroom-climate-card
+            entity: climate.heizung_wohnzimmer
+            name: Heizung
+            show_temperature_control: true
+          - type: tile
+            entity: sensor.wohnzimmer_temperatur
+          - type: tile
+            entity: sensor.wohnzimmer_luftfeuchtigkeit
+      - type: grid
+        cards:
+          - type: heading
+            heading: 🔒 Sicherheit
+          - type: tile
+            entity: binary_sensor.wz_presence_gruppe
+            name: Anwesend
+  - title: 🍳 Küche
+    path: kueche
+    icon: mdi:stove
+    type: sections
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: 💡 Beleuchtung
+          - type: custom:mushroom-light-card
+            entity: light.kuche_kuche_arbeitsplatte_rechts
+            name: Arbeitsplatte
+            show_brightness_control: true
+            use_light_color: true
+          - type: custom:mushroom-light-card
+            entity: light.kuche_licht_kuche_up
+            name: Deckenlicht
+            show_brightness_control: true
+            use_light_color: true
+      - type: grid
+        cards:
+          - type: heading
+            heading: 🌡️ Klima
+          - type: tile
+            entity: sensor.temperatur_kuche_temperatur
+          - type: tile
+            entity: sensor.temperatur_kuche_luftfeuchtigkeit
+      - type: grid
+        cards:
+          - type: heading
+            heading: 🔒 Sicherheit
+          - type: tile
+            entity: binary_sensor.kuche_presence_presence
+            name: Anwesend
+          - type: tile
+            entity: binary_sensor.fenster_kuche_door
+            name: Fenster
+          - type: tile
+            entity: binary_sensor.terrassentur_kuche_door
+            name: Terrassentür
+  - title: 🚪 Flur
+    path: flur
+    icon: mdi:door
+    type: sections
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: 💡 Beleuchtung
+          - type: custom:mushroom-light-card
+            entity: light.flur_spiegel
+            name: Spiegel
+            show_brightness_control: true
+            use_light_color: true
+          - type: custom:mushroom-light-card
+            entity: light.flur_scheinwerfer
+            name: Scheinwerfer
+            show_brightness_control: true
+            use_light_color: true
+      - type: grid
+        cards:
+          - type: heading
+            heading: 🌡️ Klima
+          - type: tile
+            entity: sensor.flur_eg_temperatur
+          - type: tile
+            entity: sensor.flur_eg_luftfeuchtigkeit
+      - type: grid
+        cards:
+          - type: heading
+            heading: 🔒 Sicherheit
+          - type: tile
+            entity: binary_sensor.flur_presence_presence
+            name: Anwesend
+          - type: tile
+            entity: binary_sensor.hauseingang_ding
+            name: Eingang
+          - type: tile
+            entity: binary_sensor.lock_ultra_50_tur
+            name: Haustür
+  - title: 🛏️ Schlafzimmer
+    path: schlafzimmer
+    icon: mdi:bed
+    type: sections
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: 💡 Beleuchtung
+          - type: custom:mushroom-light-card
+            entity: light.schlafzimmer_sideboard
+            name: Sideboard
+            show_brightness_control: true
+            show_color_temp_control: true
+            use_light_color: true
+      - type: grid
+        cards:
+          - type: heading
+            heading: 🌡️ Klima
+          - type: tile
+            entity: sensor.schlafzimmer_presence_temperature
+          - type: tile
+            entity: sensor.schlafzimmer_presence_humidity
+      - type: grid
+        cards:
+          - type: heading
+            heading: 🔒 Sicherheit
+          - type: tile
+            entity: binary_sensor.schlafzimmer_presence_presence
+            name: Anwesend
+  - title: 👧 Emily
+    path: emily
+    icon: mdi:teddy-bear
+    type: sections
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: 💡 Beleuchtung
+          - type: custom:mushroom-light-card
+            entity: light.neon_emily
+            name: Neon
+            show_brightness_control: true
+            show_color_temp_control: true
+            use_light_color: true
+          - type: custom:mushroom-light-card
+            entity: light.nachtlicht_emily
+            name: Nachtlicht
+            show_brightness_control: true
+            use_light_color: true
+      - type: grid
+        cards:
+          - type: heading
+            heading: 🌡️ Klima
+          - type: tile
+            entity: sensor.temperatur_emily_temperatur
+          - type: tile
+            entity: sensor.temperatur_emily_luftfeuchtigkeit
+  - title: 👶 Lia
+    path: lia
+    icon: mdi:cradle
+    type: sections
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: 💡 Beleuchtung
+          - type: custom:mushroom-light-card
+            entity: light.knubbelchen_knubbelchen
+            name: Knübbelchen
+            show_brightness_control: true
+            show_color_temp_control: true
+            use_light_color: true
+          - type: custom:mushroom-light-card
+            entity: light.knubbelchen_nachtlicht_lia
+            name: Nachtlicht
+            show_brightness_control: true
+            use_light_color: true
+  - title: 💻 Büro
+    path: buero
+    icon: mdi:desk
+    type: sections
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: 💡 Beleuchtung
+          - type: custom:mushroom-light-card
+            entity: light.buro_wand_1
+            name: Wand 1
+            show_brightness_control: true
+            show_color_temp_control: true
+            use_light_color: true
+          - type: custom:mushroom-light-card
+            entity: light.buro_wand_2
+            name: Wand 2
+            show_brightness_control: true
+            show_color_temp_control: true
+            use_light_color: true
+          - type: custom:mushroom-light-card
+            entity: light.buro_buro_downlight
+            name: Downlight
+            show_brightness_control: true
+            use_light_color: true
+          - type: custom:mushroom-light-card
+            entity: light.buro_buro_downlights_matter
+            name: Downlights Matter
+            show_brightness_control: true
+            use_light_color: true
+          - type: custom:mushroom-light-card
+            entity: light.neon_light_desk
+            name: Neon Desk
+            show_brightness_control: true
+            show_color_temp_control: true
+            use_light_color: true
+      - type: grid
+        cards:
+          - type: heading
+            heading: 🌡️ Klima
+          - type: custom:mushroom-climate-card
+            entity: climate.heizung_buro
+            name: Heizung
+            show_temperature_control: true
+          - type: tile
+            entity: sensor.heizung_buro_local_temperature
+          - type: tile
+            entity: sensor.temperatur_buro_temperatur
+          - type: tile
+            entity: sensor.temperatur_buro_luftfeuchtigkeit
+      - type: grid
+        cards:
+          - type: heading
+            heading: 🔒 Sicherheit
+          - type: tile
+            entity: binary_sensor.buro_buro_presence_presence_sensor_1_2
+            name: Anwesend
+  - title: 🌤️ Wetter
+    path: wetter
+    icon: mdi:weather-partly-cloudy
+    type: sections
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: 📡 Radar
+          - type: custom:weather-radar-card
+            zoom_level: 10
+            map_style: dark
+            marker_color: "#ffaa00"
+            markers:
+              - entity: zone.home
+            data_source: DWD
+      - type: grid
+        cards:
+          - type: heading
+            heading: 📈 Temperatur-Verlauf
+          - type: custom:statistics-graph-chart-card
+            card_header: Temperatur-Verlauf
+            entities:
+              - entity: sensor.wohnzimmer_temperatur
+                name: Wohnzimmer
+                color: "#ff6b35"
+              - entity: sensor.schlafzimmer_presence_temperature
+                name: Schlafzimmer
+                color: "#7c4dff"
+              - entity: sensor.temperatur_kuche_temperatur
+                name: Küche
+                color: "#00bfa5"
+              - entity: sensor.flur_eg_temperatur
+                name: Flur EG
+                color: "#ff9100"
+              - entity: sensor.temperatur_buro_temperatur
+                name: Büro
+                color: "#2979ff"
+              - entity: sensor.temperatur_emily_temperatur
+                name: Emily
+                color: "#e040fb"
+      - type: grid
+        cards:
+          - type: heading
+            heading: Vorhersage
+            heading_style: title
+          - type: custom:clock-weather-card-hui-icons
+            entity: weather.serverraum_wetter_home
+  - title: 📷 Kameras
+    path: kameras
+    icon: mdi:cctv
+    type: sections
+    max_columns: 3
+    sections:
+      - type: grid
+        cards:
+          - type: picture-entity
+            entity: camera.flur_eg_front_door_standardauflosung
+            name: Front Door
+            camera_view: live
+      - type: grid
+        cards:
+          - type: picture-entity
+            entity: camera.flur_standardauflosung
+            name: Flur
+            camera_view: live
+          - type: picture-entity
+            entity: camera.garage_standardauflosung
+            name: Garage
+            camera_view: live
+      - type: grid
+        cards:
+          - type: picture-entity
+            entity: camera.terrasse_standardauflosung
+            name: Terrasse
+            camera_view: live
+          - type: picture-entity
+            entity: camera.terrasse_tele_in_standardauflosung
+            name: Terrasse Tele
+            camera_view: live
+  - title: 🚪 Front Door
+    path: frontdoor
+    icon: mdi:doorbell-video
+    type: panel
+    cards:
+      - type: picture-entity
+        entity: camera.flur_eg_front_door_standardauflosung
+        camera_view: live
