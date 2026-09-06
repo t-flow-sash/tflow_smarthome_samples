@@ -1,0 +1,116 @@
+type: custom:stundenplan-card
+title: Mein Stundenplan
+show_title: true
+title_font_size: 20
+title_font_family: ''
+show_header_date: true
+days:
+  - Mo
+  - Di
+  - Mi
+  - Do
+  - Fr
+view_mode: week
+display_mode: default
+days_ahead: 0
+rolling_switch_mode: midnight
+rolling_switch_time: ''
+tap_action:
+  action: none
+  navigation_path: ''
+  url_path: ''
+  entity: ''
+  target: ''
+highlight_today: true
+highlight_current: true
+highlight_breaks: true
+free_only_column_highlight: true
+highlight_today_color: rgba(129, 140, 248, 0.18)
+highlight_current_color: rgba(244, 114, 182, 0.20)
+highlight_current_text: true
+highlight_current_text_color: '#be185d'
+highlight_current_time_text: true
+highlight_current_time_text_color: '#be185d'
+source_entity: ''
+source_entity_integration: ''
+source_entity_legacy: ''
+source_attribute: rows_table
+source_time_key: time
+source_type: manual
+json_url: ''
+week_offset_entity: ''
+week_offset_attribute: ''
+week_mode: 'off'
+week_a_is_even_kw: true
+week_map_entity: ''
+week_map_attribute: ''
+source_entity_a: ''
+source_attribute_a: ''
+source_entity_b: ''
+source_attribute_b: ''
+filter_main_only: true
+filter_allow_prefixes: []
+filter_exclude: []
+rows:
+  - time: '1.'
+    start: '08:15'
+    end: '09:00'
+    cells:
+      - Deutsch
+      - Sport
+      - Mathe
+      - Deutsch
+      - Deutsch
+  - time: '2.'
+    start: '09:05'
+    end: '09:50'
+    cells:
+      - Sachunterricht
+      - Sport
+      - Musik
+      - Sport
+      - Mathe
+  - break: true
+    time: ''
+    label: Pause
+  - time: '3.'
+    start: '10:10'
+    end: '10:55'
+    cells:
+      - Mathe
+      - Deutsch
+      - Deutsch
+      - Mathe
+      - Sachunterricht
+  - time: '4.'
+    start: '11:00'
+    end: '11:45'
+    cells:
+      - Kunst
+      - Mathe
+      - Freiarbeit
+      - Kunst
+      - Glück
+  - break: true
+    time: ''
+    label: Pause
+  - time: '5.'
+    start: '21:00'
+    end: '22:45'
+    cells:
+      - ''
+      - Religion
+      - ''
+      - ''
+      - Home Assistant
+card_mod:
+  style: |
+    ha-card {
+      --secondary-background-color: rgba(99, 102, 241, 0.10);
+      --divider-color: rgba(129, 140, 248, 0.22);
+      background:
+        linear-gradient(180deg, rgba(236, 72, 153, 0.10) 0%, rgba(99, 102, 241, 0.06) 18%, var(--ha-card-background, var(--card-background-color)) 100%);
+      border: 1px solid rgba(129, 140, 248, 0.24);
+      border-radius: 28px;
+      box-shadow: 0 14px 34px rgba(79, 70, 229, 0.14);
+    }
