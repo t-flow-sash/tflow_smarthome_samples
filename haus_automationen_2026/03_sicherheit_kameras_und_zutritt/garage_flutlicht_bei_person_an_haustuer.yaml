@@ -1,0 +1,56 @@
+# ============================================================================
+# Garage Flutlicht bei Person an Haustür
+# ----------------------------------------------------------------------------
+# WANN: Statusänderung von binary_sensor.front_door_person_2, binary_sensor.front_door_verweilen_area_1_person_2 auf on; Statusänderung von binary_sensor.front_door_person_2, binary_sensor.front_door_verweilen_area_1_person_2 auf off für 00:01:00
+# WAS:  Die Automation führt `light.turn_on`, `light.turn_off` aus (mit verzweigten Bedingungen, mit Warte-/Verzögerungsschritten).
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `binary_sensor.front_door_person_2`, `binary_sensor.front_door_verweilen_area_1_person_2`, `light.turn_on`, `light.garage_scheinwerfer`, `light.turn_off`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: front_door_person_garage_flutlicht
+  alias: Garage Flutlicht bei Person an Haustür
+  description: Person erkannt -> Garage Flutlicht an (nach Sonnenuntergang), 2 Min
+    nach Person weg -> aus
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.front_door_person_2
+    - binary_sensor.front_door_verweilen_area_1_person_2
+    to: 'on'
+    id: person
+  - trigger: state
+    entity_id:
+    - binary_sensor.front_door_person_2
+    - binary_sensor.front_door_verweilen_area_1_person_2
+    to: 'off'
+    for: 00:01:00
+    id: person_weg
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: person
+      - condition: sun
+        after: sunset
+        after_offset: 00:30:00
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        target:
+          entity_id: light.garage_scheinwerfer
+        data: {}
+    - conditions:
+      - condition: trigger
+        id: person_weg
+      sequence:
+      - delay:
+          hours: 0
+          minutes: 2
+          seconds: 0
+      - action: light.turn_off
+        metadata: {}
+        target:
+          entity_id: light.garage_scheinwerfer
+        data: {}
+  mode: single

@@ -1,0 +1,58 @@
+# ============================================================================
+# Luftentfeuchter durch Raumwerte Regeln
+# ----------------------------------------------------------------------------
+# WANN: humidity.crossed_threshold bei sensor.temperatur_buro_luftfeuchtigkeit; humidity.crossed_threshold bei sensor.temperatur_buro_luftfeuchtigkeit
+# WAS:  Die Automation führt `humidifier.turn_on`, `humidifier.turn_off` aus (mit verzweigten Bedingungen).
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `sensor.temperatur_buro_luftfeuchtigkeit`, `humidifier.turn_on`, `humidifier.turn_off`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: '1786961009373'
+  alias: Luftentfeuchter durch Raumwerte Regeln
+  description: ''
+  triggers:
+  - trigger: humidity.crossed_threshold
+    target:
+      entity_id: sensor.temperatur_buro_luftfeuchtigkeit
+    options:
+      threshold:
+        type: above
+        value:
+          active_choice: number
+          number: 60
+    id: wet
+  - trigger: humidity.crossed_threshold
+    target:
+      entity_id: sensor.temperatur_buro_luftfeuchtigkeit
+    options:
+      threshold:
+        type: below
+        value:
+          active_choice: number
+          number: 50
+    alias: Luftfeuchte unterschritten
+    id: dry
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - wet
+      sequence:
+      - action: humidifier.turn_on
+        metadata: {}
+        target:
+          device_id: REPLACE_WITH_DEVICE_OR_CONFIG_ENTRY_ID_01
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - dry
+      sequence:
+      - action: humidifier.turn_off
+        metadata: {}
+        target:
+          device_id: REPLACE_WITH_DEVICE_OR_CONFIG_ENTRY_ID_01
+        data: {}
+  mode: single

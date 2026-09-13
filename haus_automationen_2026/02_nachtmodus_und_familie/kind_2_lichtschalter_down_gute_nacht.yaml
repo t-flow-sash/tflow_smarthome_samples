@@ -1,0 +1,24 @@
+# ============================================================================
+# Kind 2 Lichtschalter Down Gute Nacht
+# ----------------------------------------------------------------------------
+# WANN: Geräteereignis (mqtt: action)
+# WAS:  Die Automation führt `input_boolean.toggle` aus.
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `input_boolean.toggle`, `input_boolean.gute_nacht_kind_2`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: kind_2_lichtschalter_down_gute_nacht
+  alias: Kind 2 Lichtschalter Down Gute Nacht
+  description: Der untere Taster schaltet Lias Gute-Nacht-Modus um. Das entkoppelte und gesperrte Relais bleibt unberührt.
+  triggers:
+  - domain: mqtt
+    device_id: REPLACE_WITH_DEVICE_OR_CONFIG_ENTRY_ID_01
+    type: action
+    subtype: single_down
+    trigger: device
+  conditions: []
+  actions:
+  - action: input_boolean.toggle
+    target:
+      entity_id: input_boolean.gute_nacht_kind_2
+  mode: single

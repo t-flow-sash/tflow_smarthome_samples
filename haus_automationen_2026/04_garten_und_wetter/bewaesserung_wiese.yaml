@@ -1,0 +1,45 @@
+# ============================================================================
+# Bewässerung Wiese
+# ----------------------------------------------------------------------------
+# WANN: Täglich um 05:00:00
+# WAS:  Die Automation führt `select.select_option`, `button.press` aus (mit Warte-/Verzögerungsschritten).
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `input_number.heisse_tage_zahler`, `sensor.pirateweather_current_day_liquid_accumulation`, `sensor.owmh_home_day0rain`, `sensor.owmh_home_day1rain`, `select.select_option`, `select.irrisense_2_bewasserungszone`, `select.irrisense_2_dosis`, `button.press`, `button.irrisense_2_bewasserung_starten`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: '1785500000002'
+  alias: Bewässerung Wiese
+  description: Alle 3 Tage um 05:00, 13mm. Versetzt zu Zypressen
+  triggers:
+  - trigger: time
+    at: 05:00:00
+  conditions:
+  - condition: template
+    value_template: '{% set hot = states(''input_number.heisse_tage_zahler'') | int(0)
+      >= 2 %}{{ now().timetuple().tm_yday % (3 if not hot else 2) == 1 }}'
+  - condition: numeric_state
+    entity_id: sensor.pirateweather_current_day_liquid_accumulation
+    below: 0.01
+  - condition: numeric_state
+    entity_id: sensor.owmh_home_day0rain
+    below: 0.01
+  - condition: numeric_state
+    entity_id: sensor.owmh_home_day1rain
+    below: 0.01
+  actions:
+  - action: select.select_option
+    target:
+      entity_id: select.irrisense_2_bewasserungszone
+    data:
+      option: Wiese (Area)
+  - action: select.select_option
+    target:
+      entity_id: select.irrisense_2_dosis
+    data:
+      option: 13 mm
+  - delay:
+      seconds: 2
+  - action: button.press
+    target:
+      entity_id: button.irrisense_2_bewasserung_starten
+  mode: single

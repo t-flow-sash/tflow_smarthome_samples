@@ -1,0 +1,35 @@
+# ============================================================================
+# EcoFlow Cloud Selbstheilung
+# ----------------------------------------------------------------------------
+# WANN: Statusänderung von binary_sensor.ecoflow_daten_stale auf on
+# WAS:  Die Automation führt `homeassistant.reload_config_entry`, `input_datetime.set_datetime` aus.
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `binary_sensor.ecoflow_daten_stale`, `input_datetime.ecoflow_last_reload`, `input_datetime.set_datetime`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: ecoflow_self_heal
+  alias: EcoFlow Cloud Selbstheilung
+  description: Reloaded den EcoFlow Cloud Config Entry wenn Daten stale (>3 Min),
+    mit 15-Min-Cooldown
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.ecoflow_daten_stale
+    to: 'on'
+  conditions:
+  - condition: template
+    value_template: '{{ (as_timestamp(now()) - as_timestamp(states(''input_datetime.ecoflow_last_reload'')))
+      > 900 if states(''input_datetime.ecoflow_last_reload'') not in [''unknown'',''unavailable'',None]
+      else true }}'
+  actions:
+  - action: homeassistant.reload_config_entry
+    metadata: {}
+    data:
+      entry_id: 01M02DVHD8E0K17NKRBWY2H266
+  - action: input_datetime.set_datetime
+    metadata: {}
+    target:
+      entity_id: input_datetime.ecoflow_last_reload
+    data:
+      timestamp: '{{ now().timestamp() }}'
+  mode: single

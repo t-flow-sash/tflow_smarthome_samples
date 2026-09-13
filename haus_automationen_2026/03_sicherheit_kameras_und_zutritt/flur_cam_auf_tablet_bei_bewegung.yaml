@@ -1,0 +1,58 @@
+# ============================================================================
+# Flur Cam auf Tablet bei Bewegung
+# ----------------------------------------------------------------------------
+# WANN: Statusänderung von binary_sensor.motion_flur_oben_occupancy auf on; Statusänderung von binary_sensor.motion_flur_oben_occupancy auf off
+# WAS:  Die Automation führt `fully_kiosk.load_url` aus (mit verzweigten Bedingungen).
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `binary_sensor.motion_flur_oben_occupancy`, `input_boolean.nachtmodus`, `input_boolean.gute_nacht_kind_1`, `input_boolean.gute_nacht_kind_2`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: '1785600000001'
+  alias: Flur Cam auf Tablet bei Bewegung
+  description: Tablet zeigt Flur Cam wenn Bewegung im Flur, außer bei Nachtmodus
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.motion_flur_oben_occupancy
+    to: 'on'
+  - trigger: state
+    entity_id:
+    - binary_sensor.motion_flur_oben_occupancy
+    to: 'off'
+  conditions:
+  - condition: state
+    entity_id: input_boolean.nachtmodus
+    state: 'off'
+  - condition: or
+    conditions:
+    - condition: state
+      entity_id: input_boolean.gute_nacht_kind_1
+      state: 'on'
+    - condition: state
+      entity_id: input_boolean.gute_nacht_kind_2
+      state: 'on'
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.motion_flur_oben_occupancy
+        state: 'on'
+      sequence:
+      - action: fully_kiosk.load_url
+        metadata: {}
+        data:
+          url: http://homeassistant.local:8123/hermes-dashboard/flurcam
+        target:
+          device_id: REPLACE_WITH_DEVICE_OR_CONFIG_ENTRY_ID_01
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.motion_flur_oben_occupancy
+        state: 'off'
+      sequence:
+      - action: fully_kiosk.load_url
+        metadata: {}
+        data:
+          url: http://homeassistant.local:8123/hermes-dashboard/uebersicht
+        target:
+          device_id: REPLACE_WITH_DEVICE_OR_CONFIG_ENTRY_ID_01
+  mode: single

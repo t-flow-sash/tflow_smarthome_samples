@@ -1,0 +1,32 @@
+# ============================================================================
+# Türklingel Benachrichtigung
+# ----------------------------------------------------------------------------
+# WANN: Statusänderung von binary_sensor.flur_eg_front_door_besucher auf on
+# WAS:  Die Automation führt `notify.mobile_app_dein_iphone` aus.
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `binary_sensor.flur_eg_front_door_besucher`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: '1785300000001'
+  alias: Türklingel Benachrichtigung
+  description: Kritische Benachrichtigung an iPhone wenn Besucher an der Tür klingelt
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.flur_eg_front_door_besucher
+    to:
+    - 'on'
+  conditions: []
+  actions:
+  - action: notify.mobile_app_dein_iphone
+    data:
+      title: "\U0001F6AA Türklingel"
+      message: Jemand steht vor der Tür!
+      data:
+        push:
+          sound:
+            name: default
+            critical: 1
+            volume: 1
+        url: https://reolink.com/ulink
+  mode: single

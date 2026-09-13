@@ -1,0 +1,42 @@
+# ============================================================================
+# Light Strings Terrasse Automatik
+# ----------------------------------------------------------------------------
+# WANN: Sonne: sunset; Statusänderung von input_boolean.nachtmodus auf on
+# WAS:  Die Automation führt `light.turn_on`, `light.turn_off` aus (mit verzweigten Bedingungen).
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `input_boolean.nachtmodus`, `light.turn_on`, `light.garten_light_strings_terrasse`, `light.turn_off`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: light_strings_terrasse_automatik
+  alias: Light Strings Terrasse Automatik
+  description: Abends an, Nachtmodus aus
+  triggers:
+  - trigger: sun
+    event: sunset
+    id: sunset
+  - trigger: state
+    entity_id: input_boolean.nachtmodus
+    to: 'on'
+    id: nachtmodus_on
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: sunset
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        target:
+          entity_id: light.garten_light_strings_terrasse
+        data: {}
+    - conditions:
+      - condition: trigger
+        id: nachtmodus_on
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        target:
+          entity_id: light.garten_light_strings_terrasse
+        data: {}
+  mode: single

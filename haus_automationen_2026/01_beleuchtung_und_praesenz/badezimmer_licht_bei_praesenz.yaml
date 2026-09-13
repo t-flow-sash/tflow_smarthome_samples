@@ -1,0 +1,48 @@
+# ============================================================================
+# Badezimmer Licht bei Präsenz
+# ----------------------------------------------------------------------------
+# WANN: Statusänderung von binary_sensor.prasenz_badezimmer_presence auf on; Statusänderung von binary_sensor.prasenz_badezimmer_presence auf off
+# WAS:  Die Automation führt `light.turn_on`, `light.turn_off` aus (mit verzweigten Bedingungen).
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `binary_sensor.prasenz_badezimmer_presence`, `input_boolean.nachtmodus`, `sensor.prasenz_badezimmer_illuminance`, `light.turn_on`, `light.badezimmer_licht_badezimmer_up`, `light.turn_off`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: badezimmer_licht_bei_praesenz
+  alias: Badezimmer Licht bei Präsenz
+  description: Licht an bei Präsenz (dunkler als 40 lx, Nachtmodus aus), aus wenn
+    keine Präsenz
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.prasenz_badezimmer_presence
+    to: 'on'
+  - trigger: state
+    entity_id:
+    - binary_sensor.prasenz_badezimmer_presence
+    to: 'off'
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.prasenz_badezimmer_presence
+        state: 'on'
+      - condition: state
+        entity_id: input_boolean.nachtmodus
+        state: 'off'
+      - condition: numeric_state
+        entity_id: sensor.prasenz_badezimmer_illuminance
+        below: 40
+      sequence:
+      - action: light.turn_on
+        target:
+          entity_id: light.badezimmer_licht_badezimmer_up
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.prasenz_badezimmer_presence
+        state: 'off'
+      sequence:
+      - action: light.turn_off
+        target:
+          entity_id: light.badezimmer_licht_badezimmer_up
+  mode: single

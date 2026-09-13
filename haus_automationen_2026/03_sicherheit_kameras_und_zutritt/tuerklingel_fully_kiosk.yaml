@@ -1,0 +1,90 @@
+# ============================================================================
+# Türklingel Fully Kiosk
+# ----------------------------------------------------------------------------
+# WANN: Statusänderung von binary_sensor.front_door_verweilen_area_1_person_2, binary_sensor.front_door_besucher_2 auf on
+# WAS:  Die Automation führt `camera.play_stream`, `media_player.play_media`, `media_player.media_stop`, `fully_kiosk.load_url`, `browser_mod.navigate` aus (mit verzweigten Bedingungen, mit Warte-/Verzögerungsschritten).
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `binary_sensor.front_door_verweilen_area_1_person_2`, `binary_sensor.front_door_besucher_2`, `media_player.buro_promo_screen_buro`, `media_player.shield`, `camera.play_stream`, `camera.front_door_standardauflosung`, `media_player.play_media`, `media_player.media_stop`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: '1785400000001'
+  alias: Türklingel Fully Kiosk
+  description: Front Door Kamera 60s nur auf bereits aktivem Shield; laufendes Kaminvideo danach wiederherstellen; Tablet/iPad 30s anzeigen
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.front_door_verweilen_area_1_person_2
+    - binary_sensor.front_door_besucher_2
+    to:
+    - 'on'
+  conditions: []
+  actions:
+  - variables:
+      shield_was_on: "{{ states('media_player.buro_promo_screen_buro') not in ['off', 'unavailable', 'unknown'] }}"
+      fireplace_was_playing: "{{ is_state('media_player.shield', 'playing') and state_attr('media_player.shield', 'media_content_id') == 'http://homeassistant.local:8123/local/media/shield-fireplace-1080p60-muted-faststart.mp4' }}"
+  - parallel:
+    - sequence:
+      - condition: template
+        value_template: "{{ shield_was_on | bool }}"
+      - action: camera.play_stream
+        continue_on_error: true
+        target:
+          entity_id: camera.front_door_standardauflosung
+        data:
+          media_player: media_player.shield
+          format: hls
+      - delay:
+          hours: 0
+          minutes: 1
+          seconds: 0
+      - condition: template
+        value_template: "{{ states('media_player.buro_promo_screen_buro') not in ['off', 'unavailable', 'unknown'] }}"
+      - choose:
+        - conditions:
+          - condition: template
+            value_template: "{{ fireplace_was_playing | bool }}"
+          sequence:
+          - action: media_player.play_media
+            continue_on_error: true
+            target:
+              entity_id: media_player.shield
+            data:
+              media_content_type: video/mp4
+              media_content_id: http://homeassistant.local:8123/local/media/shield-fireplace-1080p60-muted-faststart.mp4
+        default:
+        - action: media_player.media_stop
+          continue_on_error: true
+          target:
+            entity_id: media_player.shield
+    - sequence:
+      - action: fully_kiosk.load_url
+        continue_on_error: true
+        metadata: {}
+        data:
+          url: http://homeassistant.local:8123/hermes-dashboard/frontdoor
+        target:
+          device_id: REPLACE_WITH_DEVICE_OR_CONFIG_ENTRY_ID_01
+      - action: browser_mod.navigate
+        continue_on_error: true
+        data:
+          browser_id:
+          - REPLACE_WITH_BROWSER_ID
+          path: /hermes-dashboard/frontdoor
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 30
+      - action: fully_kiosk.load_url
+        continue_on_error: true
+        metadata: {}
+        data:
+          url: http://homeassistant.local:8123/hermes-dashboard/uebersicht
+        target:
+          device_id: REPLACE_WITH_DEVICE_OR_CONFIG_ENTRY_ID_01
+      - action: browser_mod.navigate
+        continue_on_error: true
+        data:
+          browser_id:
+          - REPLACE_WITH_BROWSER_ID
+          path: /hermes-dashboard/uebersicht
+  mode: single

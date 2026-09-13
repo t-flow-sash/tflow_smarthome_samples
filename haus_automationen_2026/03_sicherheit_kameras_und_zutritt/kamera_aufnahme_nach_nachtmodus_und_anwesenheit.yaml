@@ -1,0 +1,72 @@
+# ============================================================================
+# Kamera-Aufnahme nach Nachtmodus und Anwesenheit
+# ----------------------------------------------------------------------------
+# WANN: Statusänderung von input_boolean.nachtmodus, person.person_1, person.person_2; Statusänderung von lock.flur_eg_haustur_lock auf locked, unlocked; Home Assistant: start; Statusänderung von switch.zion_nvr_aufzeichnen auf off
+# WAS:  Die Automation führt `switch.turn_on`, `switch.turn_off` aus (mit verzweigten Bedingungen).
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `input_boolean.nachtmodus`, `person.person_1`, `person.person_2`, `lock.flur_eg_haustur_lock`, `switch.zion_nvr_aufzeichnen`, `switch.turn_on`, `switch.turn_off`, `switch.flur_aufzeichnen`, `switch.terrasse_aufzeichnen`, `switch.garage_aufzeichnen` (+3 weitere)
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: camera_recording_presence_night_mode
+  alias: Kamera-Aufnahme nach Nachtmodus und Anwesenheit
+  description: Hält den NVR-Aufnahme-Master dauerhaft aktiv. Schaltet alle Kamera-Kanäle
+    einschließlich Front Door ein bei Nachtmodus, wenn beide Personen sicher nicht
+    zu Hause sind oder wenn die Haustür abgeschlossen ist. Schaltet aus, sobald der
+    Nachtmodus aus ist und mindestens eine Person zu Hause ist; der Schlossstatus
+    blockiert das Ausschalten nicht. Unknown/unavailable bewirken keine Abschaltung.
+  triggers:
+  - trigger: state
+    entity_id:
+    - input_boolean.nachtmodus
+    - person.person_1
+    - person.person_2
+  - trigger: state
+    entity_id:
+    - lock.flur_eg_haustur_lock
+    to:
+    - locked
+    - unlocked
+  - trigger: homeassistant
+    event: start
+  - trigger: state
+    entity_id:
+    - switch.zion_nvr_aufzeichnen
+    to: 'off'
+  conditions: []
+  actions:
+  - action: switch.turn_on
+    target:
+      entity_id:
+      - switch.zion_nvr_aufzeichnen
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ is_state(''input_boolean.nachtmodus'', ''off'') and (is_state(''person.person_1'',
+          ''home'') or is_state(''person.person_2'', ''home'')) }}'
+      sequence:
+      - action: switch.turn_off
+        target:
+          entity_id:
+          - switch.flur_aufzeichnen
+          - switch.terrasse_aufzeichnen
+          - switch.garage_aufzeichnen
+          - switch.wohnzimmer_aufzeichnen
+          - switch.front_door_aufzeichnen_2
+          - switch.hausseite_aufzeichnen
+    - conditions:
+      - condition: template
+        value_template: '{{ is_state(''input_boolean.nachtmodus'', ''on'') or is_state(''lock.flur_eg_haustur_lock'',
+          ''locked'') or (states(''person.person_1'') not in [''home'', ''unknown'',
+          ''unavailable''] and states(''person.person_2'') not in [''home'', ''unknown'',
+          ''unavailable'']) }}'
+      sequence:
+      - action: switch.turn_on
+        target:
+          entity_id:
+          - switch.flur_aufzeichnen
+          - switch.terrasse_aufzeichnen
+          - switch.garage_aufzeichnen
+          - switch.wohnzimmer_aufzeichnen
+          - switch.front_door_aufzeichnen_2
+          - switch.hausseite_aufzeichnen
+  mode: restart

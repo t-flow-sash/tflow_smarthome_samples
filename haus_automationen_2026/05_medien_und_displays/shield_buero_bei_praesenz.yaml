@@ -1,0 +1,99 @@
+# ============================================================================
+# Shield Büro bei Präsenz
+# ----------------------------------------------------------------------------
+# WANN: Statusänderung von binary_sensor.buro_buro_presence_presence_sensor_1_2 auf on; Statusänderung von binary_sensor.buro_buro_presence_presence_sensor_1_2 auf off für 00:10:00
+# WAS:  Die Automation führt `media_player.turn_on`, `media_player.play_media`, `androidtv.adb_command`, `media_player.turn_off` aus (mit verzweigten Bedingungen, mit Warte-/Verzögerungsschritten, mit Wiederholungslogik).
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `binary_sensor.buro_buro_presence_presence_sensor_1_2`, `media_player.turn_on`, `media_player.buro_promo_screen_buro`, `media_player.shield`, `media_player.play_media`, `input_datetime.shield_buro_echter_start`, `media_player.turn_off`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: '1788994500003'
+  alias: Shield Büro bei Präsenz
+  description: Schaltet die Shield bei Büropräsenz ein, prüft den echten Google-Cast-Zustand, heilt einen festgefahrenen Receiver per einmaligem Reboot und hält das 30-Minuten-Kaminvideo aktiv; Ausschalten nach 10 Minuten Abwesenheit mit 120 Sekunden Mindestlaufzeit
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.buro_buro_presence_presence_sensor_1_2
+    to: 'on'
+    id: presence_on
+  - trigger: state
+    entity_id: binary_sensor.buro_buro_presence_presence_sensor_1_2
+    to: 'off'
+    for: 00:10:00
+    id: presence_off
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: presence_on
+      - condition: state
+        entity_id: binary_sensor.buro_buro_presence_presence_sensor_1_2
+        state: 'on'
+      sequence:
+      - action: media_player.turn_on
+        target:
+          entity_id: media_player.buro_promo_screen_buro
+      - delay: 00:00:20
+      - wait_template: "{{ states('media_player.shield') not in ['unavailable', 'unknown'] }}"
+        timeout: 00:00:40
+        continue_on_timeout: true
+      - repeat:
+          while:
+          - condition: template
+            value_template: "{{ repeat.index <= 6 and not (is_state('media_player.shield', 'playing') and state_attr('media_player.shield', 'media_content_id') == 'http://homeassistant.local:8123/local/media/shield-fireplace-720p30-silent-aac-30m.mp4' and is_state('media_player.buro_promo_screen_buro', 'playing') and state_attr('media_player.buro_promo_screen_buro', 'app_name') == 'Google Cast') }}"
+          sequence:
+          - action: media_player.play_media
+            continue_on_error: true
+            target:
+              entity_id: media_player.shield
+            data:
+              media_content_type: video
+              media_content_id: http://homeassistant.local:8123/local/media/shield-fireplace-720p30-silent-aac-30m.mp4
+          - wait_template: "{{ is_state('media_player.shield', 'playing') and state_attr('media_player.shield', 'media_content_id') == 'http://homeassistant.local:8123/local/media/shield-fireplace-720p30-silent-aac-30m.mp4' and is_state('media_player.buro_promo_screen_buro', 'playing') and state_attr('media_player.buro_promo_screen_buro', 'app_name') == 'Google Cast' }}"
+            timeout: 00:00:20
+            continue_on_timeout: true
+      - if:
+        - condition: template
+          value_template: "{{ not (is_state('media_player.shield', 'playing') and state_attr('media_player.shield', 'media_content_id') == 'http://homeassistant.local:8123/local/media/shield-fireplace-720p30-silent-aac-30m.mp4' and is_state('media_player.buro_promo_screen_buro', 'playing') and state_attr('media_player.buro_promo_screen_buro', 'app_name') == 'Google Cast') }}"
+        then:
+        - action: androidtv.adb_command
+          continue_on_error: true
+          target:
+            entity_id: media_player.buro_promo_screen_buro
+          data:
+            command: reboot
+        - delay: 00:00:45
+        - wait_template: "{{ states('media_player.shield') not in ['off', 'unavailable', 'unknown'] }}"
+          timeout: 00:00:40
+          continue_on_timeout: true
+        - repeat:
+            while:
+            - condition: template
+              value_template: "{{ repeat.index <= 6 and not (is_state('media_player.shield', 'playing') and state_attr('media_player.shield', 'media_content_id') == 'http://homeassistant.local:8123/local/media/shield-fireplace-720p30-silent-aac-30m.mp4' and is_state('media_player.buro_promo_screen_buro', 'playing') and state_attr('media_player.buro_promo_screen_buro', 'app_name') == 'Google Cast') }}"
+            sequence:
+            - action: media_player.play_media
+              continue_on_error: true
+              target:
+                entity_id: media_player.shield
+              data:
+                media_content_type: video
+                media_content_id: http://homeassistant.local:8123/local/media/shield-fireplace-720p30-silent-aac-30m.mp4
+            - wait_template: "{{ is_state('media_player.shield', 'playing') and state_attr('media_player.shield', 'media_content_id') == 'http://homeassistant.local:8123/local/media/shield-fireplace-720p30-silent-aac-30m.mp4' and is_state('media_player.buro_promo_screen_buro', 'playing') and state_attr('media_player.buro_promo_screen_buro', 'app_name') == 'Google Cast' }}"
+              timeout: 00:00:20
+              continue_on_timeout: true
+    - conditions:
+      - condition: trigger
+        id: presence_off
+      sequence:
+      - variables:
+          remaining_seconds: "{% set ts = as_timestamp(states('input_datetime.shield_buro_echter_start'), 0) | float(0) %}{{ 120 if ts <= 0 or ts > as_timestamp(now()) else ([120 - (as_timestamp(now()) - ts), 0] | max | round(0, 'ceil') | int) }}"
+      - delay:
+          seconds: "{{ remaining_seconds | int(120) }}"
+      - condition: state
+        entity_id: binary_sensor.buro_buro_presence_presence_sensor_1_2
+        state: 'off'
+      - action: media_player.turn_off
+        target:
+          entity_id: media_player.buro_promo_screen_buro
+  mode: restart
+  max_exceeded: silent

@@ -1,0 +1,127 @@
+# ============================================================================
+# Kind 2 Lichtschalter Up Deckenlicht Override
+# ----------------------------------------------------------------------------
+# WANN: Geräteereignis (mqtt: action)
+# WAS:  Die Automation führt `input_boolean.turn_off`, `light.turn_off`, `light.turn_on`, `scene.turn_on`, `scene.create`, `input_boolean.turn_on` aus (mit verzweigten Bedingungen, mit Warte-/Verzögerungsschritten).
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `input_boolean.gute_nacht_kind_2`, `input_boolean.turn_off`, `input_boolean.kind_2_deckenlicht_override_aktiv`, `light.turn_off`, `light.deckenlicht_lia_rgb`, `light.deckenlicht_lia_white`, `light.turn_on`, `scene.turn_on`, `scene.kind_2_deckenlicht_vor_override`, `scene.create` (+1 weitere)
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: kind_2_lichtschalter_up_deckenlicht_override
+  alias: Kind 2 Lichtschalter Up Deckenlicht Override
+  description: Normalmodus mit Snapshot/Restore. Bei Gute Nacht schaltet Single-Up Weiß auf 40%, ein zweiter Druck innerhalb 10 Sekunden auf 100%, ein späterer Druck aus; RGB bleibt dabei aus. Das entkoppelte Relais bleibt unberührt.
+  triggers:
+  - domain: mqtt
+    device_id: REPLACE_WITH_DEVICE_OR_CONFIG_ENTRY_ID_01
+    type: action
+    subtype: single_up
+    trigger: device
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.gute_nacht_kind_2
+        state: 'on'
+      sequence:
+      - action: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.kind_2_deckenlicht_override_aktiv
+      - action: light.turn_off
+        target:
+          entity_id: light.deckenlicht_lia_rgb
+        data:
+          transition: 1
+      - choose:
+        - conditions:
+          - condition: state
+            entity_id: light.deckenlicht_lia_white
+            state: 'off'
+          sequence:
+          - action: light.turn_on
+            target:
+              entity_id: light.deckenlicht_lia_white
+            data:
+              brightness_pct: 40
+              color_temp_kelvin: 2702
+              transition: 1
+          - wait_for_trigger:
+            - domain: mqtt
+              device_id: REPLACE_WITH_DEVICE_OR_CONFIG_ENTRY_ID_01
+              type: action
+              subtype: single_up
+              trigger: device
+            timeout: '00:00:10'
+            continue_on_timeout: false
+          - condition: state
+            entity_id: input_boolean.gute_nacht_kind_2
+            state: 'on'
+          - action: light.turn_on
+            target:
+              entity_id: light.deckenlicht_lia_white
+            data:
+              brightness_pct: 100
+              color_temp_kelvin: 2702
+              transition: 1
+        default:
+        - action: light.turn_off
+          target:
+            entity_id: light.deckenlicht_lia_white
+          data:
+            transition: 1
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.kind_2_deckenlicht_override_aktiv
+        state: 'on'
+      sequence:
+      - action: scene.turn_on
+        target:
+          entity_id: scene.kind_2_deckenlicht_vor_override
+        data:
+          transition: 1
+      - action: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.kind_2_deckenlicht_override_aktiv
+    default:
+    - action: scene.create
+      data:
+        scene_id: kind_2_deckenlicht_vor_override
+        snapshot_entities:
+        - light.deckenlicht_lia_white
+        - light.deckenlicht_lia_rgb
+    - action: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.kind_2_deckenlicht_override_aktiv
+    - action: light.turn_on
+      target:
+        entity_id: light.deckenlicht_lia_white
+      data:
+        brightness_pct: 100
+        color_temp_kelvin: 2702
+        transition: 1
+    - action: light.turn_on
+      target:
+        entity_id: light.deckenlicht_lia_rgb
+      data:
+        brightness_pct: 100
+        rgb_color:
+        - 255
+        - 20
+        - 147
+        transition: 1
+    - if:
+      - condition: state
+        entity_id: input_boolean.gute_nacht_kind_2
+        state: 'on'
+      then:
+      - action: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.kind_2_deckenlicht_override_aktiv
+      - action: light.turn_off
+        target:
+          entity_id:
+          - light.deckenlicht_lia_white
+          - light.deckenlicht_lia_rgb
+        data:
+          transition: 1
+  mode: single

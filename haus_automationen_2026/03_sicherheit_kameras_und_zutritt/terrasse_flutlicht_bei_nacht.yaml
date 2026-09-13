@@ -1,0 +1,62 @@
+# ============================================================================
+# Terrasse Flutlicht bei Nacht
+# ----------------------------------------------------------------------------
+# WANN: Statusänderung von input_boolean.nachtmodus; Statusänderung von media_player.wohnzimmer_tv_wohnzimmer_homekit; Statusänderung von person.person_1; Statusänderung von person.person_2
+# WAS:  Die Automation führt `select.select_option` aus (mit verzweigten Bedingungen).
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `input_boolean.nachtmodus`, `media_player.wohnzimmer_tv_wohnzimmer_homekit`, `person.person_1`, `person.person_2`, `select.select_option`, `select.terrasse_flutlichtereignis_modus`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: '1786000000001'
+  alias: Terrasse Flutlicht bei Nacht
+  description: Flutlicht an/aus je nach Zustand
+  triggers:
+  - trigger: state
+    entity_id:
+    - input_boolean.nachtmodus
+  - trigger: state
+    entity_id:
+    - media_player.wohnzimmer_tv_wohnzimmer_homekit
+  - trigger: state
+    entity_id:
+    - person.person_1
+  - trigger: state
+    entity_id:
+    - person.person_2
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: and
+          conditions:
+          - condition: state
+            entity_id: input_boolean.nachtmodus
+            state: 'on'
+          - condition: not
+            conditions:
+            - condition: state
+              entity_id: media_player.wohnzimmer_tv_wohnzimmer_homekit
+              state: 'on'
+        - condition: or
+          conditions:
+          - condition: state
+            entity_id: person.person_1
+            state: not_home
+          - condition: state
+            entity_id: person.person_2
+            state: not_home
+      sequence:
+      - action: select.select_option
+        target:
+          entity_id: select.terrasse_flutlichtereignis_modus
+        data:
+          option: 'on'
+    default:
+    - action: select.select_option
+      target:
+        entity_id: select.terrasse_flutlichtereignis_modus
+      data:
+        option: 'off'
+  mode: single

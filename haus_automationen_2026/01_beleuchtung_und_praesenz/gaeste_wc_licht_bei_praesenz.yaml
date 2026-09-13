@@ -1,0 +1,46 @@
+# ============================================================================
+# Gäste WC Licht bei Präsenz
+# ----------------------------------------------------------------------------
+# WANN: Statusänderung von binary_sensor.prasenz_gaste_wc_presence auf on; Statusänderung von binary_sensor.prasenz_gaste_wc_presence auf off
+# WAS:  Die Automation führt `light.turn_on`, `light.turn_off` aus (mit verzweigten Bedingungen).
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `binary_sensor.prasenz_gaste_wc_presence`, `input_boolean.nachtmodus`, `sensor.prasenz_gaste_wc_illuminance`, `light.turn_on`, `light.gaste_wc_licht_gaste_wc_up`, `light.turn_off`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: '1785400000002'
+  alias: Gäste WC Licht bei Präsenz
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.prasenz_gaste_wc_presence
+    to: 'on'
+  - trigger: state
+    entity_id:
+    - binary_sensor.prasenz_gaste_wc_presence
+    to: 'off'
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.prasenz_gaste_wc_presence
+        state: 'on'
+      - condition: state
+        entity_id: input_boolean.nachtmodus
+        state: 'off'
+      - condition: numeric_state
+        entity_id: sensor.prasenz_gaste_wc_illuminance
+        below: 40
+      sequence:
+      - action: light.turn_on
+        target:
+          entity_id: light.gaste_wc_licht_gaste_wc_up
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.prasenz_gaste_wc_presence
+        state: 'off'
+      sequence:
+      - action: light.turn_off
+        target:
+          entity_id: light.gaste_wc_licht_gaste_wc_up
+  mode: single

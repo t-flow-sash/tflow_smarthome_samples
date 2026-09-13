@@ -1,0 +1,58 @@
+# ============================================================================
+# Küche Schalter oben Override Küche oben
+# ----------------------------------------------------------------------------
+# WANN: Geräteereignis (mqtt: action)
+# WAS:  Die Automation führt `scene.turn_on`, `input_boolean.turn_off`, `scene.create`, `input_boolean.turn_on`, `light.turn_on` aus (mit verzweigten Bedingungen).
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `input_boolean.kuche_oben_override_aktiv`, `scene.turn_on`, `scene.kueche_oben_vor_override`, `input_boolean.turn_off`, `scene.create`, `light.kuche_links_oben`, `light.kuche_backofen_oben`, `light.kuche_rechts_oben`, `input_boolean.turn_on`, `light.turn_on`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: kuche_schalter_oben_kuche_oben_max
+  alias: Küche Schalter oben Override Küche oben
+  description: Speichert beim ersten Up-Druck den aktuellen Zustand der drei oberen
+    Küchenleuchten und schaltet sie auf 100% hellweiß; beim zweiten Druck wird der
+    vorherige Zustand wiederhergestellt.
+  triggers:
+  - domain: mqtt
+    device_id: REPLACE_WITH_DEVICE_OR_CONFIG_ENTRY_ID_01
+    type: action
+    subtype: single_up
+    trigger: device
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.kuche_oben_override_aktiv
+        state: 'on'
+      sequence:
+      - action: scene.turn_on
+        target:
+          entity_id: scene.kueche_oben_vor_override
+        data:
+          transition: 1
+      - action: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.kuche_oben_override_aktiv
+    default:
+    - action: scene.create
+      data:
+        scene_id: kueche_oben_vor_override
+        snapshot_entities:
+        - light.kuche_links_oben
+        - light.kuche_backofen_oben
+        - light.kuche_rechts_oben
+    - action: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.kuche_oben_override_aktiv
+    - action: light.turn_on
+      target:
+        entity_id:
+        - light.kuche_links_oben
+        - light.kuche_backofen_oben
+        - light.kuche_rechts_oben
+      data:
+        brightness_pct: 100
+        color_temp_kelvin: 4500
+        transition: 1
+  mode: single

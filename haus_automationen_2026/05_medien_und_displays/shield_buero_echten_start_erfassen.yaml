@@ -1,0 +1,28 @@
+# ============================================================================
+# Shield Büro echten Start erfassen
+# ----------------------------------------------------------------------------
+# WANN: Statusänderung von media_player.buro_promo_screen_buro von off auf idle
+# WAS:  Die Automation führt `input_datetime.set_datetime` aus.
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `media_player.buro_promo_screen_buro`, `input_datetime.set_datetime`, `input_datetime.shield_buro_echter_start`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: '1788994500002'
+  alias: Shield Büro echten Start erfassen
+  description: Erfasst ausschließlich den echten Android-TV-Wake off nach idle; Cast- und Appwechsel setzen den Zeitpunkt nicht zurück
+  triggers:
+  - trigger: state
+    entity_id: media_player.buro_promo_screen_buro
+    from: 'off'
+    to: idle
+  conditions:
+  - condition: state
+    entity_id: media_player.buro_promo_screen_buro
+    state: idle
+  actions:
+  - action: input_datetime.set_datetime
+    target:
+      entity_id: input_datetime.shield_buro_echter_start
+    data:
+      datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
+  mode: single

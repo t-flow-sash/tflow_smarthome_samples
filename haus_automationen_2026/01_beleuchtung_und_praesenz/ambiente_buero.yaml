@@ -1,0 +1,86 @@
+# ============================================================================
+# Ambiente Büro
+# ----------------------------------------------------------------------------
+# WANN: Statusänderung von binary_sensor.buro_buro_presence_presence_sensor_1_2 auf on; Statusänderung von binary_sensor.buro_buro_presence_presence_sensor_1_2 auf off; illuminance.crossed_threshold bei sensor.buro_buro_presence_light_sensor_light_level_2
+# WAS:  Die Automation führt `scene.turn_on`, `light.turn_off` aus (mit verzweigten Bedingungen).
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `binary_sensor.buro_buro_presence_presence_sensor_1_2`, `sensor.buro_buro_presence_light_sensor_light_level_2`, `scene.turn_on`, `scene.ambiente_buro_hell`, `light.turn_off`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: '1785166749348'
+  alias: Ambiente Büro
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.buro_buro_presence_presence_sensor_1_2
+    to:
+    - 'on'
+    id: 'on'
+  - trigger: state
+    entity_id:
+    - binary_sensor.buro_buro_presence_presence_sensor_1_2
+    to:
+    - 'off'
+    id: 'off'
+  - trigger: illuminance.crossed_threshold
+    target:
+      entity_id: sensor.buro_buro_presence_light_sensor_light_level_2
+    options:
+      threshold:
+        type: above
+        value:
+          active_choice: number
+          number: 30
+      for:
+        hours: 0
+        minutes: 5
+        seconds: 0
+      behavior: each
+    id: bright
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - 'on'
+      - condition: illuminance.is_value
+        target:
+          entity_id: sensor.buro_buro_presence_light_sensor_light_level_2
+        options:
+          behavior: any
+          for: 00:00:00
+          threshold:
+            type: below
+            value:
+              active_choice: number
+              number: 30
+      - condition: state
+        entity_id: binary_sensor.buro_buro_presence_presence_sensor_1_2
+        state:
+        - 'on'
+      sequence:
+      - action: scene.turn_on
+        metadata: {}
+        data:
+          transition: 2
+        target:
+          entity_id:
+          - scene.ambiente_buro_hell
+    - conditions:
+      - condition: trigger
+        id:
+        - 'off'
+        - bright
+      - condition: state
+        entity_id: binary_sensor.buro_buro_presence_presence_sensor_1_2
+        state:
+        - 'off'
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        data: {}
+        target:
+          area_id: buro
+  mode: single

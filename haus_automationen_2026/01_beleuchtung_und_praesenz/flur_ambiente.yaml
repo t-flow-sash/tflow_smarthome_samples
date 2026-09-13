@@ -1,0 +1,122 @@
+# ============================================================================
+# Flur Ambiente
+# ----------------------------------------------------------------------------
+# WANN: Statusänderung von binary_sensor.flur_presence_presence auf on; illuminance.crossed_threshold bei sensor.flur_presence_illuminance; occupancy.detected; Sobald die definierte Template-Bedingung wahr wird
+# WAS:  Die Automation führt `scene.turn_on`, `light.turn_off` aus (mit verzweigten Bedingungen).
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `binary_sensor.flur_presence_presence`, `sensor.flur_presence_illuminance`, `binary_sensor.motion_flur_oben_occupancy`, `scene.turn_on`, `scene.flur_beleuchtung_abends`, `light.turn_off`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: '1785095618833'
+  alias: Flur Ambiente
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.flur_presence_presence
+    to:
+    - 'on'
+    id: 'on'
+  - trigger: illuminance.crossed_threshold
+    target:
+      entity_id:
+      - sensor.flur_presence_illuminance
+    options:
+      threshold:
+        type: above
+        value:
+          active_choice: number
+          number: 40
+      for:
+        hours: 0
+        minutes: 5
+        seconds: 0
+      behavior: each
+    id: bright
+  - trigger: occupancy.detected
+    target:
+      device_id: REPLACE_WITH_DEVICE_OR_CONFIG_ENTRY_ID_01
+    options:
+      behavior: each
+    id: onmotion
+  - trigger: template
+    value_template: "{{ is_state('binary_sensor.motion_flur_oben_occupancy', 'off')\n
+      \      and is_state('binary_sensor.flur_presence_presence', 'off') }}"
+    id: 'off'
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - 'on'
+      - condition: illuminance.is_value
+        target:
+          entity_id:
+          - sensor.flur_presence_illuminance
+        options:
+          behavior: any
+          for: 00:00:00
+          threshold:
+            type: below
+            value:
+              active_choice: number
+              number: 30
+      - condition: state
+        entity_id: binary_sensor.flur_presence_presence
+        state:
+        - 'on'
+      sequence:
+      - action: scene.turn_on
+        metadata: {}
+        data:
+          transition: 2
+        target:
+          entity_id: scene.flur_beleuchtung_abends
+    - conditions:
+      - condition: trigger
+        id:
+        - 'off'
+        - bright
+      - condition: and
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.flur_presence_presence
+          state:
+          - 'off'
+        - condition: occupancy.is_not_detected
+          target:
+            device_id: REPLACE_WITH_DEVICE_OR_CONFIG_ENTRY_ID_01
+          options:
+            behavior: any
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        target:
+          area_id:
+          - flur_eg
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - onmotion
+      - condition: illuminance.is_value
+        target:
+          entity_id:
+          - sensor.flur_presence_illuminance
+        options:
+          behavior: any
+          for: 00:00:00
+          threshold:
+            type: below
+            value:
+              active_choice: number
+              number: 30
+      sequence:
+      - action: scene.turn_on
+        metadata: {}
+        target:
+          entity_id: scene.flur_beleuchtung_abends
+        data:
+          transition: 1
+  mode: single

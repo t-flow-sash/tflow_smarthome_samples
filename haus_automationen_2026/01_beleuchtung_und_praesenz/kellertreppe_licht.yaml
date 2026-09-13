@@ -1,0 +1,109 @@
+# ============================================================================
+# Kellertreppe Licht
+# ----------------------------------------------------------------------------
+# WANN: occupancy.detected bei binary_sensor.motion_kellertreppe_occupancy; occupancy.cleared bei binary_sensor.motion_kellertreppe_occupancy; occupancy.detected; occupancy.cleared
+# WAS:  Die Automation führt `light.turn_on`, `light.turn_off` aus (mit verzweigten Bedingungen).
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `binary_sensor.motion_kellertreppe_occupancy`, `sensor.flur_presence_illuminance`, `light.turn_on`, `light.kellertreppe`, `light.turn_off`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: '1785862445042'
+  alias: Kellertreppe Licht
+  description: ''
+  triggers:
+  - trigger: occupancy.detected
+    target:
+      entity_id: binary_sensor.motion_kellertreppe_occupancy
+    options:
+      behavior: each
+      for: 00:00:00
+    id: motionon
+  - trigger: occupancy.cleared
+    target:
+      entity_id: binary_sensor.motion_kellertreppe_occupancy
+    options:
+      behavior: each
+      for: 00:00:00
+    id: motionoff
+  - trigger: occupancy.detected
+    target:
+      device_id: REPLACE_WITH_DEVICE_OR_CONFIG_ENTRY_ID_01
+    options:
+      behavior: each
+    id: presenceon
+  - trigger: occupancy.cleared
+    target:
+      device_id: REPLACE_WITH_DEVICE_OR_CONFIG_ENTRY_ID_01
+    options:
+      behavior: each
+    id: presenceoff
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - motionon
+      - condition: numeric_state
+        entity_id: sensor.flur_presence_illuminance
+        below: 20
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        target:
+          entity_id: light.kellertreppe
+        data:
+          transition: 1
+          brightness_pct: 100
+      - action: light.turn_on
+        metadata: {}
+        target:
+          device_id: REPLACE_WITH_DEVICE_OR_CONFIG_ENTRY_ID_02
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - presenceon
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        target:
+          device_id: REPLACE_WITH_DEVICE_OR_CONFIG_ENTRY_ID_02
+        data: {}
+      - if:
+        - condition: numeric_state
+          entity_id: sensor.flur_presence_illuminance
+          below: 20
+        then:
+        - action: light.turn_on
+          metadata: {}
+          target:
+            entity_id: light.kellertreppe
+          data:
+            transition: 1
+            brightness_pct: 100
+    - conditions:
+      - condition: trigger
+        id:
+        - motionoff
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        target:
+          device_id: REPLACE_WITH_DEVICE_OR_CONFIG_ENTRY_ID_03
+        data:
+          transition: 1
+    - conditions:
+      - condition: trigger
+        id:
+        - presenceoff
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        target:
+          device_id:
+          - REPLACE_WITH_DEVICE_OR_CONFIG_ENTRY_ID_02
+          - REPLACE_WITH_DEVICE_OR_CONFIG_ENTRY_ID_03
+        data:
+          transition: 1
+  mode: single

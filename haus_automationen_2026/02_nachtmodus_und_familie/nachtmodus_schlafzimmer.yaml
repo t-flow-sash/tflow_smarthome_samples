@@ -1,0 +1,55 @@
+# ============================================================================
+# Nachtmodus Schlafzimmer
+# ----------------------------------------------------------------------------
+# WANN: Statusänderung von input_boolean.nachtmodus auf on
+# WAS:  Die Automation führt `input_boolean.turn_on`, `scene.turn_on`, `light.turn_off`, `input_boolean.turn_off` aus (mit Warte-/Verzögerungsschritten).
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `input_boolean.nachtmodus`, `input_boolean.turn_on`, `input_boolean.schlafzimmer_nacht_phase`, `binary_sensor.schlafzimmer_presence_presence`, `scene.turn_on`, `scene.schlafzimmer_abends`, `light.turn_off`, `light.schlafzimmer_sideboard`, `input_boolean.turn_off`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: '1785266923867'
+  alias: Nachtmodus Schlafzimmer
+  description: Warte auf Präsenz + Szene + 5 Min Timer + Licht aus
+  triggers:
+  - trigger: state
+    entity_id:
+    - input_boolean.nachtmodus
+    to: 'on'
+  conditions: []
+  actions:
+  - action: input_boolean.turn_on
+    metadata: {}
+    target:
+      entity_id: input_boolean.schlafzimmer_nacht_phase
+    data: {}
+  - if:
+    - condition: state
+      entity_id: binary_sensor.schlafzimmer_presence_presence
+      state: 'off'
+    then:
+    - wait_for_trigger:
+      - trigger: state
+        entity_id:
+        - binary_sensor.schlafzimmer_presence_presence
+        to: 'on'
+  - action: scene.turn_on
+    metadata: {}
+    target:
+      entity_id: scene.schlafzimmer_abends
+    data:
+      transition: 2
+  - delay:
+      hours: 0
+      minutes: 5
+      seconds: 0
+  - action: light.turn_off
+    metadata: {}
+    target:
+      entity_id: light.schlafzimmer_sideboard
+    data: {}
+  - action: input_boolean.turn_off
+    metadata: {}
+    target:
+      entity_id: input_boolean.schlafzimmer_nacht_phase
+    data: {}
+  mode: single

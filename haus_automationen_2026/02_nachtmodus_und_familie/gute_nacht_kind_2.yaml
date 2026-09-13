@@ -1,0 +1,57 @@
+# ============================================================================
+# Gute Nacht Kind 2
+# ----------------------------------------------------------------------------
+# WANN: Statusänderung von input_boolean.gute_nacht_kind_2 auf on; Statusänderung von input_boolean.gute_nacht_kind_2 auf off
+# WAS:  Die Automation führt `input_boolean.turn_off`, `light.turn_off`, `light.turn_on` aus (mit verzweigten Bedingungen).
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `input_boolean.gute_nacht_kind_2`, `input_boolean.turn_off`, `input_boolean.kind_2_deckenlicht_override_aktiv`, `light.turn_off`, `light.deckenlicht_lia_white`, `light.deckenlicht_lia_rgb`, `light.turn_on`, `light.lia_hue_go`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: '1785900000002'
+  alias: Gute Nacht Kind 2
+  description: Deckenlicht aus und Nachtlicht Kind 2 auf 6% warmweiß; beim Deaktivieren Nachtlicht aus
+  triggers:
+  - trigger: state
+    entity_id:
+    - input_boolean.gute_nacht_kind_2
+    to: 'on'
+  - trigger: state
+    entity_id:
+    - input_boolean.gute_nacht_kind_2
+    to: 'off'
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.gute_nacht_kind_2
+        state: 'on'
+      sequence:
+      - action: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.kind_2_deckenlicht_override_aktiv
+      - action: light.turn_off
+        target:
+          entity_id:
+          - light.deckenlicht_lia_white
+          - light.deckenlicht_lia_rgb
+        data:
+          transition: 1
+      - action: light.turn_on
+        target:
+          entity_id: light.lia_hue_go
+        data:
+          brightness_pct: 6
+          color_temp_kelvin: 2700
+          transition: 1
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.gute_nacht_kind_2
+        state: 'off'
+      sequence:
+      - action: light.turn_off
+        target:
+          entity_id: light.lia_hue_go
+        data:
+          transition: 1
+  mode: single

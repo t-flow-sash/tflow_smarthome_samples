@@ -1,0 +1,52 @@
+# ============================================================================
+# Schloss verriegeln
+# ----------------------------------------------------------------------------
+# WANN: Statusänderung von input_boolean.nachtmodus auf on; Statusänderung von person.person_1 auf not_home; Statusänderung von person.person_2 auf not_home
+# WAS:  Die Automation führt `lock.lock` aus (mit verzweigten Bedingungen).
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `input_boolean.nachtmodus`, `person.person_1`, `person.person_2`, `lock.lock`, `lock.flur_eg_haustur_lock`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: '1785400000003'
+  alias: Schloss verriegeln
+  description: Abschließen bei Nachtmodus ODER wenn keiner zuhause
+  triggers:
+  - trigger: state
+    id: nachtmodus
+    entity_id:
+    - input_boolean.nachtmodus
+    to: 'on'
+  - trigger: state
+    id: person_left
+    entity_id:
+    - person.person_1
+    to: not_home
+  - trigger: state
+    id: person_left
+    entity_id:
+    - person.person_2
+    to: not_home
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: nachtmodus
+      sequence:
+      - action: lock.lock
+        target:
+          entity_id: lock.flur_eg_haustur_lock
+    - conditions:
+      - condition: trigger
+        id: person_left
+      - condition: state
+        entity_id: person.person_1
+        state: not_home
+      - condition: state
+        entity_id: person.person_2
+        state: not_home
+      sequence:
+      - action: lock.lock
+        target:
+          entity_id: lock.flur_eg_haustur_lock
+  mode: single

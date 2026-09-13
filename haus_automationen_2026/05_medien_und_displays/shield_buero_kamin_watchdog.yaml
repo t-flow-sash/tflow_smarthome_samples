@@ -1,0 +1,31 @@
+# ============================================================================
+# Shield Büro Kamin-Watchdog
+# ----------------------------------------------------------------------------
+# WANN: Zeitmuster minutes=/1
+# WAS:  Die Automation führt `media_player.play_media` aus.
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `binary_sensor.buro_buro_presence_presence_sensor_1_2`, `media_player.buro_promo_screen_buro`, `media_player.shield`, `media_player.play_media`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: '1788994500004'
+  alias: Shield Büro Kamin-Watchdog
+  description: Startet das Kaminvideo nach Dateiende erneut, ohne den Präsenz-Start-/Reboot-Ablauf zu unterbrechen oder andere laufende Cast-Inhalte zu überschreiben
+  triggers:
+  - trigger: time_pattern
+    minutes: /1
+  conditions:
+  - condition: state
+    entity_id: binary_sensor.buro_buro_presence_presence_sensor_1_2
+    state: 'on'
+  - condition: template
+    value_template: "{{ state_attr('media_player.buro_promo_screen_buro', 'app_name') == 'Google Cast' and states('media_player.shield') in ['idle', 'off'] }}"
+  actions:
+  - action: media_player.play_media
+    continue_on_error: true
+    target:
+      entity_id: media_player.shield
+    data:
+      media_content_type: video
+      media_content_id: http://homeassistant.local:8123/local/media/shield-fireplace-720p30-silent-aac-30m.mp4
+  mode: single
+  max_exceeded: silent

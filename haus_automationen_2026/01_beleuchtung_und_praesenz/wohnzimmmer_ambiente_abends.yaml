@@ -1,0 +1,102 @@
+# ============================================================================
+# Wohnzimmmer Ambiente Abends
+# ----------------------------------------------------------------------------
+# WANN: Statusänderung von binary_sensor.wz_presence_gruppe auf on; Statusänderung von binary_sensor.wz_presence_gruppe auf off für 00:05:00; illuminance.crossed_threshold bei sensor.lichtstarke_wohnzimmer; illuminance.crossed_threshold bei sensor.lichtstarke_wohnzimmer
+# WAS:  Die Automation führt `scene.turn_on`, `light.turn_off` aus (mit verzweigten Bedingungen).
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `binary_sensor.wz_presence_gruppe`, `sensor.lichtstarke_wohnzimmer`, `input_boolean.nachtmodus`, `scene.turn_on`, `scene.wohnzimmer_abends`, `light.turn_off`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: '1785094484502'
+  alias: Wohnzimmmer Ambiente Abends
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.wz_presence_gruppe
+    to:
+    - 'on'
+    id: 'on'
+  - trigger: state
+    entity_id:
+    - binary_sensor.wz_presence_gruppe
+    to:
+    - 'off'
+    for:
+      hours: 0
+      minutes: 5
+      seconds: 0
+    id: 'off'
+  - trigger: illuminance.crossed_threshold
+    target:
+      entity_id: sensor.lichtstarke_wohnzimmer
+    options:
+      threshold:
+        type: above
+        value:
+          active_choice: number
+          number: 60
+      for:
+        hours: 0
+        minutes: 5
+        seconds: 0
+    id: bright
+  - alias: Schwellwert unterschritten
+    trigger: illuminance.crossed_threshold
+    target:
+      entity_id: sensor.lichtstarke_wohnzimmer
+    options:
+      threshold:
+        type: below
+        value:
+          active_choice: number
+          number: 50
+      for:
+        hours: 0
+        minutes: 5
+        seconds: 0
+    id: dark
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - 'on'
+        - dark
+      - condition: illuminance.is_value
+        target:
+          entity_id: sensor.lichtstarke_wohnzimmer
+        options:
+          behavior: any
+          for: 00:00:00
+          threshold:
+            type: below
+            value:
+              active_choice: number
+              number: 50
+      - condition: state
+        entity_id: binary_sensor.wz_presence_gruppe
+        state:
+        - 'on'
+      - condition: state
+        entity_id: input_boolean.nachtmodus
+        state: 'off'
+      sequence:
+      - action: scene.turn_on
+        metadata: {}
+        target:
+          entity_id: scene.wohnzimmer_abends
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - 'off'
+        - bright
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        target:
+          area_id: wohnzimmer
+        data: {}
+  mode: single

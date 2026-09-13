@@ -1,0 +1,39 @@
+# ============================================================================
+# Esstisch Schalter toggelt Esstisch unten
+# ----------------------------------------------------------------------------
+# WANN: Geräteereignis (mqtt: action)
+# WAS:  Die Automation führt `light.turn_off`, `light.turn_on` aus (mit verzweigten Bedingungen).
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `light.licht_esstisch_unten`, `light.turn_off`, `light.turn_on`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: esstisch_schalter_toggle_esstisch_unten
+  alias: Esstisch Schalter toggelt Esstisch unten
+  description: Schaltet Licht Esstisch unten bei einfachem Tastendruck des Aqara Esstisch-Schalters
+    um. Beim Einschalten immer 75% und warmweiß.
+  triggers:
+  - domain: mqtt
+    device_id: REPLACE_WITH_DEVICE_OR_CONFIG_ENTRY_ID_01
+    type: action
+    subtype: single
+    trigger: device
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: light.licht_esstisch_unten
+        state: 'on'
+      sequence:
+      - action: light.turn_off
+        target:
+          entity_id: light.licht_esstisch_unten
+    default:
+    - action: light.turn_on
+      target:
+        entity_id: light.licht_esstisch_unten
+      data:
+        brightness_pct: 75
+        color_temp_kelvin: 2700
+        transition: 1
+  mode: single

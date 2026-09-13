@@ -1,0 +1,28 @@
+# ============================================================================
+# Ventilator WZ Switch Fix
+# ----------------------------------------------------------------------------
+# WANN: Statusänderung von switch.nebelventilator_power auf off
+# WAS:  Die Automation führt `switch.turn_on`, `fan.turn_off` aus (mit Warte-/Verzögerungsschritten).
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `switch.nebelventilator_power`, `switch.turn_on`, `fan.turn_off`, `fan.nebelventilator_2`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: '1786100000001'
+  alias: Ventilator WZ Switch Fix
+  description: Power Switch automatisch wieder einschalten wenn er ausgeht
+  triggers:
+  - trigger: state
+    entity_id:
+    - switch.nebelventilator_power
+    to: 'off'
+  conditions: []
+  actions:
+  - action: switch.turn_on
+    target:
+      entity_id: switch.nebelventilator_power
+  - delay:
+      milliseconds: 500
+  - action: fan.turn_off
+    target:
+      entity_id: fan.nebelventilator_2
+  mode: single

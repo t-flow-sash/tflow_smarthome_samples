@@ -1,0 +1,46 @@
+# ============================================================================
+# Gute Nacht Kind 1
+# ----------------------------------------------------------------------------
+# WANN: Statusänderung von input_boolean.gute_nacht_kind_1 auf on; Statusänderung von input_boolean.gute_nacht_kind_1 auf off
+# WAS:  Die Automation führt `light.turn_on`, `light.turn_off` aus (mit verzweigten Bedingungen).
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `input_boolean.gute_nacht_kind_1`, `light.turn_on`, `light.twinkly_emily`, `light.turn_off`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: '1785900000001'
+  alias: Gute Nacht Kind 1
+  description: Nachtlicht Kind 1 auf 1% mit Rainbow-Effekt, aus bei deaktivieren
+  triggers:
+  - trigger: state
+    entity_id:
+    - input_boolean.gute_nacht_kind_1
+    to: 'on'
+  - trigger: state
+    entity_id:
+    - input_boolean.gute_nacht_kind_1
+    to: 'off'
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.gute_nacht_kind_1
+        state: 'on'
+      sequence:
+      - action: light.turn_on
+        target:
+          entity_id:
+          - light.twinkly_emily
+        data:
+          brightness_pct: 3
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.gute_nacht_kind_1
+        state: 'off'
+      sequence:
+      - action: light.turn_off
+        target:
+          entity_id:
+          - light.twinkly_emily
+        data: {}
+  mode: single

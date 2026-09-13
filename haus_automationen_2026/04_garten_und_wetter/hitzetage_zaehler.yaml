@@ -1,0 +1,36 @@
+# ============================================================================
+# Hitzetage Zähler
+# ----------------------------------------------------------------------------
+# WANN: Täglich um 23:59:00
+# WAS:  Die Automation führt `input_number.increment`, `input_number.set_value` aus (mit verzweigten Bedingungen).
+# ANPASSEN: Alle Entity-, Area-, Device- und Browser-IDs an dein Setup anpassen.
+# ABHÄNGIGKEITEN (Auszug): `sensor.owmh_home_day0max`, `input_number.increment`, `input_number.heisse_tage_zahler`, `input_number.set_value`
+# HINWEIS: Geräte-/Browser-IDs und private URLs wurden für GitHub neutralisiert.
+# ============================================================================
+- id: '1785500000003'
+  alias: Hitzetage Zähler
+  description: Zählt heiße Tage (>32°C) und setzt Zähler zurück wenn kühler
+  triggers:
+  - trigger: time
+    at: '23:59:00'
+  actions:
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.owmh_home_day0max
+        above: 32
+      sequence:
+      - action: input_number.increment
+        target:
+          entity_id: input_number.heisse_tage_zahler
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.owmh_home_day0max
+        below: 33
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.heisse_tage_zahler
+        data:
+          value: 0
+  mode: single
