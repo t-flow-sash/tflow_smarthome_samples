@@ -1,11 +1,11 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
 # Baustein: input_number.demo_lade_preis
-# Zweck: Speichert Tarif der zuletzt verbuchten Teilstrecke.
-# Nutzen: Erhält Tarif der zuletzt verbuchten Teilstrecke über Reloads als HA-Helper.
+# Zweck: Speichert den aktuell im Helper hinterlegten Tarif für künftige Verbrauchsdifferenzen.
+# Nutzen: Beim Preiswechsel wird die seit dem letzten Zählerstand entstandene Differenz zunächst mit dem bisher gespeicherten Preis verbucht; erst danach speichert die Automation den neuen Tarif für folgende Deltas.
 # Einbau: Diesen einen Schlüssel in das Mapping input_number: mergen (z. B. configuration.yaml oder passender Mapping-Include); nicht die ganze Domain ersetzen.
 # Abhängigkeiten: automation.ladekosten und sensor.beispiel_tibber_eur_kwh
 # Anpassen: EUR/kWh statt Cent/kWh für den eigenen Adapter prüfen.
-# Sicherheitsgrenze: Beispielrechnung, keine eichrechtskonforme Abrechnung; ungültige Messwerte nicht fortschreiben.
+# Sicherheitsgrenze: Beispielrechnung: Der gespeicherte Tarif gilt für die nächste gemessene Differenz, nicht als Nachweis des exakten Tarifverlaufs innerhalb eines Messintervalls.
 # Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 demo_lade_preis:
   name: demo_lade_preis

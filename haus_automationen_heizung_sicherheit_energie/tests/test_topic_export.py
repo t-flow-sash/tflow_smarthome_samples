@@ -173,6 +173,31 @@ class TopicExport(unittest.TestCase):
             self.assertIn('keine', note.lower())
             self.assertIn('manuell', note.lower())
 
+    def test_stored_tariff_comment_matches_billing_before_price_update(self):
+        canonical = yaml.load((ROOT / 'packages/haus.yaml').read_text(encoding='utf-8'), Loader=ExportLoader)
+        cost = next(item for item in canonical['automation'] if item['id'] == 'public_ladekosten')
+        start, ongoing = cost['actions'][1]['choose'][:2]
+        start_price = next(action for action in start['sequence']
+                           if action.get('target', {}).get('entity_id') == 'input_number.demo_lade_preis')
+        self.assertIn('sensor.beispiel_tibber_eur_kwh', start_price['data']['value'])
+        steps = ongoing['sequence']
+        billed_at = next(i for i, step in enumerate(steps)
+                         if step.get('target', {}).get('entity_id') == 'input_number.demo_lade_kosten')
+        updated_at = next(i for i, step in enumerate(steps)
+                          if step.get('target', {}).get('entity_id') == 'input_number.demo_lade_preis')
+        self.assertLess(billed_at, updated_at, 'Settle with stored tariff before replacing it')
+        self.assertIn('input_number.demo_lade_preis', steps[billed_at]['data']['value'])
+        self.assertIn('sensor.beispiel_tibber_eur_kwh', steps[updated_at]['data']['value'])
+
+        note = export.component_notes.comment('input_number', 'demo_lade_preis')
+        self.assertIn('aktuell im Helper hinterlegten Tarif', note)
+        self.assertIn('künftige Verbrauchsdifferenzen', note)
+        self.assertIn('Beim Preiswechsel', note)
+        self.assertIn('bisher gespeicherten Preis', note)
+        self.assertNotIn('zuletzt verbuchten Teilstrecke', note)
+        leaf = (EXPORT / 'energie/input_number/demo_lade_preis.yaml').read_text(encoding='utf-8')
+        self.assertTrue(leaf.startswith(leaf.splitlines()[0] + '\n' + note))
+
     def test_all_topic_yaml_linked_once_in_correct_theme_and_readme_navigation(self):
         used = []
         for topic, doc in [('heizung', 'heizung.md'), ('sicherheit', 'sicherheit-kameras.md'),

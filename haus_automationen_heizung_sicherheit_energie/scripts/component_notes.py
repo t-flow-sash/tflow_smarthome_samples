@@ -57,13 +57,19 @@ NUMBERS = {
     'demo_lade_zaehler': ('letzten verbuchten Wallbox-Zählerstand', 'sensor.beispiel_wallbox_kwh', 'kWh-Zählereinheit und Rücksprünge'),
     'demo_lade_kosten': ('aufgelaufene Sitzungskosten', 'automation.ladekosten und input_number.demo_lade_preis', 'EUR-Betragsbereich und Rundung'),
     'demo_lade_energie': ('aufgelaufene Sitzungsenergie', 'automation.ladekosten und Wallbox-kWh-Zähler', 'kWh-Bereich und Zählerauflösung'),
-    'demo_lade_preis': ('Tarif der zuletzt verbuchten Teilstrecke', 'automation.ladekosten und sensor.beispiel_tibber_eur_kwh', 'EUR/kWh statt Cent/kWh'),
     'demo_letzte_energie': ('Energie der abgeschlossenen Ladesitzung', 'automation.ladekosten und input_number.demo_lade_energie', 'kWh-Darstellung'),
     'demo_letzte_kosten': ('Kosten der abgeschlossenen Ladesitzung', 'automation.ladekosten und input_number.demo_lade_kosten', 'EUR-Darstellung'),
 }
 for key, (measurement, deps, adjust) in NUMBERS.items():
     NOTES[('input_number', key)] = (f'Speichert {measurement}.', f'Erhält {measurement} über Reloads als HA-Helper.', '', deps,
                                       f'{adjust} für den eigenen Adapter prüfen.', 'Beispielrechnung, keine eichrechtskonforme Abrechnung; ungültige Messwerte nicht fortschreiben.')
+
+NOTES[('input_number', 'demo_lade_preis')] = (
+    'Speichert den aktuell im Helper hinterlegten Tarif für künftige Verbrauchsdifferenzen.',
+    'Beim Preiswechsel wird die seit dem letzten Zählerstand entstandene Differenz zunächst mit dem bisher gespeicherten Preis verbucht; erst danach speichert die Automation den neuen Tarif für folgende Deltas.',
+    '', 'automation.ladekosten und sensor.beispiel_tibber_eur_kwh',
+    'EUR/kWh statt Cent/kWh für den eigenen Adapter prüfen.',
+    'Beispielrechnung: Der gespeicherte Tarif gilt für die nächste gemessene Differenz, nicht als Nachweis des exakten Tarifverlaufs innerhalb eines Messintervalls.')
 
 NOTES[('input_text', 'demo_kalender_wolf_vorher')] = ('Bewahrt die vor dem Kalender-Wechsel gelesene Wolf-Option.', 'Erlaubt den Versuch, bei gesetzter Ownership von Standby auf das zuvor gelesene Auto zurückzustellen.', '', 'automation.kalender_abwesenheit, select.beispiel_wolf_dhk und input_boolean.demo_wolf_ownership.', 'Optionstext Auto/Standby am echten Select prüfen.', 'Keine Herkunftserkennung für zwischenzeitlich erneut gesetztes Standby; vor der Rücknahme auf Auto nur aktueller Optionswert und Marker geprüft.')
 NOTES[('input_text', 'demo_wolf_ziel')] = ('Reserviert Text für ein mögliches Wolf-Ziel.', 'Dokumentiert einen Erweiterungspunkt; keine Automation nutzt ihn im Beispiel.', '', 'Keine aktive Laufzeitabhängigkeit; Wolf-Adapter nur bei eigener Erweiterung.', 'Vor zusätzlicher Nutzung erlaubte Optionen und Ownership definieren.', 'Nicht als bereits wirksame Kesselsteuerung ausgeben.')
