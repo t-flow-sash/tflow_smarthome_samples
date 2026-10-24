@@ -1,0 +1,6 @@
+# Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+- binary_sensor:
+  - name: Demo Preis Guenstig
+    state: '{{ is_number(states(''sensor.beispiel_tibber_eur_kwh'')) and 0 <= states(''sensor.beispiel_tibber_eur_kwh'')
+      | float(-1) <= 10 and ((states(''sensor.beispiel_tibber_eur_kwh'') | float(99)) < 0.20 or (is_number(state_attr(''sensor.beispiel_tibber_eur_kwh'',''intraday_price_ranking''))
+      and 0 <= state_attr(''sensor.beispiel_tibber_eur_kwh'',''intraday_price_ranking'') | float(99) <= 0.25)) }}'

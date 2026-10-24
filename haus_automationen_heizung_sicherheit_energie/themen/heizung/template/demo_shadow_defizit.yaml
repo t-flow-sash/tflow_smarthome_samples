@@ -1,0 +1,14 @@
+# Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+- sensor:
+  - name: Demo Shadow Defizit
+    state: '{% set ns = namespace(points=0,invalid=0,max_deficit=0,hold=false) %}{% for r in [{''e'':''climate.beispiel_bt_01'',''w'':2,''w600'':false},{''e'':''climate.beispiel_bt_02'',''w'':1,''w600'':false},{''e'':''climate.beispiel_bt_03'',''w'':1,''w600'':false},{''e'':''climate.beispiel_bt_04'',''w'':1,''w600'':false},{''e'':''climate.beispiel_bt_05'',''w'':1,''w600'':false},{''e'':''climate.beispiel_bt_06'',''w'':1,''w600'':false},{''e'':''climate.beispiel_bt_07'',''w'':1,''w600'':false},{''e'':''climate.beispiel_bt_08'',''w'':1,''w600'':false},{''e'':''climate.beispiel_bt_09'',''w'':1,''w600'':false},{''e'':''climate.beispiel_w600_01'',''w'':1,''w600'':true},{''e'':''climate.beispiel_w600_02'',''w'':1,''w600'':true}]
+      %}{% set idx = r.e[-2:] %}{% set v = (is_state(''binary_sensor.demo_w600_'' ~ idx ~ ''_gueltig'',''on'') if
+      r.w600 else states(r.e) not in [''unknown'',''unavailable''] and state_attr(r.e,''degraded_mode'') != true
+      and state_attr(r.e,''errors'') in [none, [], ''''] and is_number(state_attr(r.e,''temperature'')) and is_number(state_attr(r.e,''current_temperature'')))
+      %}{% if not v %}{% set ns.invalid = ns.invalid + 1 %}{% else %}{% set heat = state_attr(r.e,''hvac_action'')
+      == ''heating'' %}{% set deficit = state_attr(r.e,''temperature'') | float(0) - state_attr(r.e,''current_temperature'')
+      | float(0) %}{% set start = (is_state(''binary_sensor.demo_w600_'' ~ idx ~ ''_start'',''on'') if r.w600 else
+      heat and deficit >= 0.3) %}{% set holding = (is_state(''binary_sensor.demo_w600_'' ~ idx ~ ''_halten'',''on'')
+      if r.w600 else heat) %}{% if start %}{% set ns.points = ns.points + r.w %}{% endif %}{% if holding %}{% set
+      ns.hold = true %}{% endif %}{% if heat and deficit > ns.max_deficit %}{% set ns.max_deficit = deficit %}{%
+      endif %}{% endif %}{% endfor %}{{ ns.max_deficit }}'

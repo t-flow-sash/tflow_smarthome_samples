@@ -1,0 +1,13 @@
+# Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+- id: public_alarm_meldung
+  alias: Demo alarm meldung
+  mode: single
+  triggers:
+  - trigger: state
+    entity_id: alarm_control_panel.beispiel_alarmo
+    to: triggered
+  actions:
+  - action: persistent_notification.create
+    data:
+      title: Demo Alarm
+      message: Alarmo meldet einen Alarm; Sensoren vor Ort prüfen.

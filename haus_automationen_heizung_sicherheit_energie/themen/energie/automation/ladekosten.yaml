@@ -1,0 +1,93 @@
+# Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+- id: public_ladekosten
+  alias: Demo ladekosten
+  mode: single
+  triggers:
+  - trigger: state
+    entity_id: sensor.beispiel_wallbox_kwh
+  - trigger: state
+    entity_id: sensor.beispiel_tibber_eur_kwh
+  - trigger: state
+    entity_id: sensor.beispiel_ladestatus
+  - trigger: time_pattern
+    minutes: /1
+  - trigger: homeassistant
+    event: start
+  actions:
+  - condition: template
+    value_template: '{{ is_number(states(''sensor.beispiel_wallbox_kwh'')) and is_number(states(''sensor.beispiel_tibber_eur_kwh''))
+      and 0 <= states(''sensor.beispiel_tibber_eur_kwh'') | float(-1) <= 10 and 0 <= states(''sensor.beispiel_wallbox_kwh'')
+      | float(-1) <= 1000000 and states(''sensor.beispiel_ladestatus'') not in [''unknown'',''unavailable''] }}'
+  - choose:
+    - conditions: '{{ is_state(''sensor.beispiel_ladestatus'',''charging'') and is_state(''input_boolean.demo_ladesitzung'',''off'')
+        }}'
+      sequence:
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.demo_lade_zaehler
+        data:
+          value: '{{ states(''sensor.beispiel_wallbox_kwh'') | float(0) }}'
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.demo_lade_preis
+        data:
+          value: '{{ states(''sensor.beispiel_tibber_eur_kwh'') | float(0) }}'
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.demo_lade_kosten
+        data:
+          value: 0
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.demo_lade_energie
+        data:
+          value: 0
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.demo_ladesitzung
+    - conditions: '{{ is_state(''input_boolean.demo_ladesitzung'',''on'') }}'
+      sequence:
+      - variables:
+          delta: '{{ states(''sensor.beispiel_wallbox_kwh'') | float(0) - states(''input_number.demo_lade_zaehler'')
+            | float(0) }}'
+      - condition: template
+        value_template: '{{ 0 <= delta | float(-1) <= 100 }}'
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.demo_lade_kosten
+        data:
+          value: '{{ (states(''input_number.demo_lade_kosten'') | float(0) + delta | float(0) * states(''input_number.demo_lade_preis'')
+            | float(0)) | round(4) }}'
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.demo_lade_energie
+        data:
+          value: '{{ (states(''input_number.demo_lade_energie'') | float(0) + delta | float(0)) | round(3) }}'
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.demo_lade_zaehler
+        data:
+          value: '{{ states(''sensor.beispiel_wallbox_kwh'') | float(0) }}'
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.demo_lade_preis
+        data:
+          value: '{{ states(''sensor.beispiel_tibber_eur_kwh'') | float(0) }}'
+      - if:
+        - condition: template
+          value_template: '{{ not is_state(''sensor.beispiel_ladestatus'',''charging'') and as_timestamp(now())
+            - as_timestamp(states.sensor.beispiel_ladestatus.last_changed, as_timestamp(now())) >= 300 }}'
+        then:
+        - action: input_number.set_value
+          target:
+            entity_id: input_number.demo_letzte_energie
+          data:
+            value: '{{ states(''input_number.demo_lade_energie'') | float(0) }}'
+        - action: input_number.set_value
+          target:
+            entity_id: input_number.demo_letzte_kosten
+          data:
+            value: '{{ states(''input_number.demo_lade_kosten'') | float(0) }}'
+        - action: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.demo_ladesitzung

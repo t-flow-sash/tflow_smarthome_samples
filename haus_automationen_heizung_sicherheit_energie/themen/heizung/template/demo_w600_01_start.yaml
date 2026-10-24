@@ -1,0 +1,6 @@
+# Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+- binary_sensor:
+  - name: Demo W600 01 start
+    state: '{{ is_state(''binary_sensor.demo_w600_01_gueltig'',''on'') and state_attr(''climate.beispiel_w600_01'',''hvac_action'')
+      == ''heating'' and state_attr(''climate.beispiel_w600_01'',''temperature'') | float(0) - state_attr(''climate.beispiel_w600_01'',''current_temperature'')
+      | float(0) >= 0.3 and states(''sensor.beispiel_w600_01_ventil'') | float(0) > 70 }}'

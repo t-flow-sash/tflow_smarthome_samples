@@ -1,0 +1,9 @@
+# Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+- id: public_kamera_retention
+  alias: Demo kamera retention
+  mode: single
+  triggers:
+  - trigger: time
+    at: 03:20:00
+  actions:
+  - action: shell_command.demo_camera_maintain

@@ -1,0 +1,4 @@
+# Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+demo_wolf_ziel:
+  name: demo_wolf_ziel
+  max: 50

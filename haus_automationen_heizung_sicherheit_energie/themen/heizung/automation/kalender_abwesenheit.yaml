@@ -1,0 +1,205 @@
+# Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+- id: public_kalender_abwesenheit
+  alias: Demo kalender abwesenheit
+  mode: single
+  triggers:
+  - trigger: time
+    at: 08:00:00
+  - trigger: time
+    at: '15:00:00'
+  - trigger: time_pattern
+    minutes: /15
+  - trigger: homeassistant
+    event: start
+  - trigger: event
+    event_type: automation_reloaded
+  - trigger: calendar
+    entity_id: calendar.beispiel_abwesenheit
+    event: start
+  - trigger: calendar
+    entity_id: calendar.beispiel_abwesenheit
+    event: end
+  - trigger: state
+    entity_id: calendar.beispiel_abwesenheit
+  actions:
+  - condition: template
+    value_template: '{{ states(''calendar.beispiel_abwesenheit'') not in [''unknown'',''unavailable''] }}'
+  - action: calendar.get_events
+    target:
+      entity_id: calendar.beispiel_abwesenheit
+    data:
+      start_date_time: '{{ today_at(''00:00'') }}'
+      end_date_time: '{{ today_at(''00:00'') + timedelta(days=1) }}'
+    response_variable: answer
+    continue_on_error: true
+  - condition: template
+    value_template: '{% set ns = namespace(ok=false) %}{% if answer is defined and answer is mapping and ''calendar.beispiel_abwesenheit''
+      in answer and answer[''calendar.beispiel_abwesenheit''] is mapping %}{% set events = answer[''calendar.beispiel_abwesenheit''].get(''events'')
+      %}{% if events is sequence and events is not string and events is not mapping %}{% set ns.ok = true %}{% for
+      e in events %}{% if e is not mapping or e.get(''start'') is not string or e.get(''end'') is not string or
+      e.get(''summary'','''') is not string or as_datetime(e.get(''start''), none) is none or as_datetime(e.get(''end''),
+      none) is none or as_timestamp(e.get(''end''), 0) <= as_timestamp(e.get(''start''), 0) %}{% set ns.ok = false
+      %}{% endif %}{% endfor %}{% endif %}{% endif %}{{ ns.ok }}'
+  - variables:
+      away: '{% set ns = namespace(away=false) %}{% set t = as_timestamp(now()) %}{% for e in answer[''calendar.beispiel_abwesenheit''][''events'']
+        %}{% set a = e.get(''start'') %}{% set b = e.get(''end'') %}{% if ''[Heizung]'' in (e.get(''summary'','''')
+        | string) and a and b %}{% set first = (as_datetime(a).date() if a | string | length == 10 else as_local(as_datetime(a)).date())
+        %}{% set last = ((as_datetime(b) - timedelta(days=1)).date() if b | string | length == 10 else as_local(as_datetime(b)
+        - timedelta(seconds=1)).date()) %}{% set lo = as_timestamp(first | string ~ '' 15:00:00'') %}{% set hi =
+        as_timestamp(last | string ~ '' 08:00:00'') %}{% if lo < hi and lo <= t < hi %}{% set ns.away = true %}{%
+        endif %}{% endif %}{% endfor %}{{ ns.away }}'
+  - choose:
+    - conditions: '{{ away | bool(false) }}'
+      sequence:
+      - if:
+        - condition: state
+          entity_id: input_boolean.demo_bt_freigabe
+          state: 'on'
+        then:
+        - choose:
+          - conditions: '{{ is_state(''input_boolean.demo_kalender_ownership'',''on'') or not (state_attr(''climate.beispiel_bt_01'',''preset_mode'')
+              == ''eco'' and state_attr(''climate.beispiel_bt_02'',''preset_mode'') == ''eco'' and state_attr(''climate.beispiel_bt_03'',''preset_mode'')
+              == ''eco'' and state_attr(''climate.beispiel_bt_04'',''preset_mode'') == ''eco'' and state_attr(''climate.beispiel_bt_05'',''preset_mode'')
+              == ''eco'' and state_attr(''climate.beispiel_bt_06'',''preset_mode'') == ''eco'' and state_attr(''climate.beispiel_bt_07'',''preset_mode'')
+              == ''eco'' and state_attr(''climate.beispiel_bt_08'',''preset_mode'') == ''eco'' and state_attr(''climate.beispiel_bt_09'',''preset_mode'')
+              == ''eco'') }}'
+            sequence:
+            - condition: template
+              value_template: '{{ states(''climate.beispiel_bt_01'') not in [''unknown'',''unavailable''] and states(''climate.beispiel_bt_02'')
+                not in [''unknown'',''unavailable''] and states(''climate.beispiel_bt_03'') not in [''unknown'',''unavailable'']
+                and states(''climate.beispiel_bt_04'') not in [''unknown'',''unavailable''] and states(''climate.beispiel_bt_05'')
+                not in [''unknown'',''unavailable''] and states(''climate.beispiel_bt_06'') not in [''unknown'',''unavailable'']
+                and states(''climate.beispiel_bt_07'') not in [''unknown'',''unavailable''] and states(''climate.beispiel_bt_08'')
+                not in [''unknown'',''unavailable''] and states(''climate.beispiel_bt_09'') not in [''unknown'',''unavailable'']
+                }}'
+            - action: climate.set_preset_mode
+              target:
+                entity_id: &id001
+                - climate.beispiel_bt_01
+                - climate.beispiel_bt_02
+                - climate.beispiel_bt_03
+                - climate.beispiel_bt_04
+                - climate.beispiel_bt_05
+                - climate.beispiel_bt_06
+                - climate.beispiel_bt_07
+                - climate.beispiel_bt_08
+                - climate.beispiel_bt_09
+              data:
+                preset_mode: eco
+            - wait_template: '{{ state_attr(''climate.beispiel_bt_01'',''preset_mode'') == ''eco'' and state_attr(''climate.beispiel_bt_02'',''preset_mode'')
+                == ''eco'' and state_attr(''climate.beispiel_bt_03'',''preset_mode'') == ''eco'' and state_attr(''climate.beispiel_bt_04'',''preset_mode'')
+                == ''eco'' and state_attr(''climate.beispiel_bt_05'',''preset_mode'') == ''eco'' and state_attr(''climate.beispiel_bt_06'',''preset_mode'')
+                == ''eco'' and state_attr(''climate.beispiel_bt_07'',''preset_mode'') == ''eco'' and state_attr(''climate.beispiel_bt_08'',''preset_mode'')
+                == ''eco'' and state_attr(''climate.beispiel_bt_09'',''preset_mode'') == ''eco'' }}'
+              timeout: 00:02:00
+              continue_on_timeout: true
+            - condition: template
+              value_template: '{{ state_attr(''climate.beispiel_bt_01'',''preset_mode'') == ''eco'' and state_attr(''climate.beispiel_bt_02'',''preset_mode'')
+                == ''eco'' and state_attr(''climate.beispiel_bt_03'',''preset_mode'') == ''eco'' and state_attr(''climate.beispiel_bt_04'',''preset_mode'')
+                == ''eco'' and state_attr(''climate.beispiel_bt_05'',''preset_mode'') == ''eco'' and state_attr(''climate.beispiel_bt_06'',''preset_mode'')
+                == ''eco'' and state_attr(''climate.beispiel_bt_07'',''preset_mode'') == ''eco'' and state_attr(''climate.beispiel_bt_08'',''preset_mode'')
+                == ''eco'' and state_attr(''climate.beispiel_bt_09'',''preset_mode'') == ''eco'' }}'
+            - action: input_boolean.turn_on
+              target:
+                entity_id: input_boolean.demo_kalender_ownership
+      - if:
+        - condition: state
+          entity_id: input_boolean.demo_wolf_freigabe
+          state: 'on'
+        then:
+        - choose:
+          - conditions: '{{ is_state(''input_boolean.demo_wolf_ownership'',''off'') }}'
+            sequence:
+            - condition: template
+              value_template: '{{ is_state(''input_boolean.demo_wolf_ownership'',''off'') and states(''select.beispiel_wolf_dhk'')
+                not in [''unknown'',''unavailable'',''Standby''] }}'
+            - variables:
+                previous_wolf: '{{ states(''select.beispiel_wolf_dhk'') }}'
+            - condition: template
+              value_template: '{{ previous_wolf in [''Auto''] }}'
+            - action: input_text.set_value
+              target:
+                entity_id: input_text.demo_kalender_wolf_vorher
+              data:
+                value: '{{ previous_wolf }}'
+            - action: select.select_option
+              target:
+                entity_id: select.beispiel_wolf_dhk
+              data:
+                option: Standby
+            - wait_template: '{{ is_state(''select.beispiel_wolf_dhk'',''Standby'') }}'
+              timeout: 00:02:00
+              continue_on_timeout: true
+            - condition: template
+              value_template: '{{ is_state(''select.beispiel_wolf_dhk'',''Standby'') }}'
+            - action: input_boolean.turn_on
+              target:
+                entity_id: input_boolean.demo_wolf_ownership
+    - conditions: '{{ not (away | bool(false)) }}'
+      sequence:
+      - if:
+        - condition: state
+          entity_id: input_boolean.demo_bt_freigabe
+          state: 'on'
+        - condition: state
+          entity_id: input_boolean.demo_kalender_ownership
+          state: 'on'
+        then:
+        - condition: template
+          value_template: '{{ states(''climate.beispiel_bt_01'') not in [''unknown'',''unavailable''] and states(''climate.beispiel_bt_02'')
+            not in [''unknown'',''unavailable''] and states(''climate.beispiel_bt_03'') not in [''unknown'',''unavailable'']
+            and states(''climate.beispiel_bt_04'') not in [''unknown'',''unavailable''] and states(''climate.beispiel_bt_05'')
+            not in [''unknown'',''unavailable''] and states(''climate.beispiel_bt_06'') not in [''unknown'',''unavailable'']
+            and states(''climate.beispiel_bt_07'') not in [''unknown'',''unavailable''] and states(''climate.beispiel_bt_08'')
+            not in [''unknown'',''unavailable''] and states(''climate.beispiel_bt_09'') not in [''unknown'',''unavailable'']
+            }}'
+        - action: climate.set_preset_mode
+          target:
+            entity_id: *id001
+          data:
+            preset_mode: none
+        - wait_template: '{{ state_attr(''climate.beispiel_bt_01'',''preset_mode'') == ''none'' and state_attr(''climate.beispiel_bt_02'',''preset_mode'')
+            == ''none'' and state_attr(''climate.beispiel_bt_03'',''preset_mode'') == ''none'' and state_attr(''climate.beispiel_bt_04'',''preset_mode'')
+            == ''none'' and state_attr(''climate.beispiel_bt_05'',''preset_mode'') == ''none'' and state_attr(''climate.beispiel_bt_06'',''preset_mode'')
+            == ''none'' and state_attr(''climate.beispiel_bt_07'',''preset_mode'') == ''none'' and state_attr(''climate.beispiel_bt_08'',''preset_mode'')
+            == ''none'' and state_attr(''climate.beispiel_bt_09'',''preset_mode'') == ''none'' }}'
+          timeout: 00:02:00
+          continue_on_timeout: true
+        - condition: template
+          value_template: '{{ state_attr(''climate.beispiel_bt_01'',''preset_mode'') == ''none'' and state_attr(''climate.beispiel_bt_02'',''preset_mode'')
+            == ''none'' and state_attr(''climate.beispiel_bt_03'',''preset_mode'') == ''none'' and state_attr(''climate.beispiel_bt_04'',''preset_mode'')
+            == ''none'' and state_attr(''climate.beispiel_bt_05'',''preset_mode'') == ''none'' and state_attr(''climate.beispiel_bt_06'',''preset_mode'')
+            == ''none'' and state_attr(''climate.beispiel_bt_07'',''preset_mode'') == ''none'' and state_attr(''climate.beispiel_bt_08'',''preset_mode'')
+            == ''none'' and state_attr(''climate.beispiel_bt_09'',''preset_mode'') == ''none'' }}'
+        - action: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.demo_kalender_ownership
+      - if:
+        - condition: state
+          entity_id: input_boolean.demo_wolf_freigabe
+          state: 'on'
+        - condition: state
+          entity_id: input_boolean.demo_wolf_ownership
+          state: 'on'
+        then:
+        - condition: template
+          value_template: '{{ is_state(''input_boolean.demo_wolf_ownership'',''on'') and is_state(''input_text.demo_kalender_wolf_vorher'',''Auto'')
+            and states(''select.beispiel_wolf_dhk'') in [''Standby'',''Auto''] }}'
+        - if:
+          - condition: state
+            entity_id: select.beispiel_wolf_dhk
+            state: Standby
+          then:
+          - action: select.select_option
+            target:
+              entity_id: select.beispiel_wolf_dhk
+            data:
+              option: Auto
+          - wait_template: '{{ is_state(''select.beispiel_wolf_dhk'',''Auto'') }}'
+            timeout: 00:02:00
+            continue_on_timeout: true
+        - condition: template
+          value_template: '{{ is_state(''select.beispiel_wolf_dhk'',''Auto'') }}'
+        - action: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.demo_wolf_ownership

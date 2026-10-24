@@ -1,0 +1,7 @@
+# Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+- binary_sensor:
+  - name: Demo Shadow Komfort Stabil
+    state: '{{ is_number(states(''sensor.demo_shadow_defizit'')) and is_number(states(''sensor.demo_shadow_ungueltig''))
+      and states(''sensor.demo_shadow_defizit'') | float(0) >= 2 and states(''sensor.demo_shadow_ungueltig'') |
+      int(99) < 2 }}'
+    delay_on: 00:03:00

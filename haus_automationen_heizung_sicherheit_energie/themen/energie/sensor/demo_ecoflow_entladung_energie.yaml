@@ -1,0 +1,7 @@
+# Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+- platform: integration
+  source: sensor.demo_ecoflow_entladung
+  name: Demo EcoFlow Entladung Energie
+  unit_prefix: k
+  unit_time: h
+  method: left

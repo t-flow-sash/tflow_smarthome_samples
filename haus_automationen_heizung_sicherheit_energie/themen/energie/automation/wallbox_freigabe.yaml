@@ -1,0 +1,34 @@
+# Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+- id: public_wallbox_freigabe
+  alias: Demo wallbox freigabe
+  mode: restart
+  triggers:
+  - trigger: state
+    entity_id: input_boolean.demo_laden_freigabe
+  - trigger: state
+    entity_id: binary_sensor.beispiel_angeschlossen
+  - trigger: state
+    entity_id: binary_sensor.demo_preis_guenstig
+  - trigger: state
+    entity_id: sensor.beispiel_ladestatus
+  - trigger: state
+    entity_id: person.beispiel_a
+  - trigger: state
+    entity_id: person.beispiel_b
+  - trigger: time_pattern
+    minutes: /5
+  - trigger: homeassistant
+    event: start
+  actions:
+  - choose:
+    - conditions: '{{ is_state(''input_boolean.demo_laden_freigabe'',''on'') and is_state(''binary_sensor.beispiel_angeschlossen'',''on'')
+        and (is_state(''person.beispiel_a'',''home'') or is_state(''person.beispiel_b'',''home'')) and (is_state(''binary_sensor.demo_preis_guenstig'',''on'')
+        or is_state(''sensor.beispiel_ladestatus'',''charging'')) }}'
+      sequence:
+      - action: switch.turn_on
+        target:
+          entity_id: switch.beispiel_wallbox_freigabe
+    default:
+    - action: switch.turn_off
+      target:
+        entity_id: switch.beispiel_wallbox_freigabe

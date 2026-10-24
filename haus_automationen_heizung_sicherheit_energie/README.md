@@ -2,6 +2,14 @@
 
 Dieses **für die öffentliche Nutzung vorgesehene Beispiel in einem eigenständigen Unterordner** beschreibt einen anpassbaren Entwurf, keinen 1:1-Export des Hauses. Es enthält [16 Automationen](docs/codekarte.md), erzeugt aus [scripts/build.py](scripts/build.py) in [packages/haus.yaml](packages/haus.yaml). Die fiktiven `beispiel_*`-Entitäten und die externen Dienste müssen in einer isolierten Instanz ersetzt und nachgewiesen werden. **Nicht plug-and-play, nicht produktionszertifiziert.** Insbesondere ist kein echter Kamera-AI-Dienst enthalten. Weder Freigabe noch Sicherheit eines Live-Systems folgen aus einem erfolgreichen Syntaxcheck.
 
+## Direkt zu YAML nach Thema
+
+- [Heizung: 21 YAML-Bausteine](docs/heizung.md#direkt-kopierbare-yaml-bausteine) – Automationen, Freigabe-/Ownership-Helper und alle Shadow-/W600-Templates.
+- [Sicherheit und Kameras: 23 YAML-Bausteine](docs/sicherheit-kameras.md#direkt-kopierbare-yaml-bausteine) – Automationen für sechs Zonen, Helper, Schloss-Skript, REST- und Shell-Command.
+- [Energie: 16 YAML-Bausteine](docs/energie.md#direkt-kopierbare-yaml-bausteine) – Automationen, Lade-Helper, Tarif-/EcoFlow-Templates und Integrationssensoren.
+
+Jeder Link auf diesen Themenseiten führt unmittelbar zu einer eigenen `.yaml`-Datei. **Entweder** das [vollständige Paket](packages/haus.yaml) **oder** eine Auswahl der Einzeldateien installieren – nie beides. Bei Einzeldateien gelten [Installationsreihenfolge, YAML-Form und Abhängigkeiten](docs/setup.md#installation-aus-einzeldateien). Die Themen sind ein Code-Index, keine autarken, ohne externe Adapter lauffähigen Systeme.
+
 ## Einstieg
 
 1. [Architektur und Datenfluss](docs/architektur.md) – Paket, Helper, Generator und Grenzen.

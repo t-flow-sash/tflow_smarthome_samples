@@ -1,0 +1,35 @@
+# Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+- id: public_wolf_shadow
+  alias: Demo wolf shadow
+  mode: restart
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.demo_shadow_start_stabil
+    to: 'on'
+  - trigger: state
+    entity_id: binary_sensor.demo_shadow_komfort_stabil
+    to: 'on'
+  - trigger: state
+    entity_id: binary_sensor.demo_shadow_halten
+  - trigger: homeassistant
+    event: start
+  - trigger: event
+    event_type: automation_reloaded
+  actions:
+  - choose:
+    - conditions: '{{ is_state(''binary_sensor.demo_shadow_start_stabil'',''on'') or is_state(''binary_sensor.demo_shadow_komfort_stabil'',''on'')
+        }}'
+      sequence:
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.demo_shadow
+    - conditions: '{{ is_state(''binary_sensor.demo_shadow_halten'',''off'') and is_state(''binary_sensor.demo_shadow_start_stabil'',''off'')
+        and is_state(''binary_sensor.demo_shadow_komfort_stabil'',''off'') }}'
+      sequence:
+      - delay: 00:05:00
+      - condition: template
+        value_template: '{{ is_state(''binary_sensor.demo_shadow_halten'',''off'') and is_state(''binary_sensor.demo_shadow_start_stabil'',''off'')
+          and is_state(''binary_sensor.demo_shadow_komfort_stabil'',''off'') }}'
+      - action: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.demo_shadow

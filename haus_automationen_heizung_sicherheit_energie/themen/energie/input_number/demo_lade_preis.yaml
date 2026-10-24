@@ -1,0 +1,8 @@
+# Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+demo_lade_preis:
+  name: demo_lade_preis
+  min: 0
+  max: 10
+  step: 1.0e-05
+  mode: box
+  unit_of_measurement: EUR/kWh

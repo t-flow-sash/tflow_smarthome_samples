@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
 """Generate the self-contained, synthetic HA package. No private source is imported."""
+import argparse
 from pathlib import Path
 import yaml
-class Secret(str):
-    pass
+from export_topics import Secret, write as verify_topics, unsafe_write as regenerate_topics
 
-yaml.SafeDumper.add_representer(Secret, lambda dumper, value: dumper.represent_scalar('!secret', str(value)))
-ROOT = Path(__file__).resolve().parents[1]
+parser = argparse.ArgumentParser(description='Render and verify synthetic HA samples (read-only by default).')
+parser.add_argument('--unsafe-regenerate', action='store_true',
+                    help='Write artifacts only in a trusted, quiescent checkout; never with concurrent writers.')
+parser.add_argument('--verify-root', type=Path, help='Verify artifacts in a separate root (read-only).')
+args = parser.parse_args()
+if args.unsafe_regenerate and args.verify_root is not None:
+    parser.error('--unsafe-regenerate cannot be combined with --verify-root')
+ROOT = args.verify_root if args.verify_root is not None else Path(__file__).resolve().parents[1]
 P = ROOT / 'packages' / 'haus.yaml'
-P.parent.mkdir(exist_ok=True)
 rooms = [f'climate.beispiel_bt_{i:02}' for i in range(1, 10)]
 wrooms = [f'climate.beispiel_w600_{i:02}' for i in range(1, 3)]
 cameras = [f'zone_{i:02}' for i in range(1, 7)]
@@ -129,5 +134,14 @@ energy='sensor.beispiel_wallbox_kwh'; price='sensor.beispiel_tibber_eur_kwh'; st
 pr="{{ is_number(states('"+energy+"')) and is_number(states('"+price+"')) and 0 <= states('"+price+"') | float(-1) <= 10 and 0 <= states('"+energy+"') | float(-1) <= 1000000 and states('"+status+"') not in ['unknown','unavailable'] }}"
 settle=[var(delta="{{ states('"+energy+"') | float(0) - states('input_number.demo_lade_zaehler') | float(0) }}"),cond("{{ 0 <= delta | float(-1) <= 100 }}"),act('input_number.set_value','input_number.demo_lade_kosten',{'value':"{{ (states('input_number.demo_lade_kosten') | float(0) + delta | float(0) * states('input_number.demo_lade_preis') | float(0)) | round(4) }}"}),act('input_number.set_value','input_number.demo_lade_energie',{'value':"{{ (states('input_number.demo_lade_energie') | float(0) + delta | float(0)) | round(3) }}"}),act('input_number.set_value','input_number.demo_lade_zaehler',{'value':"{{ states('"+energy+"') | float(0) }}"}),act('input_number.set_value','input_number.demo_lade_preis',{'value':"{{ states('"+price+"') | float(0) }}"})]
 auto('ladekosten',[st(energy),st(price),st(status),{'trigger':'time_pattern','minutes':'/1'},{'trigger':'homeassistant','event':'start'}],[cond(pr),{'choose':[{'conditions':"{{ is_state('"+status+"','charging') and is_state('input_boolean.demo_ladesitzung','off') }}",'sequence':[act('input_number.set_value','input_number.demo_lade_zaehler',{'value':"{{ states('"+energy+"') | float(0) }}"}),act('input_number.set_value','input_number.demo_lade_preis',{'value':"{{ states('"+price+"') | float(0) }}"}),act('input_number.set_value','input_number.demo_lade_kosten',{'value':0}),act('input_number.set_value','input_number.demo_lade_energie',{'value':0}),act('input_boolean.turn_on','input_boolean.demo_ladesitzung')]},{'conditions':"{{ is_state('input_boolean.demo_ladesitzung','on') }}",'sequence':settle+[{'if':[cond("{{ not is_state('"+status+"','charging') and as_timestamp(now()) - as_timestamp(states.sensor.beispiel_ladestatus.last_changed, as_timestamp(now())) >= 300 }}")],'then':[act('input_number.set_value','input_number.demo_letzte_energie',{'value':"{{ states('input_number.demo_lade_energie') | float(0) }}"}),act('input_number.set_value','input_number.demo_letzte_kosten',{'value':"{{ states('input_number.demo_lade_kosten') | float(0) }}"}),act('input_boolean.turn_off','input_boolean.demo_ladesitzung')]}]}]}],mode='single')
-P.write_text('# Generiert mit scripts/build.py; nur fiktive Entity-IDs.\n'+yaml.safe_dump(D,allow_unicode=True,sort_keys=False,width=110))
-print(f'{P}: {len(D["automation"])} automations, {len(T["sensor"])} template sensors')
+content = '# Generiert mit scripts/build.py; nur fiktive Entity-IDs.\n'+yaml.safe_dump(D,allow_unicode=True,sort_keys=False,width=110)
+if args.unsafe_regenerate:
+    # Explicit operator action only; the tree must not be concurrently writable.
+    P.parent.mkdir(exist_ok=True)
+    P.write_text(content, encoding='utf-8')
+    views = regenerate_topics(ROOT, D)
+else:
+    if not P.is_file() or P.read_bytes() != content.encode('utf-8'):
+        raise ValueError(f'Package missing or changed: {P}')
+    views = verify_topics(ROOT, D)
+print(f'{P}: {len(D["automation"])} automations, {len(T["sensor"])} template sensors; {len(views)} topic components')

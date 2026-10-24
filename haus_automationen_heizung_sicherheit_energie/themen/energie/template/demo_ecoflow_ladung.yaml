@@ -1,0 +1,8 @@
+# Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+- sensor:
+  - name: Demo EcoFlow Ladung
+    state: '{{ [states(''sensor.beispiel_ecoflow_batterie_w'') | float(0),0] | max }}'
+    availability: '{{ is_number(states(''sensor.beispiel_ecoflow_batterie_w'')) }}'
+    unit_of_measurement: W
+    device_class: power
+    state_class: measurement
