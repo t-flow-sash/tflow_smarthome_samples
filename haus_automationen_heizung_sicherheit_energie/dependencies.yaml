@@ -1,0 +1,77 @@
+# Externe Laufzeitabhängigkeiten (Platzhalter, keine Installation).
+# Jede beispiel_*-Entity aus dem generierten Paket muss genau einmal erscheinen.
+entities:
+  heating:
+    - climate.beispiel_bt_01
+    - climate.beispiel_bt_02
+    - climate.beispiel_bt_03
+    - climate.beispiel_bt_04
+    - climate.beispiel_bt_05
+    - climate.beispiel_bt_06
+    - climate.beispiel_bt_07
+    - climate.beispiel_bt_08
+    - climate.beispiel_bt_09
+    - climate.beispiel_w600_01
+    - climate.beispiel_w600_02
+    - sensor.beispiel_w600_01_ventil
+    - sensor.beispiel_w600_02_ventil
+    - select.beispiel_wolf_dhk
+    - calendar.beispiel_abwesenheit
+  security:
+    - person.beispiel_a
+    - person.beispiel_b
+    - lock.beispiel_eingang
+    - binary_sensor.beispiel_tuer_offen
+    - alarm_control_panel.beispiel_alarmo
+    - binary_sensor.beispiel_eingang_bewegung
+    - binary_sensor.beispiel_klingel
+    - light.beispiel_eingang
+    - light.beispiel_display
+    - camera.beispiel_zone_01
+    - camera.beispiel_zone_02
+    - camera.beispiel_zone_03
+    - camera.beispiel_zone_04
+    - camera.beispiel_zone_05
+    - camera.beispiel_zone_06
+    - switch.beispiel_zone_01_aufnahme
+    - switch.beispiel_zone_02_aufnahme
+    - switch.beispiel_zone_03_aufnahme
+    - switch.beispiel_zone_04_aufnahme
+    - switch.beispiel_zone_05_aufnahme
+    - switch.beispiel_zone_06_aufnahme
+    - binary_sensor.beispiel_zone_01_person
+    - binary_sensor.beispiel_zone_01_tier
+    - binary_sensor.beispiel_zone_02_person
+    - binary_sensor.beispiel_zone_02_tier
+    - binary_sensor.beispiel_zone_03_person
+    - binary_sensor.beispiel_zone_03_tier
+    - binary_sensor.beispiel_zone_04_person
+    - binary_sensor.beispiel_zone_04_tier
+    - binary_sensor.beispiel_zone_05_person
+    - binary_sensor.beispiel_zone_05_tier
+    - binary_sensor.beispiel_zone_06_person
+    - binary_sensor.beispiel_zone_06_tier
+  energy:
+    - sensor.beispiel_tibber_eur_kwh
+    - sensor.beispiel_ecoflow_batterie_w
+    - binary_sensor.beispiel_angeschlossen
+    - sensor.beispiel_ladestatus
+    - sensor.beispiel_wallbox_kwh
+    - switch.beispiel_wallbox_freigabe
+external_services:
+  - calendar.get_events
+  - climate.set_preset_mode
+  - select.select_option
+  - lock.lock
+  - camera.snapshot
+  - rest_command.demo_camera_finished
+  - shell_command.demo_camera_maintain
+# Die übrigen HA-Core-Dienste (Helper, switch, light, notifications, script, event)
+# werden vom Paket bzw. Home Assistant Core bereitgestellt, nicht vom Geräteadapter.
+local_scripts:
+  - scripts/build.py
+  - scripts/camera_media.py
+  - scripts/camera_episode_receiver.py
+secret_names:
+  - demo_camera_webhook_url
+  - demo_camera_webhook_token

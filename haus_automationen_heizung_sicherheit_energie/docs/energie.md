@@ -1,0 +1,11 @@
+# Energie, Tibber-Preis und Wallbox
+
+[← Übersicht](../README.md) · [Adapter und Einrichtung](setup.md) · [Grenzen](grenzen.md)
+
+Die EcoFlow-Anbindung liefert ausschließlich einen **extern bereitgestellten** signierten Batterie-Leistungssensor: positive Watt = Ladung, negative = Entladung. Templates trennen Lade-/Entladeleistung; HA-Integrationssensoren summieren die Energie. Kein Speichersteuerbefehl, keine Netzladung und keine Manipulation der EcoFlow-Konfiguration.
+
+Ein extern angebundener Tibber- oder gleichwertiger Preisadapter muss `sensor.beispiel_tibber_eur_kwh` in **EUR/kWh** und optional das numerische Attribut `intraday_price_ranking` zwischen 0 und 1 liefern. „Günstig“ ist Preis <0,20 EUR/kWh **oder** gültiger Rang ≤0,25. Fehlende, negative oder unplausible Preise gelten nicht als günstig; die tatsächliche Provider-Einbindung und Datenaktualität müssen vor Ort nachgewiesen werden.
+
+Die Wallbox-Automation schreibt lediglich `switch.beispiel_wallbox_freigabe` als **Ladeerlaubnis**, niemals als Netztrennschalter. Voraussetzung sind explizite Ladefreigabe, angeschlossenes Fahrzeug, mindestens eine bekannte Person zu Hause und günstiger Preis **oder** bereits laufender Ladevorgang. Ein Preisanstieg allein bricht eine laufende Ladung nicht ab. Schalten, Stoppen und Auswirkungen bei fehlenden Adaptern müssen mit echter Hardware sicher geprüft werden.
+
+Die Kostenschätzung beobachtet einen monotonen kumulativen kWh-Zähler, Preis und `charging`-Status. Bei Preiswechsel wird das bis dahin entstandene Delta mit dem **vorherigen** Preis verrechnet; zuletzt werden Energie und Kosten der abgeschlossenen Sitzung als Helper gespeichert. Ein fünfminütiger Stop-Watchdog, Zähler-Reset, Restarts, unbekannte Daten und Tarifgrenzen erfordern explizite Abnahme. Dies ist eine Schätzung, **keine abrechnungsfeste Messung**: kein exakter Provider-Tarifvertrag, keine garantierte zeitaufgelöste Energieverteilung, keine Beweisführung für Messstellen- oder Rechnungswerte.
