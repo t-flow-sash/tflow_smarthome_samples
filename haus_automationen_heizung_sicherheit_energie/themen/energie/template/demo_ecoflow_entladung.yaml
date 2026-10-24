@@ -1,4 +1,12 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: template.Demo EcoFlow Entladung
+# Zweck: Splittet negative Batterieleistung in einen nichtnegativen W-Sensor.
+# Nutzen: Liefert die Quelle für den Entladung-Integrationssensor.
+# Einbau: Als einzelnes Listenelement an die template:-Liste anhängen; nicht als Mapping einrücken.
+# Abhängigkeiten: sensor.beispiel_ecoflow_batterie_w mit signierter Leistung in W.
+# Anpassen: Vorzeichenkonvention und Einheit der eigenen EcoFlow-Integration prüfen.
+# Sicherheitsgrenze: Bei ungültiger Telemetrie nicht verfügbar; kein Akku-Steuerbefehl.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 - sensor:
   - name: Demo EcoFlow Entladung
     state: '{{ [0 - states(''sensor.beispiel_ecoflow_batterie_w'') | float(0),0] | max }}'

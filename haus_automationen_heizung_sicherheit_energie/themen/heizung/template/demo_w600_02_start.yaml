@@ -1,4 +1,12 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: template.Demo W600 02 start
+# Zweck: Erkennt aktives Heizen mit mindestens 0,3 °C Defizit und Ventilöffnung über 70 %. (W600 02)
+# Nutzen: Liefert eine belastbare Startanforderung für den Shadow.
+# Einbau: Als einzelnes Listenelement an die template:-Liste anhängen; nicht als Mapping einrücken.
+# Abhängigkeiten: climate.beispiel_w600_02, sensor.beispiel_w600_02_ventil, binary_sensor.demo_w600_02_gueltig
+# Anpassen: W600 02: Raum- und Ventil-Entity sowie Grenzwerte prüfen.
+# Sicherheitsgrenze: Ungültige W600-Werte dürfen keinen Start auslösen.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 - binary_sensor:
   - name: Demo W600 02 start
     state: '{{ is_state(''binary_sensor.demo_w600_02_gueltig'',''on'') and state_attr(''climate.beispiel_w600_02'',''hvac_action'')

@@ -1,4 +1,13 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: automation.display_klingel
+# Zweck: Aktiviert Display-Licht und lokale Klingelmeldung für eine Minute.
+# Nutzen: Signalisiert einen Klingeldruck ohne Kamera-Livebildzwang.
+# Wann: Wenn binary_sensor.beispiel_klingel auf on wechselt.
+# Einbau: Als einzelnes Listenelement an automation: (automations.yaml) anhängen; nicht als Mapping einrücken.
+# Abhängigkeiten: Klingelsensor, light.beispiel_display, persistent_notification und Sicherheitsfreigabe.
+# Anpassen: Klingel- und Display-Entities sowie Leuchtdauer anpassen.
+# Sicherheitsgrenze: Keine gesicherte Fernbenachrichtigung oder Kamerafreigabe.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 - id: public_display_klingel
   alias: Demo display klingel
   mode: restart

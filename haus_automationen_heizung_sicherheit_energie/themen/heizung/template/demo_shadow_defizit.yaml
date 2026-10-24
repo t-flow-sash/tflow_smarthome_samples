@@ -1,4 +1,12 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: template.Demo Shadow Defizit
+# Zweck: Ermittelt größtes Temperaturdefizit aus neun BT- und zwei W600-Räumen.
+# Nutzen: Stellt sensor.demo_shadow_defizit für die Shadow-Entscheidung bereit.
+# Einbau: Als einzelnes Listenelement an die template:-Liste anhängen; nicht als Mapping einrücken.
+# Abhängigkeiten: Neun climate.beispiel_bt_XX sowie zwei W600-Climate-/Ventil-Adapter und deren Gültigkeits-/Start-/Halten-Templates.
+# Anpassen: Raumliste, Gewicht 2 für BT 01, Schwellen und externe Attribute abgleichen.
+# Sicherheitsgrenze: Nur gültige Raumwerte zählen; kein Kesselbefehl.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 - sensor:
   - name: Demo Shadow Defizit
     state: '{% set ns = namespace(points=0,invalid=0,max_deficit=0,hold=false) %}{% for r in [{''e'':''climate.beispiel_bt_01'',''w'':2,''w600'':false},{''e'':''climate.beispiel_bt_02'',''w'':1,''w600'':false},{''e'':''climate.beispiel_bt_03'',''w'':1,''w600'':false},{''e'':''climate.beispiel_bt_04'',''w'':1,''w600'':false},{''e'':''climate.beispiel_bt_05'',''w'':1,''w600'':false},{''e'':''climate.beispiel_bt_06'',''w'':1,''w600'':false},{''e'':''climate.beispiel_bt_07'',''w'':1,''w600'':false},{''e'':''climate.beispiel_bt_08'',''w'':1,''w600'':false},{''e'':''climate.beispiel_bt_09'',''w'':1,''w600'':false},{''e'':''climate.beispiel_w600_01'',''w'':1,''w600'':true},{''e'':''climate.beispiel_w600_02'',''w'':1,''w600'':true}]

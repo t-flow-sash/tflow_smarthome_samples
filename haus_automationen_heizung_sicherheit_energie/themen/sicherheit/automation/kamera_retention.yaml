@@ -1,4 +1,13 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: automation.kamera_retention
+# Zweck: Ruft die lokale Kamera-Medienpflege auf.
+# Nutzen: Begrenzt Bildalter und Speicherbedarf im Beispiel.
+# Wann: Täglich um 03:20.
+# Einbau: Als einzelnes Listenelement an automation: (automations.yaml) anhängen; nicht als Mapping einrücken.
+# Abhängigkeiten: shell_command.demo_camera_maintain und installiertes scripts/camera_media.py unter /config/demo_camera_media.py.
+# Anpassen: Lokale Pfade, Aufbewahrung und Dateirechte vor Aktivierung prüfen.
+# Sicherheitsgrenze: Best-Effort-Retention; HA-/media-Bilder können für weitere authentifizierte Nutzer sichtbar sein.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 - id: public_kamera_retention
   alias: Demo kamera retention
   mode: single

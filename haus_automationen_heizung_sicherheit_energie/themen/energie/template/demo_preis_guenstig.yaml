@@ -1,4 +1,12 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: template.Demo Preis Guenstig
+# Zweck: Klassifiziert den Tibber-Preis unter 0,20 EUR/kWh oder Ranking bis 0,25 als günstig.
+# Nutzen: Liefert das Tarifsignal für die Wallbox-Freigabe.
+# Einbau: Als einzelnes Listenelement an die template:-Liste anhängen; nicht als Mapping einrücken.
+# Abhängigkeiten: sensor.beispiel_tibber_eur_kwh mit gültigem Preis und optionalem intraday_price_ranking; automation.wallbox_freigabe.
+# Anpassen: EUR/kWh-Einheit, Preisgrenze und Ranking für den eigenen Tarif prüfen.
+# Sicherheitsgrenze: Ungültige/fehlende Preise gelten nicht als günstig; laufendes Laden folgt separater Zustimmung.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 - binary_sensor:
   - name: Demo Preis Guenstig
     state: '{{ is_number(states(''sensor.beispiel_tibber_eur_kwh'')) and 0 <= states(''sensor.beispiel_tibber_eur_kwh'')

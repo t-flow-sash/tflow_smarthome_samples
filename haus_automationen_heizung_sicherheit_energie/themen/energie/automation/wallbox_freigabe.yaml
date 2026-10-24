@@ -1,4 +1,13 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: automation.wallbox_freigabe
+# Zweck: Setzt ausschließlich die Ladeerlaubnis der Wallbox.
+# Nutzen: Erlaubt Laden bei Anschluss, Präsenz und günstigem Tarif; laufendes Laden darf bei Preiswechsel fortgesetzt werden.
+# Wann: Bei Freigabe-, Stecker-, Tarif-, Lade- und Personenstatus, alle fünf Minuten und beim HA-Start.
+# Einbau: Als einzelnes Listenelement an automation: (automations.yaml) anhängen; nicht als Mapping einrücken.
+# Abhängigkeiten: input_boolean.demo_laden_freigabe, binary_sensor.demo_preis_guenstig, externer Stecker-/Ladestatus, Personen und switch.beispiel_wallbox_freigabe.
+# Anpassen: Wallbox-Switch, Personen, Anschluss und Tarifadapter ersetzen.
+# Sicherheitsgrenze: Freigabe-/Präsenz-Widerruf schaltet aus; Preis-Hysterese ist keine Erlaubnis ohne Zustimmung; keine Netztrennung.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 - id: public_wallbox_freigabe
   alias: Demo wallbox freigabe
   mode: restart

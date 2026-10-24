@@ -1,4 +1,12 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: template.Demo Shadow Komfort Stabil
+# Zweck: Entprellt Shadow-Anforderung mit mindestens 2 °C maximalen Fehlbetrag über drei Minuten.
+# Nutzen: Vermeidet hektisches Flattern des reinen Heizbedarfs-Merkers.
+# Einbau: Als einzelnes Listenelement an die template:-Liste anhängen; nicht als Mapping einrücken.
+# Abhängigkeiten: sensor.demo_shadow_punkte, sensor.demo_shadow_ungueltig und sensor.demo_shadow_defizit; automation.wolf_shadow.
+# Anpassen: Punkte, Defizit und delay_on an Trägheit der Heizungsanlage anpassen.
+# Sicherheitsgrenze: Mindestens zwei ungültige Räume sperren die stabile Anforderung; keine direkte Wolf-Schaltung.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 - binary_sensor:
   - name: Demo Shadow Komfort Stabil
     state: '{{ is_number(states(''sensor.demo_shadow_defizit'')) and is_number(states(''sensor.demo_shadow_ungueltig''))

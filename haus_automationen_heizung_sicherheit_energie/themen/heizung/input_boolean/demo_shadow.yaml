@@ -1,3 +1,11 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: input_boolean.demo_shadow
+# Zweck: Speichert das verzögerte Heizbedarfs-Schattenbit.
+# Nutzen: Zeigt Raum-Anforderung ohne Aktor-Schaltung an.
+# Einbau: Diesen einen Schlüssel in das Mapping input_boolean: mergen (z. B. configuration.yaml oder passender Mapping-Include); nicht die ganze Domain ersetzen.
+# Abhängigkeiten: automation.wolf_shadow und Shadow-Start-/Komfort-/Halten-Templates.
+# Anpassen: Nicht als ungeprüften Kessel-Schaltbefehl verwenden.
+# Sicherheitsgrenze: Freigaben mit initial: false starten aus; Ownership-/Zustandsmerker ohne initial können nach Neustart wiederhergestellt werden.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 demo_shadow:
   name: demo_shadow

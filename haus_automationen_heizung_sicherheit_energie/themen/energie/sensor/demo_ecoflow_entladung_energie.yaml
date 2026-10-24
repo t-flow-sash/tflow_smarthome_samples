@@ -1,4 +1,12 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: sensor.Demo EcoFlow Entladung Energie
+# Zweck: Integriert EcoFlow-Entladungleistung zeitlich zu kWh.
+# Nutzen: Zeigt kumulierte Entladungenergie statt Momentanleistung.
+# Einbau: Als einzelnes Listenelement an die sensor:-Liste anhängen; nicht als Mapping einrücken.
+# Abhängigkeiten: sensor.demo_ecoflow_entladung (Template), HA-Integration-Plattform und gültige W-Telemetrie.
+# Anpassen: Einheit, Methode left und Reset-/Langzeitstatistik des Quellsensors kontrollieren.
+# Sicherheitsgrenze: Messschätzung, kein abrechnungsfähiger Zähler; Sensor-Plattform benötigt HA-Neustart.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 - platform: integration
   source: sensor.demo_ecoflow_entladung
   name: Demo EcoFlow Entladung Energie

@@ -1,4 +1,13 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: automation.kamera_zone_02
+# Zweck: Erstellt begrenzte Snapshots bei Personen-/Tiererkennung in zone_02.
+# Nutzen: Sammelt pro Episode Bilder aus zone_02 und meldet deren Ende an den Beispiel-Empfänger.
+# Wann: Bei Erkennungsbeginn, demo_camera_continue, HA-Start und Reload; kabelgebundene Beispielzone ohne Akku-Wartezeit.
+# Einbau: Als einzelnes Listenelement an automation: (automations.yaml) anhängen; nicht als Mapping einrücken.
+# Abhängigkeiten: camera.beispiel_zone_02, binary_sensor.beispiel_zone_02_person/tier, switch.beispiel_zone_02_aufnahme, input_boolean.demo_sicherheit_freigabe, rest_command.demo_camera_finished und /media/demo_camera/zone_02.
+# Anpassen: Kamera-, Erkennungs- und Aufnahme-IDs von zone_02 sowie Medienpfad/Empfänger anpassen.
+# Sicherheitsgrenze: Freigabe und Aufnahme vor jedem Bild prüfen; maximal 100 Frames pro Durchlauf, Best-Effort-Fortsetzung/POST ohne dauerhafte Outbox; /media-Sichtbarkeit beachten.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 - id: public_kamera_zone_02
   alias: Demo kamera zone 02
   mode: restart

@@ -1,4 +1,12 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: template.Demo W600 02 gueltig
+# Zweck: Prüft Temperatur, Ventilstellung und frische W600-Telemetrie. (W600 02)
+# Nutzen: Schließt unbekannte, veraltete oder unplausible Raumwerte aus.
+# Einbau: Als einzelnes Listenelement an die template:-Liste anhängen; nicht als Mapping einrücken.
+# Abhängigkeiten: climate.beispiel_w600_02, sensor.beispiel_w600_02_ventil
+# Anpassen: W600 02: Raum- und Ventil-Entity sowie Grenzwerte prüfen.
+# Sicherheitsgrenze: Messdaten älter als sechs Stunden gelten als ungültig.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 - binary_sensor:
   - name: Demo W600 02 gueltig
     state: '{% set c = states(''climate.beispiel_w600_02'') %}{% set v = states(''sensor.beispiel_w600_02_ventil'')

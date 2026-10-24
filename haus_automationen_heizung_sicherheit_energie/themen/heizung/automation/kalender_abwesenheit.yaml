@@ -1,4 +1,13 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: automation.kalender_abwesenheit
+# Zweck: Schaltet BT-Räume bei markierten Abwesenheitsfenstern auf eco und den Wolf-DHK-Select optional auf Standby.
+# Nutzen: Spart Wärme bei Abwesenheit und stellt nur nach eigenem Readback bestätigte Zustände zurück.
+# Wann: Um 08:00/15:00, alle 15 Minuten, bei Kalenderänderung/-start/-ende sowie HA-Start/Reload; ganztägiges Ende ist exklusiv.
+# Einbau: Als einzelnes Listenelement an automation: (automations.yaml) anhängen; nicht als Mapping einrücken.
+# Abhängigkeiten: calendar.beispiel_abwesenheit mit calendar.get_events, BT-Räume, select.beispiel_wolf_dhk, getrennte BT-/Wolf-Freigaben sowie Kalender-/Wolf-Ownership und input_text.demo_kalender_wolf_vorher.
+# Anpassen: Kalender-Markierung [Heizung], Raum-IDs, Select-Optionen und lokale Zeitzone prüfen.
+# Sicherheitsgrenze: Ungültige Kalenderantwort bewirkt keinen Aktorwechsel; Wolf-Standby ist kein Warmwasser-Eingriff.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 - id: public_kalender_abwesenheit
   alias: Demo kalender abwesenheit
   mode: single

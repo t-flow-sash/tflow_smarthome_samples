@@ -1,3 +1,11 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: input_boolean.demo_lade_zaehler_gueltig
+# Zweck: Reserviert einen Gültigkeitsmerker für den Ladezähler.
+# Nutzen: Macht die beabsichtigte Zählerprüfung explizit sichtbar.
+# Einbau: Diesen einen Schlüssel in das Mapping input_boolean: mergen (z. B. configuration.yaml oder passender Mapping-Include); nicht die ganze Domain ersetzen.
+# Abhängigkeiten: Zähleradapter sensor.beispiel_wallbox_kwh; im Beispiel nicht als aktiver Aktorgate verwendet.
+# Anpassen: Nicht als bereits wirksame Sperre behaupten; Zählerqualität separat prüfen.
+# Sicherheitsgrenze: Freigaben mit initial: false starten aus; Ownership-/Zustandsmerker ohne initial können nach Neustart wiederhergestellt werden.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 demo_lade_zaehler_gueltig:
   name: demo_lade_zaehler_gueltig

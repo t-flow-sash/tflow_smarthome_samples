@@ -1,4 +1,13 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: automation.alarm_meldung
+# Zweck: Erzeugt eine lokale Meldung bei Alarmo-Status triggered.
+# Nutzen: Macht ausgelöste Alarme sichtbar, ohne Alarmo zu schalten.
+# Wann: Beim Zustandswechsel von alarm_control_panel.beispiel_alarmo auf triggered.
+# Einbau: Als einzelnes Listenelement an automation: (automations.yaml) anhängen; nicht als Mapping einrücken.
+# Abhängigkeiten: Extern installierte Alarmo-Integration samt UI-Sensorzuordnung und persistent_notification.
+# Anpassen: Alarmo-Entity und Meldetext anpassen.
+# Sicherheitsgrenze: Keine Scharf-/Unscharfschaltung und keine garantierte externe Alarmübermittlung.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 - id: public_alarm_meldung
   alias: Demo alarm meldung
   mode: single

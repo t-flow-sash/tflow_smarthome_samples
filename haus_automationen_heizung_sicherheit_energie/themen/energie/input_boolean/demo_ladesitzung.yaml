@@ -1,3 +1,11 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: input_boolean.demo_ladesitzung
+# Zweck: Merkt eine laufende Wallbox-Abrechnungssitzung.
+# Nutzen: Ermöglicht Abschluss erst nach stabilem Ladeende.
+# Einbau: Diesen einen Schlüssel in das Mapping input_boolean: mergen (z. B. configuration.yaml oder passender Mapping-Include); nicht die ganze Domain ersetzen.
+# Abhängigkeiten: automation.ladekosten und Lade-/Zähler-/Preis-Helper.
+# Anpassen: Nach Neustart mit tatsächlichem Ladestatus und Zähler abgleichen.
+# Sicherheitsgrenze: Freigaben mit initial: false starten aus; Ownership-/Zustandsmerker ohne initial können nach Neustart wiederhergestellt werden.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 demo_ladesitzung:
   name: demo_ladesitzung

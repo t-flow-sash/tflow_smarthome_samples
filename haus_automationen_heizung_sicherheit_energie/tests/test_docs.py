@@ -54,7 +54,7 @@ class DocsContract(unittest.TestCase):
                 'persistent_notification.create'}
         self.assertEqual(set(MANIFEST['external_services']), explicit - core)
         self.assertEqual(explicit, set(MANIFEST['external_services']) | core)
-        self.assertEqual(set(MANIFEST['local_scripts']) | {'scripts/export_topics.py'}, {str(p.relative_to(ROOT)) for p in (ROOT / 'scripts').glob('*.py')})
+        self.assertEqual(set(MANIFEST['local_scripts']) | {'scripts/export_topics.py', 'scripts/component_notes.py'}, {str(p.relative_to(ROOT)) for p in (ROOT / 'scripts').glob('*.py')})
         self.assertEqual(set(MANIFEST['secret_names']), set(re.findall(r'!secret [\'\"]?([a-z_]+)', PACKAGE)))
         setup = (ROOT / 'docs/setup.md').read_text(encoding='utf-8')
         self.assertTrue(all(name in setup for name in MANIFEST['secret_names']))

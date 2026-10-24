@@ -13,6 +13,7 @@ import yaml
 from test_contract import Loader, ROOT
 
 EXPORT = ROOT / 'themen'
+sys.path.insert(0, str(ROOT / 'scripts'))  # Dynamic exporter import resolves its canonical notes module.
 spec = importlib.util.spec_from_file_location('export_topics', ROOT / 'scripts/export_topics.py')
 assert spec is not None and spec.loader is not None
 export = importlib.util.module_from_spec(spec)
@@ -80,6 +81,55 @@ class TopicExport(unittest.TestCase):
                                  Counter(key(x) for x in original))
                 self.assertEqual({key(x): x for x in reconstructed},
                                  {key(x): x for x in original})
+
+    def test_component_comments_are_specific_complete_and_match_install_shape(self):
+        canonical = yaml.load((ROOT / 'packages/haus.yaml').read_text(encoding='utf-8'), Loader=ExportLoader)
+        components = {(domain, key): value for domain, key, value in export.pieces(canonical)}
+        self.assertEqual(set(components), set(export.component_notes.NOTES), 'Every note must describe one actual component')
+        for (domain, key), value in components.items():
+            path = Path('themen') / export.topic(domain, key) / domain / export.filename(domain, key)
+            with self.subTest(path=path):
+                text = (ROOT / path).read_text(encoding='utf-8')
+                header = text.splitlines()[0] + '\n' + export.component_notes.comment(domain, key)
+                self.assertTrue(text.startswith(header), 'Header must be generated canonically before YAML')
+                self.assertIn(f'# Baustein: {domain}.{key}', header)
+                for field in ('Zweck', 'Nutzen', 'Einbau', 'Abhängigkeiten', 'Anpassen', 'Sicherheitsgrenze'):
+                    match = re.search(rf'^# {field}: (.+)$', header, re.MULTILINE)
+                    self.assertIsNotNone(match, field)
+                    if match is not None:
+                        self.assertGreater(len(match.group(1)), 20, field)
+                self.assertIn('packages/haus.yaml', header)
+                self.assertIn('niemals beide parallel', header)
+                self.assertIn(f'{domain}:', header)
+                self.assertIn(key, header.splitlines()[1])
+                note = export.component_notes.NOTES[(domain, key)]
+                self.assertEqual(len(note), 6)
+                self.assertEqual(len(set(note) - {''}), 6 if domain == 'automation' else 5,
+                                 'Purpose, benefit, dependency, adaptation and safety must differ')
+                if domain in ('automation', 'template', 'sensor'):
+                    self.assertIn('Listenelement', header)
+                    self.assertNotIn('Mapping-Include', header)
+                else:
+                    self.assertIn('Mapping', header)
+                    self.assertNotIn('Listenelement', header)
+                if domain == 'automation':
+                    self.assertRegex(header, r'(?m)^# Wann: .{15,}$')
+                self.assertEqual(yaml.load(text, Loader=ExportLoader), value)
+
+    def test_representative_comments_explain_behavior_and_constraints(self):
+        expected = {
+            'heizung/automation/wolf_shadow.yaml': ('fünf Minuten', 'ohne einen Wolf-Aktor'),
+            'heizung/automation/kalender_abwesenheit.yaml': ('ganztägiges Ende ist exklusiv', 'calendar.get_events'),
+            'sicherheit/automation/kamera_zone_04.yaml': ('Akku-Kamera', 'Best-Effort-Fortsetzung'),
+            'energie/automation/wallbox_freigabe.yaml': ('Preis-Hysterese', 'Widerruf'),
+            'energie/automation/ladekosten.yaml': ('Zählerrücksprung', 'EUR/kWh'),
+            'sicherheit/rest_command/demo_camera_finished.yaml': ('!secret', 'Zustellgarantie'),
+        }
+        for relative, terms in expected.items():
+            text = (EXPORT / relative).read_text(encoding='utf-8')
+            for term in terms:
+                with self.subTest(path=relative, term=term):
+                    self.assertIn(term, text)
 
     def test_all_topic_yaml_linked_once_in_correct_theme_and_readme_navigation(self):
         used = []

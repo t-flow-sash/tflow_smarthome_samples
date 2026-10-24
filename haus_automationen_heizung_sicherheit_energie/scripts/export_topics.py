@@ -10,6 +10,8 @@ import re
 import secrets
 import stat
 import yaml
+import component_notes
+from component_notes import comment
 
 class Secret(str):
     """Preserve HA !secret tags in package and individual components."""
@@ -80,7 +82,7 @@ def render(package):
         path = Path('themen') / topic(domain, key) / domain / filename(domain, key)
         if path in result:
             raise ValueError(f'Duplicate export: {path}')
-        result[path] = '# Generiert mit scripts/build.py; nur fiktive Entity-IDs.\n' + yaml.safe_dump(
+        result[path] = '# Generiert mit scripts/build.py; nur fiktive Entity-IDs.\n' + comment(domain, key) + yaml.safe_dump(
             value, allow_unicode=True, sort_keys=False, width=110)
     return result
 

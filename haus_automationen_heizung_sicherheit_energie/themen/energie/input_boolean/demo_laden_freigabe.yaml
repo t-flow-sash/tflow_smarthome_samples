@@ -1,4 +1,12 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: input_boolean.demo_laden_freigabe
+# Zweck: Erlaubt die Wallbox-Steuerung durch die Freigabeautomation.
+# Nutzen: Entzieht Ladeerlaubnis ausdrücklich bei Widerruf.
+# Einbau: Diesen einen Schlüssel in das Mapping input_boolean: mergen (z. B. configuration.yaml oder passender Mapping-Include); nicht die ganze Domain ersetzen.
+# Abhängigkeiten: automation.wallbox_freigabe und switch.beispiel_wallbox_freigabe.
+# Anpassen: Nur nach Prüfung der Wallbox-Freigabe-Semantik aktivieren; kein Netzschalter.
+# Sicherheitsgrenze: Freigaben mit initial: false starten aus; Ownership-/Zustandsmerker ohne initial können nach Neustart wiederhergestellt werden.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 demo_laden_freigabe:
   name: demo_laden_freigabe
   initial: false

@@ -1,4 +1,13 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: automation.eingang_licht
+# Zweck: Schaltet das Eingangslicht nach Bewegung für drei Minuten ein.
+# Nutzen: Beleuchtet den Eingangsbereich zeitlich begrenzt.
+# Wann: Wenn binary_sensor.beispiel_eingang_bewegung auf on wechselt.
+# Einbau: Als einzelnes Listenelement an automation: (automations.yaml) anhängen; nicht als Mapping einrücken.
+# Abhängigkeiten: Bewegungssensor, light.beispiel_eingang und input_boolean.demo_sicherheit_freigabe.
+# Anpassen: Sensor, Licht und Nachlaufzeit anpassen.
+# Sicherheitsgrenze: Vor Live-Einsatz konkurrierende Lichtautomationen und manuellen Override prüfen.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 - id: public_eingang_licht
   alias: Demo eingang licht
   mode: restart

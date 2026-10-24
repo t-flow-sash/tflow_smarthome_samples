@@ -1,4 +1,12 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: input_boolean.demo_bt_freigabe
+# Zweck: Erlaubt der Kalenderautomation Änderungen an Better-Thermostat-Presets.
+# Nutzen: Hält Kalendersteuerung der BT-Räume zunächst ausgeschaltet.
+# Einbau: Diesen einen Schlüssel in das Mapping input_boolean: mergen (z. B. configuration.yaml oder passender Mapping-Include); nicht die ganze Domain ersetzen.
+# Abhängigkeiten: automation.kalender_abwesenheit und neun externe climate.beispiel_bt_XX.
+# Anpassen: Nur nach geprüftem eco/none-Readback einschalten.
+# Sicherheitsgrenze: Freigaben mit initial: false starten aus; Ownership-/Zustandsmerker ohne initial können nach Neustart wiederhergestellt werden.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 demo_bt_freigabe:
   name: demo_bt_freigabe
   initial: false
