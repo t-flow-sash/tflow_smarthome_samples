@@ -1,11 +1,11 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
 # Baustein: input_text.demo_kalender_wolf_vorher
 # Zweck: Bewahrt die vor dem Kalender-Wechsel gelesene Wolf-Option.
-# Nutzen: Erlaubt gezieltes Rückstellen nur auf das bestätigte vorherige Auto.
+# Nutzen: Erlaubt den Versuch, bei gesetzter Ownership von Standby auf das zuvor gelesene Auto zurückzustellen.
 # Einbau: Diesen einen Schlüssel in das Mapping input_text: mergen (z. B. configuration.yaml oder passender Mapping-Include); nicht die ganze Domain ersetzen.
 # Abhängigkeiten: automation.kalender_abwesenheit, select.beispiel_wolf_dhk und input_boolean.demo_wolf_ownership.
 # Anpassen: Optionstext Auto/Standby am echten Select prüfen.
-# Sicherheitsgrenze: Nie einen fremden Standby-Modus ohne eigene Ownership überschreiben.
+# Sicherheitsgrenze: Keine Herkunftserkennung für zwischenzeitlich erneut gesetztes Standby; vor der Rücknahme auf Auto nur aktueller Optionswert und Marker geprüft.
 # Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 demo_kalender_wolf_vorher:
   name: demo_kalender_wolf_vorher
