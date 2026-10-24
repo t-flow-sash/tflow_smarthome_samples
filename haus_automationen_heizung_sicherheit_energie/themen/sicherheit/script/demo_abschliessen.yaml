@@ -1,0 +1,22 @@
+# Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+demo_abschliessen:
+  alias: Demo abschliessen
+  sequence:
+  - condition: state
+    entity_id: input_boolean.demo_sicherheit_freigabe
+    state: 'on'
+  - condition: template
+    value_template: '{{ is_state(''person.beispiel_a'',''not_home'') and is_state(''person.beispiel_b'',''not_home'')
+      }}'
+  - condition: state
+    entity_id: binary_sensor.beispiel_tuer_offen
+    state: 'off'
+  - action: lock.lock
+    target:
+      entity_id: lock.beispiel_eingang
+  - wait_template: '{{ is_state(''lock.beispiel_eingang'',''locked'') }}'
+    timeout: 00:02:00
+    continue_on_timeout: true
+  - condition: state
+    entity_id: lock.beispiel_eingang
+    state: locked

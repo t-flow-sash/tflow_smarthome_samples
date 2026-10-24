@@ -1,0 +1,23 @@
+# Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+- id: public_display_klingel
+  alias: Demo display klingel
+  mode: restart
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.beispiel_klingel
+    to: 'on'
+  actions:
+  - condition: state
+    entity_id: input_boolean.demo_sicherheit_freigabe
+    state: 'on'
+  - action: light.turn_on
+    target:
+      entity_id: light.beispiel_display
+  - action: persistent_notification.create
+    data:
+      title: Klingel
+      message: Eingang prüfen; Kameraansicht im Dashboard öffnen.
+  - delay: 00:01:00
+  - action: light.turn_off
+    target:
+      entity_id: light.beispiel_display

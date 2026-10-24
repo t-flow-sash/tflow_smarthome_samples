@@ -1,0 +1,85 @@
+# Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+- id: public_kamera_zone_01
+  alias: Demo kamera zone 01
+  mode: restart
+  triggers:
+  - trigger: template
+    value_template: '{{ (is_state(''binary_sensor.beispiel_zone_01_person'',''on'') or is_state(''binary_sensor.beispiel_zone_01_tier'',''on''))
+      }}'
+  - trigger: event
+    event_type: demo_camera_continue
+    event_data:
+      camera: zone_01
+  - trigger: homeassistant
+    event: start
+  - trigger: event
+    event_type: automation_reloaded
+  actions:
+  - condition: state
+    entity_id: input_boolean.demo_sicherheit_freigabe
+    state: 'on'
+  - variables:
+      episode_id: '{{ trigger.event.data.episode_id if trigger.platform == ''event'' and trigger.event.event_type
+        == ''demo_camera_continue'' else context.id | md5 }}'
+      started_at: '{{ trigger.event.data.started_at if trigger.platform == ''event'' and trigger.event.event_type
+        == ''demo_camera_continue'' else now().isoformat() }}'
+      base_index: '{{ trigger.event.data.next_index | int(0) if trigger.platform == ''event'' and trigger.event.event_type
+        == ''demo_camera_continue'' else 0 }}'
+  - repeat:
+      count: 100
+      sequence:
+      - choose:
+        - conditions: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and is_state(''switch.beispiel_zone_01_aufnahme'',''on'')
+            and (is_state(''binary_sensor.beispiel_zone_01_person'',''on'') or is_state(''binary_sensor.beispiel_zone_01_tier'',''on''))
+            and states(''camera.beispiel_zone_01'') not in [''unknown'',''unavailable''] }}'
+          sequence:
+          - action: camera.snapshot
+            target:
+              entity_id: camera.beispiel_zone_01
+            data:
+              filename: /media/demo_camera/zone_01/{{ now().strftime("%Y%m%dT%H%M%S%f") }}_{{ episode_id }}_{{ base_index
+                | int + repeat.index }}.jpg
+            continue_on_error: true
+          - delay: 00:00:05
+        default:
+        - variables:
+            reason: '{{ ''recording_disabled'' if not is_state(''input_boolean.demo_sicherheit_freigabe'',''on'')
+              or not is_state(''switch.beispiel_zone_01_aufnahme'',''on'') else ''detection_ended'' if not (is_state(''binary_sensor.beispiel_zone_01_person'',''on'')
+              or is_state(''binary_sensor.beispiel_zone_01_tier'',''on'')) else ''camera_unavailable'' }}'
+            ended_at: '{{ now().isoformat() }}'
+            snapshot_count: '{{ base_index | int + repeat.index - 1 }}'
+        - action: rest_command.demo_camera_finished
+          data:
+            camera: zone_01
+            episode_id: '{{ episode_id }}'
+            started_at: '{{ started_at }}'
+            ended_at: '{{ ended_at }}'
+            reason: '{{ reason }}'
+            snapshot_count: '{{ snapshot_count | int }}'
+        - stop: Episode abgeschlossen
+  - choose:
+    - conditions: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and is_state(''switch.beispiel_zone_01_aufnahme'',''on'')
+        and (is_state(''binary_sensor.beispiel_zone_01_person'',''on'') or is_state(''binary_sensor.beispiel_zone_01_tier'',''on''))
+        and states(''camera.beispiel_zone_01'') not in [''unknown'',''unavailable''] }}'
+      sequence:
+      - event: demo_camera_continue
+        event_data:
+          camera: zone_01
+          episode_id: '{{ episode_id }}'
+          started_at: '{{ started_at }}'
+          next_index: '{{ base_index | int + 100 }}'
+    default:
+    - variables:
+        reason: '{{ ''recording_disabled'' if not is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') or
+          not is_state(''switch.beispiel_zone_01_aufnahme'',''on'') else ''detection_ended'' if not (is_state(''binary_sensor.beispiel_zone_01_person'',''on'')
+          or is_state(''binary_sensor.beispiel_zone_01_tier'',''on'')) else ''camera_unavailable'' }}'
+        ended_at: '{{ now().isoformat() }}'
+        snapshot_count: '{{ base_index | int + 100 }}'
+    - action: rest_command.demo_camera_finished
+      data:
+        camera: zone_01
+        episode_id: '{{ episode_id }}'
+        started_at: '{{ started_at }}'
+        ended_at: '{{ ended_at }}'
+        reason: '{{ reason }}'
+        snapshot_count: '{{ snapshot_count | int }}'

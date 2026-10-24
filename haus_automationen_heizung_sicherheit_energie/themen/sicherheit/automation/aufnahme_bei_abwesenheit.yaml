@@ -1,0 +1,240 @@
+# Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+- id: public_aufnahme_bei_abwesenheit
+  alias: Demo aufnahme bei abwesenheit
+  mode: restart
+  triggers:
+  - trigger: state
+    entity_id: person.beispiel_a
+  - trigger: state
+    entity_id: person.beispiel_b
+  - trigger: state
+    entity_id: input_boolean.demo_nacht
+  - trigger: state
+    entity_id: input_boolean.demo_sicherheit_freigabe
+  - trigger: homeassistant
+    event: start
+  - trigger: event
+    event_type: automation_reloaded
+  actions:
+  - choose:
+    - conditions: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and (is_state(''person.beispiel_a'',''not_home'')
+        and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')) and is_state(''switch.beispiel_zone_01_aufnahme'',''off'')
+        and is_state(''input_boolean.demo_aufnahme_ownership_zone_01'',''off'') }}'
+      sequence:
+      - condition: template
+        value_template: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and (is_state(''person.beispiel_a'',''not_home'')
+          and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')) and
+          is_state(''switch.beispiel_zone_01_aufnahme'',''off'') and is_state(''input_boolean.demo_aufnahme_ownership_zone_01'',''off'')
+          }}'
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.demo_aufnahme_ownership_zone_01
+      - action: switch.turn_on
+        target:
+          entity_id: switch.beispiel_zone_01_aufnahme
+    - conditions: '{{ is_state(''input_boolean.demo_aufnahme_ownership_zone_01'',''on'') and not (is_state(''input_boolean.demo_sicherheit_freigabe'',''on'')
+        and (is_state(''person.beispiel_a'',''not_home'') and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')))
+        }}'
+      sequence:
+      - if:
+        - condition: template
+          value_template: '{{ is_state(''switch.beispiel_zone_01_aufnahme'',''on'') }}'
+        then:
+        - action: switch.turn_off
+          target:
+            entity_id: switch.beispiel_zone_01_aufnahme
+        - wait_template: '{{ is_state(''switch.beispiel_zone_01_aufnahme'',''off'') }}'
+          timeout: 00:00:05
+          continue_on_timeout: true
+      - if:
+        - condition: template
+          value_template: '{{ is_state(''switch.beispiel_zone_01_aufnahme'',''off'') }}'
+        then:
+        - action: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.demo_aufnahme_ownership_zone_01
+  - choose:
+    - conditions: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and (is_state(''person.beispiel_a'',''not_home'')
+        and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')) and is_state(''switch.beispiel_zone_02_aufnahme'',''off'')
+        and is_state(''input_boolean.demo_aufnahme_ownership_zone_02'',''off'') }}'
+      sequence:
+      - condition: template
+        value_template: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and (is_state(''person.beispiel_a'',''not_home'')
+          and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')) and
+          is_state(''switch.beispiel_zone_02_aufnahme'',''off'') and is_state(''input_boolean.demo_aufnahme_ownership_zone_02'',''off'')
+          }}'
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.demo_aufnahme_ownership_zone_02
+      - action: switch.turn_on
+        target:
+          entity_id: switch.beispiel_zone_02_aufnahme
+    - conditions: '{{ is_state(''input_boolean.demo_aufnahme_ownership_zone_02'',''on'') and not (is_state(''input_boolean.demo_sicherheit_freigabe'',''on'')
+        and (is_state(''person.beispiel_a'',''not_home'') and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')))
+        }}'
+      sequence:
+      - if:
+        - condition: template
+          value_template: '{{ is_state(''switch.beispiel_zone_02_aufnahme'',''on'') }}'
+        then:
+        - action: switch.turn_off
+          target:
+            entity_id: switch.beispiel_zone_02_aufnahme
+        - wait_template: '{{ is_state(''switch.beispiel_zone_02_aufnahme'',''off'') }}'
+          timeout: 00:00:05
+          continue_on_timeout: true
+      - if:
+        - condition: template
+          value_template: '{{ is_state(''switch.beispiel_zone_02_aufnahme'',''off'') }}'
+        then:
+        - action: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.demo_aufnahme_ownership_zone_02
+  - choose:
+    - conditions: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and (is_state(''person.beispiel_a'',''not_home'')
+        and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')) and is_state(''switch.beispiel_zone_03_aufnahme'',''off'')
+        and is_state(''input_boolean.demo_aufnahme_ownership_zone_03'',''off'') }}'
+      sequence:
+      - condition: template
+        value_template: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and (is_state(''person.beispiel_a'',''not_home'')
+          and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')) and
+          is_state(''switch.beispiel_zone_03_aufnahme'',''off'') and is_state(''input_boolean.demo_aufnahme_ownership_zone_03'',''off'')
+          }}'
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.demo_aufnahme_ownership_zone_03
+      - action: switch.turn_on
+        target:
+          entity_id: switch.beispiel_zone_03_aufnahme
+    - conditions: '{{ is_state(''input_boolean.demo_aufnahme_ownership_zone_03'',''on'') and not (is_state(''input_boolean.demo_sicherheit_freigabe'',''on'')
+        and (is_state(''person.beispiel_a'',''not_home'') and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')))
+        }}'
+      sequence:
+      - if:
+        - condition: template
+          value_template: '{{ is_state(''switch.beispiel_zone_03_aufnahme'',''on'') }}'
+        then:
+        - action: switch.turn_off
+          target:
+            entity_id: switch.beispiel_zone_03_aufnahme
+        - wait_template: '{{ is_state(''switch.beispiel_zone_03_aufnahme'',''off'') }}'
+          timeout: 00:00:05
+          continue_on_timeout: true
+      - if:
+        - condition: template
+          value_template: '{{ is_state(''switch.beispiel_zone_03_aufnahme'',''off'') }}'
+        then:
+        - action: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.demo_aufnahme_ownership_zone_03
+  - choose:
+    - conditions: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and (is_state(''person.beispiel_a'',''not_home'')
+        and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')) and is_state(''switch.beispiel_zone_04_aufnahme'',''off'')
+        and is_state(''input_boolean.demo_aufnahme_ownership_zone_04'',''off'') }}'
+      sequence:
+      - condition: template
+        value_template: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and (is_state(''person.beispiel_a'',''not_home'')
+          and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')) and
+          is_state(''switch.beispiel_zone_04_aufnahme'',''off'') and is_state(''input_boolean.demo_aufnahme_ownership_zone_04'',''off'')
+          }}'
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.demo_aufnahme_ownership_zone_04
+      - action: switch.turn_on
+        target:
+          entity_id: switch.beispiel_zone_04_aufnahme
+    - conditions: '{{ is_state(''input_boolean.demo_aufnahme_ownership_zone_04'',''on'') and not (is_state(''input_boolean.demo_sicherheit_freigabe'',''on'')
+        and (is_state(''person.beispiel_a'',''not_home'') and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')))
+        }}'
+      sequence:
+      - if:
+        - condition: template
+          value_template: '{{ is_state(''switch.beispiel_zone_04_aufnahme'',''on'') }}'
+        then:
+        - action: switch.turn_off
+          target:
+            entity_id: switch.beispiel_zone_04_aufnahme
+        - wait_template: '{{ is_state(''switch.beispiel_zone_04_aufnahme'',''off'') }}'
+          timeout: 00:00:05
+          continue_on_timeout: true
+      - if:
+        - condition: template
+          value_template: '{{ is_state(''switch.beispiel_zone_04_aufnahme'',''off'') }}'
+        then:
+        - action: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.demo_aufnahme_ownership_zone_04
+  - choose:
+    - conditions: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and (is_state(''person.beispiel_a'',''not_home'')
+        and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')) and is_state(''switch.beispiel_zone_05_aufnahme'',''off'')
+        and is_state(''input_boolean.demo_aufnahme_ownership_zone_05'',''off'') }}'
+      sequence:
+      - condition: template
+        value_template: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and (is_state(''person.beispiel_a'',''not_home'')
+          and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')) and
+          is_state(''switch.beispiel_zone_05_aufnahme'',''off'') and is_state(''input_boolean.demo_aufnahme_ownership_zone_05'',''off'')
+          }}'
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.demo_aufnahme_ownership_zone_05
+      - action: switch.turn_on
+        target:
+          entity_id: switch.beispiel_zone_05_aufnahme
+    - conditions: '{{ is_state(''input_boolean.demo_aufnahme_ownership_zone_05'',''on'') and not (is_state(''input_boolean.demo_sicherheit_freigabe'',''on'')
+        and (is_state(''person.beispiel_a'',''not_home'') and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')))
+        }}'
+      sequence:
+      - if:
+        - condition: template
+          value_template: '{{ is_state(''switch.beispiel_zone_05_aufnahme'',''on'') }}'
+        then:
+        - action: switch.turn_off
+          target:
+            entity_id: switch.beispiel_zone_05_aufnahme
+        - wait_template: '{{ is_state(''switch.beispiel_zone_05_aufnahme'',''off'') }}'
+          timeout: 00:00:05
+          continue_on_timeout: true
+      - if:
+        - condition: template
+          value_template: '{{ is_state(''switch.beispiel_zone_05_aufnahme'',''off'') }}'
+        then:
+        - action: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.demo_aufnahme_ownership_zone_05
+  - choose:
+    - conditions: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and (is_state(''person.beispiel_a'',''not_home'')
+        and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')) and is_state(''switch.beispiel_zone_06_aufnahme'',''off'')
+        and is_state(''input_boolean.demo_aufnahme_ownership_zone_06'',''off'') }}'
+      sequence:
+      - condition: template
+        value_template: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and (is_state(''person.beispiel_a'',''not_home'')
+          and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')) and
+          is_state(''switch.beispiel_zone_06_aufnahme'',''off'') and is_state(''input_boolean.demo_aufnahme_ownership_zone_06'',''off'')
+          }}'
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.demo_aufnahme_ownership_zone_06
+      - action: switch.turn_on
+        target:
+          entity_id: switch.beispiel_zone_06_aufnahme
+    - conditions: '{{ is_state(''input_boolean.demo_aufnahme_ownership_zone_06'',''on'') and not (is_state(''input_boolean.demo_sicherheit_freigabe'',''on'')
+        and (is_state(''person.beispiel_a'',''not_home'') and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')))
+        }}'
+      sequence:
+      - if:
+        - condition: template
+          value_template: '{{ is_state(''switch.beispiel_zone_06_aufnahme'',''on'') }}'
+        then:
+        - action: switch.turn_off
+          target:
+            entity_id: switch.beispiel_zone_06_aufnahme
+        - wait_template: '{{ is_state(''switch.beispiel_zone_06_aufnahme'',''off'') }}'
+          timeout: 00:00:05
+          continue_on_timeout: true
+      - if:
+        - condition: template
+          value_template: '{{ is_state(''switch.beispiel_zone_06_aufnahme'',''off'') }}'
+        then:
+        - action: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.demo_aufnahme_ownership_zone_06

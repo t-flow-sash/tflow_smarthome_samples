@@ -1,0 +1,8 @@
+# Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+demo_lade_zaehler:
+  name: demo_lade_zaehler
+  min: 0
+  max: 1000000
+  step: 0.001
+  mode: box
+  unit_of_measurement: kWh

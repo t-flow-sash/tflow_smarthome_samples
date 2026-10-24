@@ -2,10 +2,7 @@
 """Generate the self-contained, synthetic HA package. No private source is imported."""
 from pathlib import Path
 import yaml
-class Secret(str):
-    pass
-
-yaml.SafeDumper.add_representer(Secret, lambda dumper, value: dumper.represent_scalar('!secret', str(value)))
+from export_topics import Secret, write as write_topics
 ROOT = Path(__file__).resolve().parents[1]
 P = ROOT / 'packages' / 'haus.yaml'
 P.parent.mkdir(exist_ok=True)
@@ -130,4 +127,5 @@ pr="{{ is_number(states('"+energy+"')) and is_number(states('"+price+"')) and 0 
 settle=[var(delta="{{ states('"+energy+"') | float(0) - states('input_number.demo_lade_zaehler') | float(0) }}"),cond("{{ 0 <= delta | float(-1) <= 100 }}"),act('input_number.set_value','input_number.demo_lade_kosten',{'value':"{{ (states('input_number.demo_lade_kosten') | float(0) + delta | float(0) * states('input_number.demo_lade_preis') | float(0)) | round(4) }}"}),act('input_number.set_value','input_number.demo_lade_energie',{'value':"{{ (states('input_number.demo_lade_energie') | float(0) + delta | float(0)) | round(3) }}"}),act('input_number.set_value','input_number.demo_lade_zaehler',{'value':"{{ states('"+energy+"') | float(0) }}"}),act('input_number.set_value','input_number.demo_lade_preis',{'value':"{{ states('"+price+"') | float(0) }}"})]
 auto('ladekosten',[st(energy),st(price),st(status),{'trigger':'time_pattern','minutes':'/1'},{'trigger':'homeassistant','event':'start'}],[cond(pr),{'choose':[{'conditions':"{{ is_state('"+status+"','charging') and is_state('input_boolean.demo_ladesitzung','off') }}",'sequence':[act('input_number.set_value','input_number.demo_lade_zaehler',{'value':"{{ states('"+energy+"') | float(0) }}"}),act('input_number.set_value','input_number.demo_lade_preis',{'value':"{{ states('"+price+"') | float(0) }}"}),act('input_number.set_value','input_number.demo_lade_kosten',{'value':0}),act('input_number.set_value','input_number.demo_lade_energie',{'value':0}),act('input_boolean.turn_on','input_boolean.demo_ladesitzung')]},{'conditions':"{{ is_state('input_boolean.demo_ladesitzung','on') }}",'sequence':settle+[{'if':[cond("{{ not is_state('"+status+"','charging') and as_timestamp(now()) - as_timestamp(states.sensor.beispiel_ladestatus.last_changed, as_timestamp(now())) >= 300 }}")],'then':[act('input_number.set_value','input_number.demo_letzte_energie',{'value':"{{ states('input_number.demo_lade_energie') | float(0) }}"}),act('input_number.set_value','input_number.demo_letzte_kosten',{'value':"{{ states('input_number.demo_lade_kosten') | float(0) }}"}),act('input_boolean.turn_off','input_boolean.demo_ladesitzung')]}]}]}],mode='single')
 P.write_text('# Generiert mit scripts/build.py; nur fiktive Entity-IDs.\n'+yaml.safe_dump(D,allow_unicode=True,sort_keys=False,width=110))
-print(f'{P}: {len(D["automation"])} automations, {len(T["sensor"])} template sensors')
+views = write_topics(ROOT, D)
+print(f'{P}: {len(D["automation"])} automations, {len(T["sensor"])} template sensors; {len(views)} topic components')

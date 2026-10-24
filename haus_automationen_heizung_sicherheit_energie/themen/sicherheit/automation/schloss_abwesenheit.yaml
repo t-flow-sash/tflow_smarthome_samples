@@ -1,0 +1,17 @@
+# Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+- id: public_schloss_abwesenheit
+  alias: Demo schloss abwesenheit
+  mode: single
+  triggers:
+  - trigger: state
+    entity_id: person.beispiel_a
+  - trigger: state
+    entity_id: person.beispiel_b
+  actions:
+  - condition: state
+    entity_id: input_boolean.demo_sicherheit_freigabe
+    state: 'on'
+  - condition: template
+    value_template: '{{ is_state(''person.beispiel_a'',''not_home'') and is_state(''person.beispiel_b'',''not_home'')
+      }}'
+  - action: script.demo_abschliessen

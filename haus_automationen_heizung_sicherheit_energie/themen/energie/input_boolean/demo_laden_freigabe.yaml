@@ -1,0 +1,4 @@
+# Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+demo_laden_freigabe:
+  name: demo_laden_freigabe
+  initial: false

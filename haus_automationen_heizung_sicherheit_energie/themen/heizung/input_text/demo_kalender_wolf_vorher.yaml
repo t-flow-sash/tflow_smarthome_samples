@@ -1,0 +1,4 @@
+# Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+demo_kalender_wolf_vorher:
+  name: demo_kalender_wolf_vorher
+  max: 50

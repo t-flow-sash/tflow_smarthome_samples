@@ -9,3 +9,38 @@ Ein extern angebundener Tibber- oder gleichwertiger Preisadapter muss `sensor.be
 Die Wallbox-Automation schreibt lediglich `switch.beispiel_wallbox_freigabe` als **Ladeerlaubnis**, niemals als Netztrennschalter. Voraussetzung sind explizite Ladefreigabe, angeschlossenes Fahrzeug, mindestens eine bekannte Person zu Hause und günstiger Preis **oder** bereits laufender Ladevorgang. Ein Preisanstieg allein bricht eine laufende Ladung nicht ab, solange die Freigabe an ist und das Fahrzeug angeschlossen bleibt. Wechselt `input_boolean.demo_laden_freigabe` auf `off`, `unknown` oder `unavailable`, wird die Ladeerlaubnis bei der Zustandsänderung entzogen; auch beim HA-Start wird sie mit dem aktuellen Freigabestatus neu abgeglichen. Schalten, Stoppen und Auswirkungen bei fehlenden Adaptern müssen mit echter Hardware sicher geprüft werden.
 
 Die Kostenschätzung beobachtet einen monotonen kumulativen kWh-Zähler, Preis und `charging`-Status. Bei Preiswechsel wird das bis dahin entstandene Delta mit dem **vorherigen** Preis verrechnet; zuletzt werden Energie und Kosten der abgeschlossenen Sitzung als Helper gespeichert. Ein fünfminütiger Stop-Watchdog, Zähler-Reset, Restarts, unbekannte Daten und Tarifgrenzen erfordern explizite Abnahme. Dies ist eine Schätzung, **keine abrechnungsfeste Messung**: kein exakter Provider-Tarifvertrag, keine garantierte zeitaufgelöste Energieverteilung, keine Beweisführung für Messstellen- oder Rechnungswerte.
+
+## Direkt kopierbare YAML-Bausteine
+
+Alle 16 Komponenten dieses Themas sind direkt anklickbar. Das [komplette Paket](../packages/haus.yaml) ist die Alternative für eine isolierte Ein-Schritt-Installation; **nicht beide Varianten zusammen laden**. [Reihenfolge und YAML-Form](setup.md#installation-aus-einzeldateien) beachten.
+
+### `automation` (2)
+
+- [`ladekosten`](../themen/energie/automation/ladekosten.yaml)
+- [`wallbox_freigabe`](../themen/energie/automation/wallbox_freigabe.yaml)
+
+### `input_boolean` (3)
+
+- [`demo_lade_zaehler_gueltig`](../themen/energie/input_boolean/demo_lade_zaehler_gueltig.yaml)
+- [`demo_laden_freigabe`](../themen/energie/input_boolean/demo_laden_freigabe.yaml)
+- [`demo_ladesitzung`](../themen/energie/input_boolean/demo_ladesitzung.yaml)
+
+### `input_number` (6)
+
+- [`demo_lade_energie`](../themen/energie/input_number/demo_lade_energie.yaml)
+- [`demo_lade_kosten`](../themen/energie/input_number/demo_lade_kosten.yaml)
+- [`demo_lade_preis`](../themen/energie/input_number/demo_lade_preis.yaml)
+- [`demo_lade_zaehler`](../themen/energie/input_number/demo_lade_zaehler.yaml)
+- [`demo_letzte_energie`](../themen/energie/input_number/demo_letzte_energie.yaml)
+- [`demo_letzte_kosten`](../themen/energie/input_number/demo_letzte_kosten.yaml)
+
+### `sensor` (2)
+
+- [`demo_ecoflow_entladung_energie`](../themen/energie/sensor/demo_ecoflow_entladung_energie.yaml)
+- [`demo_ecoflow_ladung_energie`](../themen/energie/sensor/demo_ecoflow_ladung_energie.yaml)
+
+### `template` (3)
+
+- [`demo_ecoflow_entladung`](../themen/energie/template/demo_ecoflow_entladung.yaml)
+- [`demo_ecoflow_ladung`](../themen/energie/template/demo_ecoflow_ladung.yaml)
+- [`demo_preis_guenstig`](../themen/energie/template/demo_preis_guenstig.yaml)

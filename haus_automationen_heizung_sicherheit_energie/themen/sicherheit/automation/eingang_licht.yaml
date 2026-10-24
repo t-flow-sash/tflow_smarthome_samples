@@ -1,0 +1,19 @@
+# Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+- id: public_eingang_licht
+  alias: Demo eingang licht
+  mode: restart
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.beispiel_eingang_bewegung
+    to: 'on'
+  actions:
+  - condition: state
+    entity_id: input_boolean.demo_sicherheit_freigabe
+    state: 'on'
+  - action: light.turn_on
+    target:
+      entity_id: light.beispiel_eingang
+  - delay: 00:03:00
+  - action: light.turn_off
+    target:
+      entity_id: light.beispiel_eingang

@@ -1,0 +1,8 @@
+# Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+- binary_sensor:
+  - name: Demo W600 01 gueltig
+    state: '{% set c = states(''climate.beispiel_w600_01'') %}{% set v = states(''sensor.beispiel_w600_01_ventil'')
+      %}{% set x = states.sensor.beispiel_w600_01_ventil %}{{ c not in [''unknown'',''unavailable''] and is_number(state_attr(''climate.beispiel_w600_01'',''temperature''))
+      and is_number(state_attr(''climate.beispiel_w600_01'',''current_temperature'')) and is_number(v) and 0 <=
+      v | float(-1) <= 100 and x is not none and 0 <= as_timestamp(now()) - as_timestamp(x.last_reported, 0) <=
+      21600 }}'

@@ -1,0 +1,2 @@
+# Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+demo_camera_maintain: python3 /config/demo_camera_media.py maintain
