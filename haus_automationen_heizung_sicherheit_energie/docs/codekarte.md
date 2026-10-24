@@ -28,7 +28,7 @@ Weitere Lieferartefakte:
 | Datei | Rolle |
 |---|---|
 | [packages/haus.yaml](../packages/haus.yaml) | Generiertes HA-Paket: 16 Automationen, `demo_abschliessen`-Skript, Freigabe-/Ownership-/Kosten-Helper, Template-/Integrationssensoren, `rest_command` und `shell_command`. |
-| [scripts/build.py](../scripts/build.py) | Generator; nach Änderungen erneut laufen lassen und Paket-Diff prüfen. |
+| [scripts/build.py](../scripts/build.py) | Generator; standardmäßig nur Bytevergleich ohne Schreiben. Regeneration ausschließlich mit `--unsafe-regenerate` in vertrauenswürdiger, nicht parallel beschreibbarer Kopie; danach Diff prüfen. |
 | [configuration.yaml](../configuration.yaml) | Ausschließlich leere isolierte Testinstanz; nie bestehende Config überschreiben. |
 | [scripts/camera_media.py](../scripts/camera_media.py) | Lokales `prepare`/`maintain` für `/media`-JPEG-Verzeichnisse und Retention. |
 | [scripts/camera_episode_receiver.py](../scripts/camera_episode_receiver.py) | JSON-stdin-Validator/Dateiselektor, **kein** HTTP-Server/AI-Worker. |

@@ -174,6 +174,33 @@ def _walk(root_fd, parts, stack, *, create=False):
 
 
 def write(root, package):
+    """Check checked-in exports without ever creating or modifying a path.
+
+    No inode/ancestor preflight can make a later mutation safe against a
+    concurrent rename of an already-open directory to an external location.
+    """
+    expected = render(package)
+    with ExitStack() as stack:
+        root_fd = stack.enter_context(_closing_fd(os.open(root, DIR_FLAGS)))
+        theme = _directory(root_fd, 'themen', stack)
+        observed = []
+        _scan(theme, Path('themen'), expected, observed)
+        if observed:
+            raise ValueError(f'Stale generated exports require manual removal: {observed}')
+        for relative, text in expected.items():
+            with ExitStack() as inspect:
+                directory = _walk(root_fd, relative.parts[:-1], inspect)
+                if not _unchanged_file(directory, relative.name, text.encode('utf-8')):
+                    raise ValueError(f'Export missing or changed: {relative}')
+    return expected
+
+
+def unsafe_write(root, package):
+    """Explicit operator-only regeneration in a quiescent, trusted workspace.
+
+    Not a security boundary against concurrent directory rename; never invoke
+    on an untrusted or concurrently writable output tree.
+    """
     expected = render(package)
     # All paths below are relative to stable directory descriptors. O_NOFOLLOW
     # prevents symlink replacement between inspection and opening a directory.

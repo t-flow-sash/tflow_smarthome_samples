@@ -159,7 +159,7 @@ class TopicExport(unittest.TestCase):
             theme.mkdir()
             human = theme / 'notes.yaml'
             human.write_text('owned: human\n')
-            export.write(root, small_package())
+            export.unsafe_write(root, small_package())
             self.assertEqual(human.read_text(), 'owned: human\n')
             expected = theme / 'sicherheit' / 'automation' / 'demo.yaml'
             expected.write_text('owned: human\n')
@@ -202,7 +202,7 @@ class TopicExport(unittest.TestCase):
 
             with patch.object(export, '_walk', side_effect=swap_before_publish):
                 try:
-                    export.write(root, small_package())
+                    export.unsafe_write(root, small_package())
                 except ValueError:
                     pass  # Refusal is permitted, but modifying the human file is not.
             self.assertTrue(swapped)
@@ -260,7 +260,7 @@ class TopicExport(unittest.TestCase):
 
             with patch.object(export, '_directory', side_effect=swap_before_open):
                 with self.assertRaises(ValueError):
-                    export.write(root, small_package())
+                    export.unsafe_write(root, small_package())
             self.assertTrue(swapped)
             self.assertEqual({p.name: p.read_bytes() for p in external.iterdir()},
                              {'sentinel.yaml': b'private: preserve\n'})
@@ -283,7 +283,7 @@ class TopicExport(unittest.TestCase):
 
             with patch.object(export, '_walk', side_effect=inject_leaf):
                 with self.assertRaises(ValueError):
-                    export.write(root, small_package())
+                    export.unsafe_write(root, small_package())
             self.assertTrue(injected)
             self.assertEqual(target.read_text(), 'owned: human\n')
 
@@ -299,6 +299,84 @@ class TopicExport(unittest.TestCase):
             copy = Path(tmp) / 'haus.yaml'
             copy.write_bytes(before[ROOT / 'packages/haus.yaml'])
             self.assertEqual(copy.read_bytes(), (ROOT / 'packages/haus.yaml').read_bytes())
+
+    def test_default_export_rename_after_open_never_creates_external_file(self):
+        from unittest.mock import patch
+        with TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            root = base / 'repo'
+            topic = root / 'themen/sicherheit'
+            topic.mkdir(parents=True)
+            external = base / 'external'
+            external.mkdir()
+            sentinel = external / 'sentinel.yaml'
+            sentinel.write_bytes(b'private: preserve\n')
+            (topic / 'automation').mkdir()
+            original_directory = export._directory
+            swapped = False
+
+            def adversarial_directory(parent, name, stack, *, create=False):
+                nonlocal swapped
+                fd = original_directory(parent, name, stack, create=create)
+                if name == 'sicherheit' and not swapped:
+                    topic.rename(external / 'stolen-topic')
+                    topic.symlink_to(external, target_is_directory=True)
+                    swapped = True
+                return fd
+
+            with patch.object(export, '_directory', side_effect=adversarial_directory):
+                with self.assertRaises(ValueError):
+                    export.write(root, small_package())
+            self.assertTrue(swapped)
+            self.assertEqual(sentinel.read_bytes(), b'private: preserve\n')
+            self.assertEqual({p.relative_to(external) for p in external.rglob('*')},
+                             {Path('sentinel.yaml'), Path('stolen-topic'),
+                              Path('stolen-topic/automation')})
+
+    def test_default_build_is_read_only_even_with_missing_package(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / 'packages').mkdir()
+            (root / 'themen').mkdir()
+            # The source script is run with an isolated target root, never our checkout.
+            result = subprocess.run([sys.executable, '-B', str(ROOT / 'scripts/build.py'),
+                                     '--verify-root', str(root)], cwd=ROOT, capture_output=True,
+                                    text=True, env={'PYTHONDONTWRITEBYTECODE': '1'})
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn('Package missing or changed', result.stderr)
+            self.assertEqual(set(root.rglob('*')),
+                             {root / 'packages', root / 'themen'})
+
+    def test_rename_after_leaf_check_cannot_create_external_export(self):
+        from unittest.mock import patch
+        with TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            root = base / 'repo'
+            topic = root / 'themen/sicherheit'
+            (topic / 'automation').mkdir(parents=True)
+            external = base / 'external'
+            external.mkdir()
+            (external / 'sentinel.yaml').write_bytes(b'private: preserve\n')
+            original = export._unchanged_file
+            swapped = False
+
+            def rename_after_check(directory, name, content):
+                nonlocal swapped
+                unchanged = original(directory, name, content)
+                if name == 'demo.yaml' and not swapped:
+                    topic.rename(external / 'stolen-topic')
+                    topic.symlink_to(external, target_is_directory=True)
+                    swapped = True
+                return unchanged
+
+            with patch.object(export, '_unchanged_file', side_effect=rename_after_check):
+                with self.assertRaises(ValueError):
+                    export.write(root, small_package())
+            self.assertTrue(swapped)
+            self.assertEqual((external / 'sentinel.yaml').read_bytes(), b'private: preserve\n')
+            self.assertEqual({p.relative_to(external) for p in external.rglob('*')},
+                             {Path('sentinel.yaml'), Path('stolen-topic'),
+                              Path('stolen-topic/automation')})
 
 
 if __name__ == '__main__':
