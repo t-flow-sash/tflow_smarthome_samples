@@ -1,4 +1,12 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: input_number.demo_letzte_kosten
+# Zweck: Speichert Kosten der abgeschlossenen Ladesitzung.
+# Nutzen: Erhält Kosten der abgeschlossenen Ladesitzung über Reloads als HA-Helper.
+# Einbau: Diesen einen Schlüssel in das Mapping input_number: mergen (z. B. configuration.yaml oder passender Mapping-Include); nicht die ganze Domain ersetzen.
+# Abhängigkeiten: automation.ladekosten und input_number.demo_lade_kosten
+# Anpassen: EUR-Darstellung für den eigenen Adapter prüfen.
+# Sicherheitsgrenze: Beispielrechnung, keine eichrechtskonforme Abrechnung; ungültige Messwerte nicht fortschreiben.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 demo_letzte_kosten:
   name: demo_letzte_kosten
   min: 0

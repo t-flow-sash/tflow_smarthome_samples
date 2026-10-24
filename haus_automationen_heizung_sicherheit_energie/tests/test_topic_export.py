@@ -13,6 +13,7 @@ import yaml
 from test_contract import Loader, ROOT
 
 EXPORT = ROOT / 'themen'
+sys.path.insert(0, str(ROOT / 'scripts'))  # Dynamic exporter import resolves its canonical notes module.
 spec = importlib.util.spec_from_file_location('export_topics', ROOT / 'scripts/export_topics.py')
 assert spec is not None and spec.loader is not None
 export = importlib.util.module_from_spec(spec)
@@ -80,6 +81,122 @@ class TopicExport(unittest.TestCase):
                                  Counter(key(x) for x in original))
                 self.assertEqual({key(x): x for x in reconstructed},
                                  {key(x): x for x in original})
+
+    def test_component_comments_are_specific_complete_and_match_install_shape(self):
+        canonical = yaml.load((ROOT / 'packages/haus.yaml').read_text(encoding='utf-8'), Loader=ExportLoader)
+        components = {(domain, key): value for domain, key, value in export.pieces(canonical)}
+        self.assertEqual(set(components), set(export.component_notes.NOTES), 'Every note must describe one actual component')
+        for (domain, key), value in components.items():
+            path = Path('themen') / export.topic(domain, key) / domain / export.filename(domain, key)
+            with self.subTest(path=path):
+                text = (ROOT / path).read_text(encoding='utf-8')
+                header = text.splitlines()[0] + '\n' + export.component_notes.comment(domain, key)
+                self.assertTrue(text.startswith(header), 'Header must be generated canonically before YAML')
+                self.assertEqual(text[len(header):], yaml.safe_dump(
+                    value, allow_unicode=True, sort_keys=False, width=110),
+                    'The comment must not alter or reformat the generated YAML body')
+                self.assertIn(f'# Baustein: {domain}.{key}', header)
+                for field in ('Zweck', 'Nutzen', 'Einbau', 'Abhängigkeiten', 'Anpassen', 'Sicherheitsgrenze'):
+                    match = re.search(rf'^# {field}: (.+)$', header, re.MULTILINE)
+                    self.assertIsNotNone(match, field)
+                    if match is not None:
+                        self.assertGreater(len(match.group(1)), 20, field)
+                self.assertIn('packages/haus.yaml', header)
+                self.assertIn('niemals beide parallel', header)
+                self.assertIn(f'{domain}:', header)
+                self.assertIn(key, header.splitlines()[1])
+                note = export.component_notes.NOTES[(domain, key)]
+                self.assertEqual(len(note), 6)
+                self.assertEqual(len(set(note) - {''}), 6 if domain == 'automation' else 5,
+                                 'Purpose, benefit, dependency, adaptation and safety must differ')
+                if domain in ('automation', 'template', 'sensor'):
+                    self.assertIn('Listenelement', header)
+                    self.assertNotIn('Mapping-Include', header)
+                else:
+                    self.assertIn('Mapping', header)
+                    self.assertNotIn('Listenelement', header)
+                if domain == 'automation':
+                    self.assertRegex(header, r'(?m)^# Wann: .{15,}$')
+                self.assertEqual(yaml.load(text, Loader=ExportLoader), value)
+
+    def test_representative_comments_explain_behavior_and_constraints(self):
+        expected = {
+            'heizung/automation/wolf_shadow.yaml': ('fünf Minuten', 'ohne einen Wolf-Aktor'),
+            'heizung/automation/kalender_abwesenheit.yaml': ('ganztägiges Ende ist exklusiv', 'calendar.get_events'),
+            'sicherheit/automation/kamera_zone_04.yaml': ('Akku-Kamera', 'Best-Effort-Fortsetzung'),
+            'energie/automation/wallbox_freigabe.yaml': ('Preis-Hysterese', 'Widerruf'),
+            'energie/automation/ladekosten.yaml': ('Zählerrücksprung', 'EUR/kWh'),
+            'sicherheit/rest_command/demo_camera_finished.yaml': ('!secret', 'Zustellgarantie'),
+        }
+        for relative, terms in expected.items():
+            text = (EXPORT / relative).read_text(encoding='utf-8')
+            for term in terms:
+                with self.subTest(path=relative, term=term):
+                    self.assertIn(term, text)
+
+    def test_safety_notes_match_parsed_actuation_and_restoration_limits(self):
+        canonical = yaml.load((ROOT / 'packages/haus.yaml').read_text(encoding='utf-8'), Loader=ExportLoader)
+        automations = {item['id'].removeprefix('public_'): item for item in canonical['automation']}
+        calendar = automations['kalender_abwesenheit']['actions'][-1]['choose'][1]['sequence']
+        bt_return = calendar[0]
+        self.assertEqual(bt_return['if'][1]['entity_id'], 'input_boolean.demo_kalender_ownership')
+        self.assertEqual(bt_return['then'][1]['data']['preset_mode'], 'none')
+        self.assertNotIn('preset_mode', str(bt_return['then'][0]),
+                         'No attribute check before resetting BT presets')
+        calendar_note = export.component_notes.comment('input_boolean', 'demo_kalender_ownership')
+        self.assertIn('Readback', calendar_note)
+        self.assertIn('keine', calendar_note.lower())
+        self.assertIn('manuell', calendar_note.lower())
+        self.assertNotIn('Schützt fremd gesetzte Presets', calendar_note)
+        self.assertNotIn('stellt nur nach eigenem Readback bestätigte Zustände zurück',
+                             export.component_notes.comment('automation', 'kalender_abwesenheit'))
+        self.assertIn('ohne erneuten Preset-Vergleich',
+                      export.component_notes.comment('automation', 'kalender_abwesenheit'))
+        wolf_note = export.component_notes.comment('input_boolean', 'demo_wolf_ownership')
+        self.assertIn('keine Erkennung fremder Änderungen', wolf_note)
+        self.assertIn('Keine Herkunftserkennung',
+                      export.component_notes.comment('input_text', 'demo_kalender_wolf_vorher'))
+        self.assertEqual(canonical['input_boolean']['demo_lade_zaehler_gueltig'],
+                         {'name': 'demo_lade_zaehler_gueltig'})
+        self.assertNotIn('demo_lade_zaehler_gueltig', str(automations['ladekosten']))
+        cost_note = export.component_notes.comment('input_boolean', 'demo_lade_zaehler_gueltig')
+        self.assertIn('nicht als aktiver', cost_note)
+        self.assertIn('keine aktive Sperre', cost_note)
+        receiver_note = export.component_notes.comment('rest_command', 'demo_camera_finished')
+        self.assertIn('keine dauerhafte Zustellgarantie', receiver_note)
+        self.assertNotIn('garantierte Zustellung', receiver_note)
+        for zone in range(1, 7):
+            z = f'zone_{zone:02}'
+            recording = automations['aufnahme_bei_abwesenheit']['actions']
+            self.assertTrue(any(z in str(action) for action in recording))
+            note = export.component_notes.comment('input_boolean', f'demo_aufnahme_ownership_{z}')
+            self.assertIn('keine', note.lower())
+            self.assertIn('manuell', note.lower())
+
+    def test_stored_tariff_comment_matches_billing_before_price_update(self):
+        canonical = yaml.load((ROOT / 'packages/haus.yaml').read_text(encoding='utf-8'), Loader=ExportLoader)
+        cost = next(item for item in canonical['automation'] if item['id'] == 'public_ladekosten')
+        start, ongoing = cost['actions'][1]['choose'][:2]
+        start_price = next(action for action in start['sequence']
+                           if action.get('target', {}).get('entity_id') == 'input_number.demo_lade_preis')
+        self.assertIn('sensor.beispiel_tibber_eur_kwh', start_price['data']['value'])
+        steps = ongoing['sequence']
+        billed_at = next(i for i, step in enumerate(steps)
+                         if step.get('target', {}).get('entity_id') == 'input_number.demo_lade_kosten')
+        updated_at = next(i for i, step in enumerate(steps)
+                          if step.get('target', {}).get('entity_id') == 'input_number.demo_lade_preis')
+        self.assertLess(billed_at, updated_at, 'Settle with stored tariff before replacing it')
+        self.assertIn('input_number.demo_lade_preis', steps[billed_at]['data']['value'])
+        self.assertIn('sensor.beispiel_tibber_eur_kwh', steps[updated_at]['data']['value'])
+
+        note = export.component_notes.comment('input_number', 'demo_lade_preis')
+        self.assertIn('aktuell im Helper hinterlegten Tarif', note)
+        self.assertIn('künftige Verbrauchsdifferenzen', note)
+        self.assertIn('Beim Preiswechsel', note)
+        self.assertIn('bisher gespeicherten Preis', note)
+        self.assertNotIn('zuletzt verbuchten Teilstrecke', note)
+        leaf = (EXPORT / 'energie/input_number/demo_lade_preis.yaml').read_text(encoding='utf-8')
+        self.assertTrue(leaf.startswith(leaf.splitlines()[0] + '\n' + note))
 
     def test_all_topic_yaml_linked_once_in_correct_theme_and_readme_navigation(self):
         used = []

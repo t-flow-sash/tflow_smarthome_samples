@@ -1,4 +1,12 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: template.Demo W600 01 halten
+# Zweck: Erkennt Heizen mit Ventilöffnung ab 30 %. (W600 01)
+# Nutzen: Hält bestehenden Shadow-Bedarf, ohne ständig neu zu starten.
+# Einbau: Als einzelnes Listenelement an die template:-Liste anhängen; nicht als Mapping einrücken.
+# Abhängigkeiten: climate.beispiel_w600_01, sensor.beispiel_w600_01_ventil, binary_sensor.demo_w600_01_gueltig
+# Anpassen: W600 01: Raum- und Ventil-Entity sowie Grenzwerte prüfen.
+# Sicherheitsgrenze: Nur gültige Messwerte dürfen den Bedarf halten.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 - binary_sensor:
   - name: Demo W600 01 halten
     state: '{{ is_state(''binary_sensor.demo_w600_01_gueltig'',''on'') and state_attr(''climate.beispiel_w600_01'',''hvac_action'')

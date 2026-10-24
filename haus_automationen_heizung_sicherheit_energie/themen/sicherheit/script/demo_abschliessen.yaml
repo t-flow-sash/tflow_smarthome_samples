@@ -1,4 +1,12 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: script.demo_abschliessen
+# Zweck: Schließt das Eingangsschloss erst nach Freigabe, Abwesenheit und geschlossenem Türkontakt.
+# Nutzen: Erlaubt der Abwesenheitsautomation eine kontrollierte Verriegelung mit Readback.
+# Einbau: Diesen einen Schlüssel in das Mapping script: mergen (z. B. configuration.yaml oder passender Mapping-Include); nicht die ganze Domain ersetzen.
+# Abhängigkeiten: input_boolean.demo_sicherheit_freigabe, person.beispiel_a/b, binary_sensor.beispiel_tuer_offen und lock.beispiel_eingang.
+# Anpassen: Schloss, Türkontakt und Personen durch verifizierte Test-Entities ersetzen.
+# Sicherheitsgrenze: Nie entriegeln; unbekannte Präsenz/Türzustände sperren den Befehl.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 demo_abschliessen:
   alias: Demo abschliessen
   sequence:

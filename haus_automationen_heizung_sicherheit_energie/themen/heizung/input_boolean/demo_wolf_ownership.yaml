@@ -1,3 +1,11 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: input_boolean.demo_wolf_ownership
+# Zweck: Merkt den nach eigenem Select-Schreibversuch zurückgelesenen Wolf-Standby-Wechsel.
+# Nutzen: Markiert eine mögliche Rücknahme auf Auto bei Abwesenheitsende, wenn die zuvor gelesene Option Auto war.
+# Einbau: Diesen einen Schlüssel in das Mapping input_boolean: mergen (z. B. configuration.yaml oder passender Mapping-Include); nicht die ganze Domain ersetzen.
+# Abhängigkeiten: automation.kalender_abwesenheit und select.beispiel_wolf_dhk.
+# Anpassen: Nach Neustart Ownership/Readback vor Auto-Rücknahme prüfen; keine Erkennung fremder Änderungen zwischen zwei Readbacks.
+# Sicherheitsgrenze: Freigaben mit initial: false starten aus; Ownership-/Zustandsmerker ohne initial können nach Neustart wiederhergestellt werden.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 demo_wolf_ownership:
   name: demo_wolf_ownership

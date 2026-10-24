@@ -1,4 +1,12 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: rest_command.demo_camera_finished
+# Zweck: Sendet einen Kamera-Episodenabschluss als JSON an den externen Empfänger.
+# Nutzen: Übergibt Episode, Ende, Grund und Bildanzahl für eine mögliche nachgelagerte Verarbeitung.
+# Einbau: Diesen einen Schlüssel in das Mapping rest_command: mergen (z. B. configuration.yaml oder passender Mapping-Include); nicht die ganze Domain ersetzen.
+# Abhängigkeiten: Externes authentifiziertes HTTPS-Gateway; !secret demo_camera_webhook_url und demo_camera_webhook_token.
+# Anpassen: Nur eigene HTTPS-URL und Token in nicht versionierter secrets.yaml setzen; Empfängervertrag prüfen.
+# Sicherheitsgrenze: Kein mitgelieferter AI-/Netzwerkdienst, keine dauerhafte Zustellgarantie; Bildzugriff separat absichern.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 demo_camera_finished:
   url: !secret 'demo_camera_webhook_url'
   method: post

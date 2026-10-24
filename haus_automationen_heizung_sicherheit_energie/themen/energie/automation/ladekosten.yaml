@@ -1,4 +1,13 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: automation.ladekosten
+# Zweck: Verbucht gemessene Ladedifferenzen mit dem zuletzt gespeicherten Tarif.
+# Nutzen: Stellt Sitzungsenergie, Beispielkosten und letzten Abschluss dar; beim Preiswechsel gilt der zuvor gespeicherte Preis für die seit dem letzten Zählerstand gemessene Differenz.
+# Wann: Bei Zähler-/Preis-/Ladestatuswechsel, minütlich und bei HA-Start.
+# Einbau: Als einzelnes Listenelement an automation: (automations.yaml) anhängen; nicht als Mapping einrücken.
+# Abhängigkeiten: sensor.beispiel_wallbox_kwh, sensor.beispiel_tibber_eur_kwh, sensor.beispiel_ladestatus, input_boolean.demo_ladesitzung und Lade-/Letzte-Helper.
+# Anpassen: Zähler in kWh, Preis in EUR/kWh, Statuswort charging und Zeitgrenze prüfen.
+# Sicherheitsgrenze: Ungültige Werte oder Zählerrücksprung stoppen die Verbuchung; demo_lade_zaehler_gueltig ist kein aktives Gate; keine eichrechtskonforme Abrechnung.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 - id: public_ladekosten
   alias: Demo ladekosten
   mode: single

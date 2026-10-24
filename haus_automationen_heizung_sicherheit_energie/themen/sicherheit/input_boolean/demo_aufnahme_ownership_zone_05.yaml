@@ -1,3 +1,11 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: input_boolean.demo_aufnahme_ownership_zone_05
+# Zweck: Merkt ausschließlich die von der Abwesenheitsautomation beanspruchte Aufnahme in zone_05.
+# Nutzen: Vermeidet das Abschalten von bereits bei Start eingeschalteten Aufnahmen in zone_05, wenn der Marker aus ist.
+# Einbau: Diesen einen Schlüssel in das Mapping input_boolean: mergen (z. B. configuration.yaml oder passender Mapping-Include); nicht die ganze Domain ersetzen.
+# Abhängigkeiten: automation.aufnahme_bei_abwesenheit und switch.beispiel_zone_05_aufnahme.
+# Anpassen: Ownership-Zuordnung für Kamera zone_05 nach Neustart prüfen.
+# Sicherheitsgrenze: Keine sichere Erkennung manueller Änderungen nach der Übernahme; nicht selbst als Zustimmung zur Aufzeichnung verwenden.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 demo_aufnahme_ownership_zone_05:
   name: demo_aufnahme_ownership_zone_05

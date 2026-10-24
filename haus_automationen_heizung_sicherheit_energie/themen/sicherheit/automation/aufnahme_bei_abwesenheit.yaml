@@ -1,4 +1,13 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: automation.aufnahme_bei_abwesenheit
+# Zweck: Gleicht sechs Aufnahme-Schalter mit Nacht- oder bestätigter Abwesenheit ab.
+# Nutzen: Lässt nur selbst beanspruchte Aufnahme-Schalter beim Widerruf wieder los.
+# Wann: Bei Personen-/Nacht-/Freigabewechsel, HA-Start und Reload.
+# Einbau: Als einzelnes Listenelement an automation: (automations.yaml) anhängen; nicht als Mapping einrücken.
+# Abhängigkeiten: person.beispiel_a/b, input_boolean.demo_nacht, demo_sicherheit_freigabe, sechs switch.beispiel_zone_XX_aufnahme und zugehörige Ownership-Helper.
+# Anpassen: Zonen, Person-IDs und Aufnahme-Entity-IDs den eigenen Integrationen zuordnen.
+# Sicherheitsgrenze: Unbekannte Präsenz gilt nicht als Abwesenheit; Ownership-Markierung und physischer Switch-Befehl sind nicht atomar.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 - id: public_aufnahme_bei_abwesenheit
   alias: Demo aufnahme bei abwesenheit
   mode: restart

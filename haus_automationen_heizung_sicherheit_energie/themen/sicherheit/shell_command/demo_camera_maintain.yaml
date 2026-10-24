@@ -1,2 +1,10 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: shell_command.demo_camera_maintain
+# Zweck: Startet den lokalen Medienhelfer mit maintain.
+# Nutzen: Bereinigt alte Kameraaufnahmen nach lokalem Aufbewahrungsvertrag.
+# Einbau: Diesen einen Schlüssel in das Mapping shell_command: mergen (z. B. configuration.yaml oder passender Mapping-Include); nicht die ganze Domain ersetzen.
+# Abhängigkeiten: scripts/camera_media.py muss als /config/demo_camera_media.py installiert sein; /media/demo_camera vorbereiten.
+# Anpassen: Interpreterpfad, Rechte und Retention vor Aktivierung prüfen.
+# Sicherheitsgrenze: Kein garantierter Löschzeitpunkt; keinen fremdbeschreibbaren Skriptpfad verwenden.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 demo_camera_maintain: python3 /config/demo_camera_media.py maintain

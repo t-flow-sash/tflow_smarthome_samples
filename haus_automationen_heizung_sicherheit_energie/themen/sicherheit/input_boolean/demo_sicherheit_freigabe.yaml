@@ -1,4 +1,12 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: input_boolean.demo_sicherheit_freigabe
+# Zweck: Erlaubt Sicherheits-, Kamera-, Schloss- und Lichtaktionen.
+# Nutzen: Startet alle physischen Sicherheitspfade standardmäßig gesperrt.
+# Einbau: Diesen einen Schlüssel in das Mapping input_boolean: mergen (z. B. configuration.yaml oder passender Mapping-Include); nicht die ganze Domain ersetzen.
+# Abhängigkeiten: Sicherheitsautomationen, script.demo_abschliessen, Kamera-/Schloss-/Licht-Adapter.
+# Anpassen: Vor Aktivierung alle Aktoren und Widerrufspfade isoliert testen.
+# Sicherheitsgrenze: Freigaben mit initial: false starten aus; Ownership-/Zustandsmerker ohne initial können nach Neustart wiederhergestellt werden.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 demo_sicherheit_freigabe:
   name: demo_sicherheit_freigabe
   initial: false

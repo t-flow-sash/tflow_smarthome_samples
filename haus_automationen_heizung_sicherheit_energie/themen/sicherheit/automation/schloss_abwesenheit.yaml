@@ -1,4 +1,13 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: automation.schloss_abwesenheit
+# Zweck: Ruft das Abschließ-Skript nur bei gesicherter Abwesenheit auf.
+# Nutzen: Vermeidet einen Schlossbefehl bei unklarer Anwesenheit.
+# Wann: Bei Zustandswechsel einer der beiden Personen.
+# Einbau: Als einzelnes Listenelement an automation: (automations.yaml) anhängen; nicht als Mapping einrücken.
+# Abhängigkeiten: person.beispiel_a/b, input_boolean.demo_sicherheit_freigabe und script.demo_abschliessen.
+# Anpassen: Personen und Schloss-Skript der Testanlage zuordnen.
+# Sicherheitsgrenze: Nur abschließen, niemals automatisch aufschließen; vor echtem Schlossbetrieb Türkontakt/Readback prüfen.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 - id: public_schloss_abwesenheit
   alias: Demo schloss abwesenheit
   mode: single

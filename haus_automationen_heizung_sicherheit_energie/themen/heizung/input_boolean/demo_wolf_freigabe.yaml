@@ -1,4 +1,12 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: input_boolean.demo_wolf_freigabe
+# Zweck: Erlaubt ausschließlich den Wolf-Select-Zweig der Kalenderautomation.
+# Nutzen: Trennt Kesselzustimmung von der BT-Raumfreigabe.
+# Einbau: Diesen einen Schlüssel in das Mapping input_boolean: mergen (z. B. configuration.yaml oder passender Mapping-Include); nicht die ganze Domain ersetzen.
+# Abhängigkeiten: automation.kalender_abwesenheit und select.beispiel_wolf_dhk.
+# Anpassen: Nur nach Auto/Standby-Readback einschalten; kein Warmwasser-Select.
+# Sicherheitsgrenze: Freigaben mit initial: false starten aus; Ownership-/Zustandsmerker ohne initial können nach Neustart wiederhergestellt werden.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 demo_wolf_freigabe:
   name: demo_wolf_freigabe
   initial: false

@@ -1,3 +1,11 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: input_boolean.demo_nacht
+# Zweck: Signalisiert der Aufnahmeautomation einen Nachtbedarf.
+# Nutzen: Erlaubt Aufzeichnung unabhängig von bestätigter Abwesenheit.
+# Einbau: Diesen einen Schlüssel in das Mapping input_boolean: mergen (z. B. configuration.yaml oder passender Mapping-Include); nicht die ganze Domain ersetzen.
+# Abhängigkeiten: automation.aufnahme_bei_abwesenheit, Sicherheitsfreigabe und sechs Aufnahme-Adapter.
+# Anpassen: Nachtstatus und Datenschutzregeln vor Aufzeichnungsfreigabe prüfen.
+# Sicherheitsgrenze: Freigaben mit initial: false starten aus; Ownership-/Zustandsmerker ohne initial können nach Neustart wiederhergestellt werden.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 demo_nacht:
   name: demo_nacht

@@ -1,4 +1,13 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: automation.wolf_shadow
+# Zweck: Berechnet Heizbedarf aus gewichteten Raumwerten und setzt den reinen Shadow-Merker.
+# Nutzen: Macht den Wärmebedarf sichtbar, ohne einen Wolf-Aktor zu schalten.
+# Wann: Bei stabiler Start-/Komfortanforderung, Haltesignal, HA-Start oder Automation-Reload; Rücknahme erst nach fünf Minuten ohne Bedarf.
+# Einbau: Als einzelnes Listenelement an automation: (automations.yaml) anhängen; nicht als Mapping einrücken.
+# Abhängigkeiten: Shadow-Templates, input_boolean.demo_shadow; externe Better-Thermostat- und W600-Raumwerte.
+# Anpassen: Raumgewichte, Gültigkeitsgrenzen und Schwellwerte an die Anlage anpassen.
+# Sicherheitsgrenze: Kein direkter Kesselbefehl; Shadow ist nur ein Bedarfssignal.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 - id: public_wolf_shadow
   alias: Demo wolf shadow
   mode: restart

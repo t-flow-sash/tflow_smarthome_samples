@@ -1,4 +1,12 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: input_text.demo_wolf_ziel
+# Zweck: Reserviert Text für ein mögliches Wolf-Ziel.
+# Nutzen: Dokumentiert einen Erweiterungspunkt; keine Automation nutzt ihn im Beispiel.
+# Einbau: Diesen einen Schlüssel in das Mapping input_text: mergen (z. B. configuration.yaml oder passender Mapping-Include); nicht die ganze Domain ersetzen.
+# Abhängigkeiten: Keine aktive Laufzeitabhängigkeit; Wolf-Adapter nur bei eigener Erweiterung.
+# Anpassen: Vor zusätzlicher Nutzung erlaubte Optionen und Ownership definieren.
+# Sicherheitsgrenze: Nicht als bereits wirksame Kesselsteuerung ausgeben.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 demo_wolf_ziel:
   name: demo_wolf_ziel
   max: 50

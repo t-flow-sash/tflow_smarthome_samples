@@ -1,4 +1,12 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: input_number.demo_lade_kosten
+# Zweck: Speichert aufgelaufene Sitzungskosten.
+# Nutzen: Erhält aufgelaufene Sitzungskosten über Reloads als HA-Helper.
+# Einbau: Diesen einen Schlüssel in das Mapping input_number: mergen (z. B. configuration.yaml oder passender Mapping-Include); nicht die ganze Domain ersetzen.
+# Abhängigkeiten: automation.ladekosten und input_number.demo_lade_preis
+# Anpassen: EUR-Betragsbereich und Rundung für den eigenen Adapter prüfen.
+# Sicherheitsgrenze: Beispielrechnung, keine eichrechtskonforme Abrechnung; ungültige Messwerte nicht fortschreiben.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 demo_lade_kosten:
   name: demo_lade_kosten
   min: 0

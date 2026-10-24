@@ -1,3 +1,11 @@
 # Generiert mit scripts/build.py; nur fiktive Entity-IDs.
+# Baustein: input_boolean.demo_kalender_ownership
+# Zweck: Merkt, dass nach einem eco-Schreibversuch alle neun BT-Presets als eco zurückgelesen wurden.
+# Nutzen: Dient der Kalenderautomation als Marker für die spätere Rücknahme auf none, nicht als Nachweis dauerhafter exklusiver Kontrolle.
+# Einbau: Diesen einen Schlüssel in das Mapping input_boolean: mergen (z. B. configuration.yaml oder passender Mapping-Include); nicht die ganze Domain ersetzen.
+# Abhängigkeiten: automation.kalender_abwesenheit und BT-Preset-Readback.
+# Anpassen: Nach Neustart Ownership mit realem Raumzustand abgleichen; keine Prüfung zwischenzeitlicher manueller Preset-Änderungen vor der Rücknahme.
+# Sicherheitsgrenze: Freigaben mit initial: false starten aus; Ownership-/Zustandsmerker ohne initial können nach Neustart wiederhergestellt werden.
+# Entweder dieser Einzelbaustein oder packages/haus.yaml; niemals beide parallel installieren.
 demo_kalender_ownership:
   name: demo_kalender_ownership
