@@ -14,7 +14,7 @@ MANIFEST = yaml.safe_load((ROOT / 'dependencies.yaml').read_text(encoding='utf-8
 
 class DocsContract(unittest.TestCase):
     def test_every_relative_markdown_link_resolves(self):
-        self.assertEqual(len(DOCS), 8)
+        self.assertEqual(len(DOCS), 9)
         for doc in DOCS:
             for link in re.findall(r'(?<!!)\[[^\]]+\]\(([^)]+)\)', doc.read_text(encoding='utf-8')):
                 parsed = urlsplit(link)
@@ -29,6 +29,37 @@ class DocsContract(unittest.TestCase):
                         headings = re.findall(r'^#{1,6}\s+(.+)$', body, re.MULTILINE)
                         slugs = {re.sub(r'[^\w\- ]', '', h.casefold()).replace(' ', '-') for h in headings}
                         self.assertIn(unquote(parsed.fragment).casefold(), slugs)
+
+    def test_integration_catalog_exact_public_repo_mapping_and_navigation(self):
+        catalog = (ROOT / 'docs/integrationen.md').read_text(encoding='utf-8')
+        expected = {
+            'Better Thermostat': 'KartoffelToby/better_thermostat',
+            'Alarmo': 'nielsfaber/alarmo',
+            'EcoFlow Energy': 'shuette42/ecoflow-energy-ha',
+            'Heidelberg Energy Control': 'Schrolli91/heidelberg_energy_control',
+            'Climate Group Helper': 'bjrnptrsn/climate_group_helper',
+            'X-Sense': 'Jarnsen/ha-xsense-component_test',
+            'Browser Mod': 'thomasloven/hass-browser_mod',
+            'Tibber Graph': 'stefanes/tibber-graph',
+            'EcoFlow Cloud': 'tolwi/hassio-ecoflow-cloud',
+            'Mushroom': 'piitaya/lovelace-mushroom',
+            'Room Summary Card': 'homeassistant-extras/room-summary-card',
+            'ApexCharts Card': 'RomRider/apexcharts-card',
+            'Solar Card': 'victorigualada/lovelace-solar-card',
+            'Alarmo Card': 'nielsfaber/alarmo-card',
+            'HACS selbst': 'hacs/integration',
+        }
+        actual = re.findall(r'\[([^\]]+)\]\(https://github\.com/([\w.-]+/[\w.-]+)\)', catalog)
+        self.assertEqual(dict(actual), expected)
+        self.assertEqual(len(actual), len(expected), 'Each verified repository is linked exactly once')
+        for page in ('README.md', 'docs/setup.md', 'docs/heizung.md',
+                     'docs/sicherheit-kameras.md', 'docs/energie.md'):
+            body = (ROOT / page).read_text(encoding='utf-8')
+            self.assertIn('integrationen.md)', body, page)
+        for name in ('better_thermostat', 'alarm_control_panel.beispiel_alarmo',
+                     'ecoflow_energy', 'heidelberg_energy_control', 'Core-MQTT',
+                     'Frontend-Karte', 'Add-on', 'externer Dienst'):
+            self.assertIn(name, catalog)
 
     def test_all_generated_automations_documented_once(self):
         from test_contract import D as package

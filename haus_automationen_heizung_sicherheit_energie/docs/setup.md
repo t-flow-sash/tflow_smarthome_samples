@@ -1,6 +1,6 @@
 # Voraussetzungen und isolierte Einrichtung
 
-[← Übersicht](../README.md) · [Architektur](architektur.md) · [Grenzen](grenzen.md)
+[← Übersicht](../README.md) · [Integrationen und HACS-Repositories](integrationen.md) · [Architektur](architektur.md) · [Grenzen](grenzen.md)
 
 ## Welche Bausteine sind woher?
 
@@ -8,7 +8,7 @@
 |---|---|---|
 | Home Assistant Core | YAML-Pakete, Template-, Integrationssensor, Kalender-, Kamera-, Schloss-, Licht-, REST-/Shell-Aktionen, Helper | Vorhandene HA-Installation; [configuration.yaml](../configuration.yaml) ist nur ein wegwerfbares Testbeispiel. |
 | Externe HA-Integrationen/Adapter | Neun Better-Thermostat-Räume; zwei W600-Ventile; Wolf-DHK-Select; Kalender, Personen, Tür/Schloss, Bewegung/Klingel/Licht; sechs Kameras + Erkennungs- und Aufnahme-Entities; Tibber-Preis, EcoFlow-Telemetrie, Fahrzeug/Wallbox | Betreiber installiert passende Geräteintegrationen und mappt **alle** fiktiven IDs. Geräte, Credentials, lokale Bridges und UI-Einträge sind nicht Bestandteil des Pakets. Hersteller-/Custom-Integrationen können je nach HA-Version und Gerät voneinander abweichen. |
-| HACS | Möglicher Installationsweg für bestimmte Drittanbieter-Integrationen wie Better Thermostat bzw. geräteabhängige Custom-Komponenten | **Nicht** durch das Paket installiert, kein pauschal erforderliches Add-on und keine Zusage für eine bestimmte Bezugsquelle/Version. Integrationsdokumentation je Anbieter prüfen. |
+| HACS | Möglicher Installationsweg für bestimmte Drittanbieter-Integrationen wie Better Thermostat und Alarmo sowie optionale Frontend-Karten | **Nicht** durch das Paket installiert und kein Add-on. Konkrete, direkt anklickbare und nach Pflicht/Adapter/Optionalität getrennte Bezugsquellen: [Integrationsübersicht](integrationen.md). Nicht jedes dort genannte Repo wird benötigt. |
 | HA Add-ons | Mögliche externe Dienste/Bridges (z. B. gerätespezifische Vermittler) | Hier wird **kein** bestimmtes Add-on installiert oder als zwingend vorausgesetzt. Ein Add-on ist ein separat betriebener Dienst, nicht gleichbedeutend mit einer HACS-Integration. |
 | Alarmo | Alarmstatus und reale Sensor-Zuordnung | Drittanbieter-Integration und **UI-Konfiguration** durch Betreiber: Modi, Mitgliedschaft, Scharfschaltung. Das Beispiel liest nur `triggered`. Keine Alarmo-UI-Daten exportierbar. |
 | Hermes/AI-Gateway | Optionaler Kamera-Abschluss-POST, gesicherter Bildzugriff und AI-Verarbeitung | **Extern, nicht mitgeliefert.** Gateway, Auth, Profilbindung, Receiver-Endpunkt, Worker und Dateitransfer müssen gesondert gebaut und getestet werden. [Receiver-CLI](../scripts/camera_episode_receiver.py) ist nur lokale Eingabevalidierung, kein Netzwerkdienst. |

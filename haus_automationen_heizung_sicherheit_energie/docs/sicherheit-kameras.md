@@ -1,6 +1,6 @@
 # Sicherheit, Abwesenheit und sechs Kameras
 
-[← Übersicht](../README.md) · [Einrichtung](setup.md) · [Datenschutz](grenzen.md)
+[← Übersicht](../README.md) · [Einrichtung](setup.md) · [HACS/Core-Links](integrationen.md) · [Datenschutz](grenzen.md)
 
 ## Sicherheitslogik
 
