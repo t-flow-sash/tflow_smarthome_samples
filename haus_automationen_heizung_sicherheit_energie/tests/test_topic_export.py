@@ -167,7 +167,7 @@ class TopicExport(unittest.TestCase):
                 export.write(root, small_package())
             self.assertEqual(expected.read_text(), 'owned: human\n')
 
-    def test_stale_generated_yaml_removed_but_human_files_remain(self):
+    def test_stale_generated_yaml_requires_manual_cleanup_without_touching_human_files(self):
         with TemporaryDirectory() as tmp:
             root = Path(tmp)
             theme = root / 'themen'
@@ -176,9 +176,65 @@ class TopicExport(unittest.TestCase):
             stale.write_bytes(export.GENERATED_HEADER + b'orphan: true\n')
             notes = theme / 'notes.yaml'
             notes.write_text('owned: human\n')
-            export.write(root, small_package())
-            self.assertFalse(stale.exists())
+            with self.assertRaises(ValueError):
+                export.write(root, small_package())
+            self.assertEqual(stale.read_bytes(), export.GENERATED_HEADER + b'orphan: true\n')
             self.assertEqual(notes.read_text(), 'owned: human\n')
+
+    def test_human_leaf_swapped_after_last_ownership_check_is_not_replaced(self):
+        from unittest.mock import patch
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            target = root / 'themen/sicherheit/automation/demo.yaml'
+            target.parent.mkdir(parents=True)
+            target.write_text(export.render(small_package())[Path('themen/sicherheit/automation/demo.yaml')])
+            original_walk = export._walk
+            swapped = False
+
+            def swap_before_publish(root_fd, parts, stack, *, create=False):
+                nonlocal swapped
+                directory = original_walk(root_fd, parts, stack, create=create)
+                if create and not swapped:
+                    swapped = True
+                    target.unlink()
+                    target.write_text('owned: human\n')
+                return directory
+
+            with patch.object(export, '_walk', side_effect=swap_before_publish):
+                try:
+                    export.write(root, small_package())
+                except ValueError:
+                    pass  # Refusal is permitted, but modifying the human file is not.
+            self.assertTrue(swapped)
+            self.assertEqual(target.read_bytes(), b'owned: human\n')
+
+    def test_stale_human_leaf_swapped_after_ownership_check_is_not_deleted(self):
+        from unittest.mock import patch
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            stale = root / 'themen/orphan.yaml'
+            stale.parent.mkdir()
+            stale.write_bytes(export.GENERATED_HEADER + b'old: generated\n')
+            original = export._owned_file
+            checks = 0
+
+            def swap_after_check(directory, name):
+                nonlocal checks
+                owned = original(directory, name)
+                if name == 'orphan.yaml':
+                    checks += 1
+                    if checks == 1:
+                        stale.unlink()
+                        stale.write_text('owned: human\n')
+                return owned
+
+            with patch.object(export, '_owned_file', side_effect=swap_after_check):
+                try:
+                    export.write(root, small_package())
+                except ValueError:
+                    pass
+            self.assertGreaterEqual(checks, 1)
+            self.assertEqual(stale.read_bytes(), b'owned: human\n')
 
     def test_raced_topic_symlink_never_writes_external_target(self):
         from unittest.mock import patch

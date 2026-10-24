@@ -128,6 +128,20 @@ def _owned_file(directory, name):
         return source.read(len(GENERATED_HEADER)) == GENERATED_HEADER
 
 
+def _unchanged_file(directory, name, content):
+    """Byte-identical existing exports need no path mutation."""
+    try:
+        fd = os.open(name, FILE_FLAGS, dir_fd=directory)
+    except FileNotFoundError:
+        return False
+    except OSError as error:
+        raise ValueError(f'Unsafe export file: {name}') from error
+    with os.fdopen(fd, 'rb') as source:
+        if not stat.S_ISREG(os.fstat(source.fileno()).st_mode):
+            raise ValueError(f'Unsafe export file: {name}')
+        return source.read() == content
+
+
 def _scan(directory, prefix, expected, stale):
     """Inspect the entire tree without following any symlinks, before mutations."""
     with os.scandir(directory) as entries:
@@ -199,12 +213,18 @@ def write(root, package):
                     else:
                         if not _owned_file(directory, relative.name):
                             raise ValueError(f'Human-owned export collision: {relative}')
+        # Refuse stale exports rather than unlinking a pathname that may have
+        # changed ownership since the scan. Prune them manually in a trusted tree.
+        if stale:
+            raise ValueError(f'Stale generated exports require manual removal: {stale}')
         # Create and publish each file via a same-directory temporary name.
         # Directory FDs and NOFOLLOW block ancestor escapes; exclusive hard-link
         # publication protects a newly created human-owned leaf from overwrite.
         for relative, text in expected.items():
             with ExitStack() as output:
                 directory = _walk(root_fd, relative.parts[:-1], output, create=True)
+                if _unchanged_file(directory, relative.name, text.encode('utf-8')):
+                    continue
                 temporary = f'.export-{secrets.token_hex(16)}.tmp'
                 fd = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL |
                              os.O_NOFOLLOW | os.O_CLOEXEC, 0o644, dir_fd=directory)
@@ -221,17 +241,13 @@ def write(root, package):
                         except FileExistsError as error:
                             raise ValueError(f'Export collision: {relative}') from error
                     else:
-                        if not _owned_file(directory, relative.name):
-                            raise ValueError(f'Human-owned export collision: {relative}')
-                        os.replace(temporary, relative.name, src_dir_fd=directory, dst_dir_fd=directory)
+                        # A regular file can be swapped between any ownership
+                        # check and os.replace. Never replace an existing name.
+                        raise ValueError(f'Export exists; remove manually before regeneration: {relative}')
                 finally:
                     try:
                         os.unlink(temporary, dir_fd=directory)
                     except FileNotFoundError:
                         pass
-        for relative in stale:
-            with ExitStack() as cleanup:
-                directory = _walk(root_fd, relative.parts[:-1], cleanup)
-                if _owned_file(directory, relative.name):
-                    os.unlink(relative.name, dir_fd=directory)
+
     return expected
