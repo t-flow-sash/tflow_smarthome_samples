@@ -156,6 +156,49 @@ class Contract(unittest.TestCase):
                 self.assertIn("not is_state('input_boolean.demo_sicherheit_freigabe','on')",wait_expr)
         self.assertNotIn('switch.turn_off',str(A['public_kamera_zone_01']))
 
+    def test_wallbox_consent_revoke_and_charging_price_hysteresis(self):
+        wallbox=A['public_wallbox_freigabe']
+        self.assertEqual(wallbox['mode'],'restart')
+        self.assertIn({'trigger':'state','entity_id':'input_boolean.demo_laden_freigabe'},wallbox['triggers'])
+        self.assertIn({'trigger':'homeassistant','event':'start'},wallbox['triggers'])
+        self.assertFalse(wallbox.get('conditions'), 'A global consent condition would skip the off action')
+        permission='switch.beispiel_wallbox_freigabe'
+        actions=wallbox['actions']
+        def decision(consent, price='off', status='charging', connected='on', person='home'):
+            state={'input_boolean.demo_laden_freigabe':consent,
+                   'binary_sensor.demo_preis_guenstig':price,
+                   'sensor.beispiel_ladestatus':status,
+                   'binary_sensor.beispiel_angeschlossen':connected,
+                   'person.beispiel_a':person,'person.beispiel_b':'not_home'}
+            def evaluate(condition):
+                if isinstance(condition,list):
+                    return all(evaluate(item) for item in condition)
+                if isinstance(condition,dict) and condition.get('condition')=='state':
+                    return state.get(condition['entity_id'])==condition['state']
+                self.assertIsInstance(condition,str)
+                return Environment().from_string(condition).render(
+                    is_state=lambda entity,value: state.get(entity)==value).strip()=='True'
+            for item in actions:
+                if 'choose' not in item:
+                    self.assertTrue(evaluate(item), 'Global gate skipped the safety action')
+                    continue
+                branch=next((b['sequence'] for b in item['choose'] if evaluate(b['conditions'])),item['default'])
+                self.assertEqual(len(branch),1)
+                self.assertEqual(branch[0]['target']['entity_id'],permission)
+                return branch[0]['action']
+            self.fail('Missing permission action')
+        for consent in ('off','unknown','unavailable'):
+            with self.subTest(consent=consent):
+                # Existing switch is on; the actual helper transition must choose revocation.
+                self.assertEqual(decision(consent),'switch.turn_off')
+        self.assertEqual(decision('off',price='on',status='charging'),'switch.turn_off')
+        # Restart while helper is off must also revoke a restored on permission.
+        self.assertEqual(decision('unknown',price='on'),'switch.turn_off')
+        self.assertEqual(decision('on',price='off',status='charging'),'switch.turn_on')
+        self.assertEqual(decision('on',price='off',status='idle'),'switch.turn_off')
+        self.assertEqual(decision('on',price='on',status='idle'),'switch.turn_on')
+        self.assertEqual(decision('on',price='off',status='charging',connected='off'),'switch.turn_off')
+
     def test_physical_and_energy_boundaries(self):
         self.assertNotIn('lock.unlock',TEXT)
         self.assertNotIn('alarm_control_panel.alarm_disarm',TEXT)

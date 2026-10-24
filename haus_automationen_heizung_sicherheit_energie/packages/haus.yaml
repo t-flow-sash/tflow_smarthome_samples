@@ -1267,6 +1267,8 @@ automation:
   mode: restart
   triggers:
   - trigger: state
+    entity_id: input_boolean.demo_laden_freigabe
+  - trigger: state
     entity_id: binary_sensor.beispiel_angeschlossen
   - trigger: state
     entity_id: binary_sensor.demo_preis_guenstig
@@ -1281,12 +1283,9 @@ automation:
   - trigger: homeassistant
     event: start
   actions:
-  - condition: state
-    entity_id: input_boolean.demo_laden_freigabe
-    state: 'on'
   - choose:
-    - conditions: '{{ is_state(''binary_sensor.beispiel_angeschlossen'',''on'') and (is_state(''person.beispiel_a'',''home'')
-        or is_state(''person.beispiel_b'',''home'')) and (is_state(''binary_sensor.demo_preis_guenstig'',''on'')
+    - conditions: '{{ is_state(''input_boolean.demo_laden_freigabe'',''on'') and is_state(''binary_sensor.beispiel_angeschlossen'',''on'')
+        and (is_state(''person.beispiel_a'',''home'') or is_state(''person.beispiel_b'',''home'')) and (is_state(''binary_sensor.demo_preis_guenstig'',''on'')
         or is_state(''sensor.beispiel_ladestatus'',''charging'')) }}'
       sequence:
       - action: switch.turn_on
