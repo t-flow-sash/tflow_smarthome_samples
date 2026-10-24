@@ -1,0 +1,6 @@
+# Disposable Home Assistant test configuration; never replace an existing configuration.yaml.
+default_config:
+homeassistant:
+  name: Anonymes Testhaus
+  time_zone: Europe/Berlin
+  packages: !include_dir_named packages
