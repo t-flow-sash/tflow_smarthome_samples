@@ -3,8 +3,12 @@
 Do not parse and re-dump packages/haus.yaml: both outputs are rendered from
 exactly the same in-memory object in build.py (including !secret tags).
 """
+from contextlib import ExitStack
+import os
 from pathlib import Path
 import re
+import secrets
+import stat
 import yaml
 
 class Secret(str):
@@ -81,15 +85,153 @@ def render(package):
     return result
 
 
+# Ownership is deliberately narrower than the .yaml extension. A handwritten
+# YAML file must never be deleted or overwritten by the exporter.
+GENERATED_HEADER = b'# Generiert mit scripts/build.py; nur fiktive Entity-IDs.\n'
+DIR_FLAGS = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC
+FILE_FLAGS = os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC
+
+
+def _directory(parent, name, stack, *, create=False):
+    if create:
+        try:
+            os.mkdir(name, dir_fd=parent)
+        except FileExistsError:
+            pass
+    try:
+        fd = os.open(name, DIR_FLAGS, dir_fd=parent)
+    except OSError as error:
+        raise ValueError(f'Unsafe export directory: {name}') from error
+    return stack.enter_context(_closing_fd(fd))
+
+
+class _closing_fd:
+    def __init__(self, fd):
+        self.fd = fd
+
+    def __enter__(self):
+        return self.fd
+
+    def __exit__(self, *_):
+        os.close(self.fd)
+
+
+def _owned_file(directory, name):
+    """Read only an ordinary generated file, never follow a leaf symlink."""
+    try:
+        fd = os.open(name, FILE_FLAGS, dir_fd=directory)
+    except OSError as error:
+        raise ValueError(f'Unsafe export file: {name}') from error
+    with os.fdopen(fd, 'rb') as source:
+        if not stat.S_ISREG(os.fstat(source.fileno()).st_mode):
+            raise ValueError(f'Unsafe export file: {name}')
+        return source.read(len(GENERATED_HEADER)) == GENERATED_HEADER
+
+
+def _scan(directory, prefix, expected, stale):
+    """Inspect the entire tree without following any symlinks, before mutations."""
+    with os.scandir(directory) as entries:
+        for item in entries:
+            relative = prefix / item.name
+            if item.is_symlink():
+                raise ValueError(f'Symlink in export tree: {relative}')
+            if item.is_dir(follow_symlinks=False):
+                fd = os.open(item.name, DIR_FLAGS, dir_fd=directory)
+                try:
+                    _scan(fd, relative, expected, stale)
+                finally:
+                    os.close(fd)
+            elif item.name.endswith('.yaml'):
+                if not _owned_file(directory, item.name):
+                    if relative in expected:
+                        raise ValueError(f'Human-owned export collision: {relative}')
+                    continue
+                if relative not in expected:
+                    stale.append(relative)
+            elif relative in expected:
+                raise ValueError(f'Export collision: {relative}')
+
+
+def _walk(root_fd, parts, stack, *, create=False):
+    directory = root_fd
+    for part in parts:
+        directory = _directory(directory, part, stack, create=create)
+    return directory
+
+
 def write(root, package):
-    destination = root / 'themen'
     expected = render(package)
-    # Only remove stale generated YAML; leave any human-owned non-YAML files alone.
-    for path in destination.rglob('*.yaml') if destination.exists() else ():
-        if path.relative_to(root) not in expected:
-            path.unlink()
-    for relative, text in expected.items():
-        path = root / relative
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text, encoding='utf-8')
+    # All paths below are relative to stable directory descriptors. O_NOFOLLOW
+    # prevents symlink replacement between inspection and opening a directory.
+    with ExitStack() as stack:
+        root_fd = stack.enter_context(_closing_fd(os.open(root, DIR_FLAGS)))
+        try:
+            theme = _directory(root_fd, 'themen', stack)
+        except ValueError:
+            # A missing directory is fine; a symlink, file or inaccessible one is not.
+            try:
+                os.stat('themen', dir_fd=root_fd, follow_symlinks=False)
+            except FileNotFoundError:
+                theme = None
+            else:
+                raise
+        stale = []
+        if theme is not None:
+            _scan(theme, Path('themen'), expected, stale)
+        # Preflight *every* expected ancestor before deleting or writing anything.
+        for relative in expected:
+            with ExitStack() as inspect:
+                directory = root_fd
+                for part in relative.parts[:-1]:
+                    try:
+                        directory = _directory(directory, part, inspect)
+                    except ValueError:
+                        try:
+                            os.stat(part, dir_fd=directory, follow_symlinks=False)
+                        except FileNotFoundError:
+                            break
+                        raise
+                else:
+                    try:
+                        os.stat(relative.name, dir_fd=directory, follow_symlinks=False)
+                    except FileNotFoundError:
+                        pass
+                    else:
+                        if not _owned_file(directory, relative.name):
+                            raise ValueError(f'Human-owned export collision: {relative}')
+        # Create and publish each file via a same-directory temporary name.
+        # Directory FDs and NOFOLLOW block ancestor escapes; exclusive hard-link
+        # publication protects a newly created human-owned leaf from overwrite.
+        for relative, text in expected.items():
+            with ExitStack() as output:
+                directory = _walk(root_fd, relative.parts[:-1], output, create=True)
+                temporary = f'.export-{secrets.token_hex(16)}.tmp'
+                fd = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL |
+                             os.O_NOFOLLOW | os.O_CLOEXEC, 0o644, dir_fd=directory)
+                try:
+                    with os.fdopen(fd, 'wb') as target:
+                        target.write(text.encode('utf-8'))
+                    try:
+                        os.stat(relative.name, dir_fd=directory, follow_symlinks=False)
+                    except FileNotFoundError:
+                        # Atomic create-if-absent: a raced human file is not replaced.
+                        try:
+                            os.link(temporary, relative.name, src_dir_fd=directory,
+                                    dst_dir_fd=directory, follow_symlinks=False)
+                        except FileExistsError as error:
+                            raise ValueError(f'Export collision: {relative}') from error
+                    else:
+                        if not _owned_file(directory, relative.name):
+                            raise ValueError(f'Human-owned export collision: {relative}')
+                        os.replace(temporary, relative.name, src_dir_fd=directory, dst_dir_fd=directory)
+                finally:
+                    try:
+                        os.unlink(temporary, dir_fd=directory)
+                    except FileNotFoundError:
+                        pass
+        for relative in stale:
+            with ExitStack() as cleanup:
+                directory = _walk(root_fd, relative.parts[:-1], cleanup)
+                if _owned_file(directory, relative.name):
+                    os.unlink(relative.name, dir_fd=directory)
     return expected

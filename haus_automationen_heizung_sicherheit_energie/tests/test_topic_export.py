@@ -22,6 +22,11 @@ class ExportLoader(Loader):
 ExportLoader.add_constructor('!secret', lambda loader, node: export.Secret(loader.construct_scalar(node)))
 
 
+def small_package():
+    return {domain: ([{'id': 'public_demo'}] if domain == 'automation' else
+                     [] if domain in ('template', 'sensor') else {}) for domain in export.DOMAINS}
+
+
 class TopicExport(unittest.TestCase):
     def test_every_domain_component_exactly_once_and_semantically_identical(self):
         canonical = yaml.load((ROOT / 'packages/haus.yaml').read_text(encoding='utf-8'), Loader=ExportLoader)
@@ -89,6 +94,142 @@ class TopicExport(unittest.TestCase):
             self.assertIn(f'docs/{doc}#direkt-kopierbare-yaml-bausteine',
                           (ROOT / 'README.md').read_text(encoding='utf-8'))
         self.assertEqual(len(used), len(set(used)))
+
+    def test_symlink_root_rejected_without_external_edits(self):
+        with TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            root = base / 'repo'
+            root.mkdir()
+            external = base / 'external'
+            external.mkdir()
+            sentinel = external / 'sentinel.yaml'
+            sentinel.write_text('private: preserve\n')
+            (root / 'themen').symlink_to(external, target_is_directory=True)
+            with self.assertRaises(ValueError):
+                export.write(root, small_package())
+            self.assertEqual({p.name: p.read_bytes() for p in external.iterdir()},
+                             {'sentinel.yaml': b'private: preserve\n'})
+
+    def test_symlink_ancestors_rejected_before_stale_cleanup(self):
+        for location in ('topic', 'domain'):
+            with self.subTest(location=location), TemporaryDirectory() as tmp:
+                base = Path(tmp)
+                root = base / 'repo'
+                theme = root / 'themen'
+                theme.mkdir(parents=True)
+                stale = theme / 'orphan.yaml'
+                stale.write_text('# Generiert mit scripts/build.py; nur fiktive Entity-IDs.\nstale: true\n')
+                external = base / 'external'
+                external.mkdir()
+                sentinel = external / 'sentinel.yaml'
+                sentinel.write_text('private: preserve\n')
+                if location == 'topic':
+                    (theme / 'sicherheit').symlink_to(external, target_is_directory=True)
+                else:
+                    topic = theme / 'sicherheit'
+                    topic.mkdir()
+                    (topic / 'automation').symlink_to(external, target_is_directory=True)
+                with self.assertRaises(ValueError):
+                    export.write(root, small_package())
+                self.assertTrue(stale.exists(), 'Preflight must precede deletion')
+                self.assertEqual({p.name: p.read_bytes() for p in external.iterdir()},
+                                 {'sentinel.yaml': b'private: preserve\n'})
+
+    def test_yaml_leaf_symlinks_rejected_before_deletion_or_write(self):
+        for location in ('expected', 'stale'):
+            with self.subTest(location=location), TemporaryDirectory() as tmp:
+                base = Path(tmp)
+                root = base / 'repo'
+                directory = root / 'themen' / 'sicherheit' / 'automation'
+                directory.mkdir(parents=True)
+                external = base / 'sentinel.yaml'
+                external.write_text('private: preserve\n')
+                stale = root / 'themen' / 'orphan.yaml'
+                stale.write_text('# Generiert mit scripts/build.py; nur fiktive Entity-IDs.\nstale: true\n')
+                (directory / ('demo.yaml' if location == 'expected' else 'orphan.yaml')).symlink_to(external)
+                with self.assertRaises(ValueError):
+                    export.write(root, small_package())
+                self.assertEqual(external.read_bytes(), b'private: preserve\n')
+                self.assertTrue(stale.exists())
+
+    def test_human_yaml_preserved_and_expected_collision_fails_closed(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            theme = root / 'themen'
+            theme.mkdir()
+            human = theme / 'notes.yaml'
+            human.write_text('owned: human\n')
+            export.write(root, small_package())
+            self.assertEqual(human.read_text(), 'owned: human\n')
+            expected = theme / 'sicherheit' / 'automation' / 'demo.yaml'
+            expected.write_text('owned: human\n')
+            with self.assertRaises(ValueError):
+                export.write(root, small_package())
+            self.assertEqual(expected.read_text(), 'owned: human\n')
+
+    def test_stale_generated_yaml_removed_but_human_files_remain(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            theme = root / 'themen'
+            theme.mkdir()
+            stale = theme / 'orphan.yaml'
+            stale.write_bytes(export.GENERATED_HEADER + b'orphan: true\n')
+            notes = theme / 'notes.yaml'
+            notes.write_text('owned: human\n')
+            export.write(root, small_package())
+            self.assertFalse(stale.exists())
+            self.assertEqual(notes.read_text(), 'owned: human\n')
+
+    def test_raced_topic_symlink_never_writes_external_target(self):
+        from unittest.mock import patch
+        with TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            root = base / 'repo'
+            topic = root / 'themen' / 'sicherheit'
+            topic.mkdir(parents=True)
+            external = base / 'external'
+            external.mkdir()
+            sentinel = external / 'sentinel.yaml'
+            sentinel.write_text('private: preserve\n')
+            original = export._directory
+            swapped = False
+
+            def swap_before_open(parent, name, stack, *, create=False):
+                nonlocal swapped
+                if create and name == 'sicherheit' and not swapped:
+                    swapped = True
+                    topic.rename(root / 'themen' / 'old-topic')
+                    topic.symlink_to(external, target_is_directory=True)
+                return original(parent, name, stack, create=create)
+
+            with patch.object(export, '_directory', side_effect=swap_before_open):
+                with self.assertRaises(ValueError):
+                    export.write(root, small_package())
+            self.assertTrue(swapped)
+            self.assertEqual({p.name: p.read_bytes() for p in external.iterdir()},
+                             {'sentinel.yaml': b'private: preserve\n'})
+
+    def test_leaf_created_after_preflight_is_not_overwritten(self):
+        from unittest.mock import patch
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            target = root / 'themen/sicherheit/automation/demo.yaml'
+            original = export._walk
+            injected = False
+
+            def inject_leaf(root_fd, parts, stack, *, create=False):
+                nonlocal injected
+                directory = original(root_fd, parts, stack, create=create)
+                if create and not injected:
+                    injected = True
+                    target.write_text('owned: human\n')
+                return directory
+
+            with patch.object(export, '_walk', side_effect=inject_leaf):
+                with self.assertRaises(ValueError):
+                    export.write(root, small_package())
+            self.assertTrue(injected)
+            self.assertEqual(target.read_text(), 'owned: human\n')
 
     def test_build_twice_is_idempotent_and_canonical_package_unchanged(self):
         paths = [ROOT / 'packages/haus.yaml', *sorted(EXPORT.rglob('*.yaml'))]
