@@ -21,6 +21,8 @@ for key in ('demo_bt_freigabe','demo_wolf_freigabe','demo_sicherheit_freigabe','
     ib(key, False)
 for key in ('demo_kalender_ownership','demo_wolf_ownership','demo_shadow','demo_nacht','demo_ladesitzung','demo_lade_zaehler_gueltig'):
     ib(key)
+for c in cameras:
+    ib('demo_aufnahme_ownership_'+c)
 for key,unit,maxval,step in [('demo_lade_zaehler','kWh',1000000,.001),('demo_lade_kosten','EUR',100000,.0001),('demo_lade_energie','kWh',100000,.001),('demo_lade_preis','EUR/kWh',10,.00001),('demo_letzte_energie','kWh',100000,.001),('demo_letzte_kosten','EUR',100000,.0001)]:
     D['input_number'][key] = {'name':key,'min':0,'max':maxval,'step':step,'mode':'box','unit_of_measurement':unit}
 for key in ('demo_kalender_wolf_vorher','demo_wolf_ziel'):
@@ -80,8 +82,21 @@ calact=[cond("{{ states('"+cal+"') not in ['unknown','unavailable'] }}"),{'actio
 auto('kalender_abwesenheit',caltr,calact,mode='single')
 # Physical commands are deliberately never unlock/disarm; unknown presence blocks absence activation.
 absent="{{ is_state('person.beispiel_a','not_home') and is_state('person.beispiel_b','not_home') }}"
-secure=[st('person.beispiel_a'),st('person.beispiel_b'),st('input_boolean.demo_nacht'),{'trigger':'homeassistant','event':'start'}]
-auto('aufnahme_bei_abwesenheit',secure,[{'condition':'state','entity_id':'input_boolean.demo_sicherheit_freigabe','state':'on'},{'choose':[{'conditions':"{{ "+absent[3:-3]+" or is_state('input_boolean.demo_nacht','on') }}",'sequence':[act('switch.turn_on',[f'switch.beispiel_{c}_aufnahme' for c in cameras])]},{'conditions':"{{ (is_state('person.beispiel_a','home') or is_state('person.beispiel_b','home')) and is_state('input_boolean.demo_nacht','off') }}",'sequence':[act('switch.turn_off',[f'switch.beispiel_{c}_aufnahme' for c in cameras])]}]}],mode='restart')
+secure=[st('person.beispiel_a'),st('person.beispiel_b'),st('input_boolean.demo_nacht'),st('input_boolean.demo_sicherheit_freigabe'),{'trigger':'homeassistant','event':'start'},{'trigger':'event','event_type':'automation_reloaded'}]
+# Claim before the switch command so a cancellation can still reconcile it; this is not atomic.
+recording_actions=[]
+for c in cameras:
+    rec=f'switch.beispiel_{c}_aufnahme'; owner=f'input_boolean.demo_aufnahme_ownership_{c}'
+    demand="is_state('input_boolean.demo_sicherheit_freigabe','on') and ("+absent[3:-3]+" or is_state('input_boolean.demo_nacht','on'))"
+    recording_actions.append({'choose':[
+        {'conditions':"{{ "+demand+" and is_state('"+rec+"','off') and is_state('"+owner+"','off') }}",
+         'sequence':[cond("{{ "+demand+" and is_state('"+rec+"','off') and is_state('"+owner+"','off') }}"),act('input_boolean.turn_on',owner),
+                     act('switch.turn_on',rec)]},
+        {'conditions':"{{ is_state('"+owner+"','on') and not ("+demand+") }}",
+         'sequence':[{'if':[cond("{{ is_state('"+rec+"','on') }}")],'then':[act('switch.turn_off',rec),
+                     {'wait_template':"{{ is_state('"+rec+"','off') }}",'timeout':'00:00:05','continue_on_timeout':True}]},
+                     {'if':[cond("{{ is_state('"+rec+"','off') }}")],'then':[act('input_boolean.turn_off',owner)]}]}]})
+auto('aufnahme_bei_abwesenheit',secure,recording_actions,mode='restart')
 D['script']['demo_abschliessen']={'alias':'Demo abschliessen','sequence':[{'condition':'state','entity_id':'input_boolean.demo_sicherheit_freigabe','state':'on'},cond(absent),{'condition':'state','entity_id':'binary_sensor.beispiel_tuer_offen','state':'off'},act('lock.lock','lock.beispiel_eingang'),wait("{{ is_state('lock.beispiel_eingang','locked') }}"),{'condition':'state','entity_id':'lock.beispiel_eingang','state':'locked'}]}
 auto('schloss_abwesenheit',[st('person.beispiel_a'),st('person.beispiel_b')],[{'condition':'state','entity_id':'input_boolean.demo_sicherheit_freigabe','state':'on'},cond(absent),act('script.demo_abschliessen')])
 auto('alarm_meldung',[st('alarm_control_panel.beispiel_alarmo','triggered')],[act('persistent_notification.create',data={'title':'Demo Alarm','message':'Alarmo meldet einen Alarm; Sensoren vor Ort prüfen.'})])
@@ -92,14 +107,14 @@ auto('kamera_retention',[{'trigger':'time','at':'03:20:00'}],[act('shell_command
 for i,c in enumerate(cameras):
     det=f'binary_sensor.beispiel_{c}_person'; animal=f'binary_sensor.beispiel_{c}_tier'; rec=f'switch.beispiel_{c}_aufnahme'; cam=f'camera.beispiel_{c}'
     detection="(is_state('"+det+"','on') or is_state('"+animal+"','on'))"
-    gate="{{ is_state('"+rec+"','on') and "+detection+" and states('"+cam+"') not in ['unknown','unavailable'] }}"
-    reason="{{ 'recording_disabled' if not is_state('"+rec+"','on') else 'detection_ended' if not "+detection+" else 'camera_unavailable' }}"
+    gate="{{ is_state('input_boolean.demo_sicherheit_freigabe','on') and is_state('"+rec+"','on') and "+detection+" and states('"+cam+"') not in ['unknown','unavailable'] }}"
+    reason="{{ 'recording_disabled' if not is_state('input_boolean.demo_sicherheit_freigabe','on') or not is_state('"+rec+"','on') else 'detection_ended' if not "+detection+" else 'camera_unavailable' }}"
     trigger=[{'trigger':'template','value_template':"{{ "+detection+" }}"},{'trigger':'event','event_type':'demo_camera_continue','event_data':{'camera':c}},{'trigger':'homeassistant','event':'start'},{'trigger':'event','event_type':'automation_reloaded'}]
     finish=lambda count: [var(reason=reason, ended_at='{{ now().isoformat() }}', snapshot_count=count),act('rest_command.demo_camera_finished',data={'camera':c,'episode_id':'{{ episode_id }}','started_at':'{{ started_at }}','ended_at':'{{ ended_at }}','reason':'{{ reason }}','snapshot_count':'{{ snapshot_count | int }}'})]
     sequence=[{'condition':'state','entity_id':'input_boolean.demo_sicherheit_freigabe','state':'on'},
               var(episode_id="{{ trigger.event.data.episode_id if trigger.platform == 'event' and trigger.event.event_type == 'demo_camera_continue' else context.id | md5 }}",started_at="{{ trigger.event.data.started_at if trigger.platform == 'event' and trigger.event.event_type == 'demo_camera_continue' else now().isoformat() }}",base_index="{{ trigger.event.data.next_index | int(0) if trigger.platform == 'event' and trigger.event.event_type == 'demo_camera_continue' else 0 }}")]
     if i>=3:
-        sequence += [{'wait_template':"{{ states('"+cam+"') not in ['unknown','unavailable'] or not is_state('"+rec+"','on') or not "+detection+" }}",'timeout':'00:00:30','continue_on_timeout':True}]
+        sequence += [{'wait_template':"{{ states('"+cam+"') not in ['unknown','unavailable'] or not is_state('input_boolean.demo_sicherheit_freigabe','on') or not is_state('"+rec+"','on') or not "+detection+" }}",'timeout':'00:00:30','continue_on_timeout':True}]
     frame=act('camera.snapshot',cam,{'filename':'/media/demo_camera/'+c+'/{{ now().strftime("%Y%m%dT%H%M%S%f") }}_{{ episode_id }}_{{ base_index | int + repeat.index }}.jpg'})
     frame['continue_on_error']=True
     sequence += [{'repeat':{'count':100,'sequence':[{'choose':[{'conditions':gate,'sequence':[frame,{'delay':'00:00:05'}]}],

@@ -5,6 +5,7 @@ import re
 import unittest
 from pathlib import Path
 import yaml
+from jinja2 import Environment
 
 ROOT = Path(__file__).resolve().parents[1]
 TEXT = (ROOT/'packages/haus.yaml').read_text()
@@ -90,6 +91,70 @@ class Contract(unittest.TestCase):
         self.assertTrue(helper)
         self.assertIn('demo_camera_finished',D['rest_command'])
         self.assertEqual(D['shell_command']['demo_camera_maintain'],'python3 /config/demo_camera_media.py maintain')
+
+    def test_security_revoke_gates_every_frame_and_reconciles_owned_recorders(self):
+        security=A['public_aufnahme_bei_abwesenheit']
+        self.assertIn({'trigger':'state','entity_id':'input_boolean.demo_sicherheit_freigabe'}, security['triggers'])
+        # Evaluate the actual YAML frame Jinja, not a string anywhere in the automation.
+        for i in range(1,7):
+            slug=f'zone_{i:02}'
+            a=A['public_kamera_'+slug]
+            frame=next(x for x in walk(a) if x.get('action')=='camera.snapshot')
+            # The choose containing the frame must be the per-iteration action.
+            frame_choose=next(x for x in walk(a['actions'][len(a['actions'])-2]) if x.get('choose') and any(frame in b.get('sequence',[]) for b in x['choose']))
+            gate=frame_choose['choose'][0]['conditions']
+            end_gate=a['actions'][-1]['choose'][0]['conditions']
+            for expression in (gate,end_gate):
+                self.assertIn("is_state('input_boolean.demo_sicherheit_freigabe','on')",expression)
+                env=Environment().from_string(expression)
+                for consent in ('on','off','unknown','unavailable'):
+                    states={'input_boolean.demo_sicherheit_freigabe':consent,
+                            f'switch.beispiel_{slug}_aufnahme':'on',
+                            f'binary_sensor.beispiel_{slug}_person':'on',
+                            f'binary_sensor.beispiel_{slug}_tier':'off',
+                            f'camera.beispiel_{slug}':'idle'}
+                    rendered=env.render(is_state=lambda entity,state: states.get(entity)==state,
+                                        states=lambda entity: states.get(entity,'unknown'))
+                    self.assertEqual(rendered.strip(),'True' if consent=='on' else 'False', (slug,consent))
+            reason=next(x['variables']['reason'] for x in walk(a) if 'variables' in x and 'reason' in x['variables'])
+            for consent in ('off','unknown','unavailable'):
+                state={'input_boolean.demo_sicherheit_freigabe':consent,
+                       f'switch.beispiel_{slug}_aufnahme':'on',
+                       f'binary_sensor.beispiel_{slug}_person':'on',
+                       f'binary_sensor.beispiel_{slug}_tier':'off'}
+                self.assertEqual(Environment().from_string(reason).render(
+                    is_state=lambda entity,value: state.get(entity)==value).strip(), 'recording_disabled')
+            marker=f'input_boolean.demo_aufnahme_ownership_{slug}'
+            self.assertNotIn('initial',D['input_boolean'][f'demo_aufnahme_ownership_{slug}'])
+            off=[x for x in walk(security) if x.get('action')=='switch.turn_off' and x.get('target',{}).get('entity_id')==f'switch.beispiel_{slug}_aufnahme']
+            self.assertEqual(len(off),1)
+            owner_branch=security['actions'][i-1]['choose'][1]
+            self.assertIn("is_state('"+marker+"','on')",owner_branch['conditions'])
+            self.assertIn(off[0],owner_branch['sequence'][0]['then'])
+            self.assertIn("is_state('"+f'switch.beispiel_{slug}_aufnahme'+"','on')",str(owner_branch['sequence'][0]['if']))
+            start_branch=security['actions'][i-1]['choose'][0]
+            start_actions=start_branch['sequence']
+            self.assertLess(next(j for j,x in enumerate(start_actions) if x.get('action')=='input_boolean.turn_on'),
+                            next(j for j,x in enumerate(start_actions) if x.get('action')=='switch.turn_on'))
+            for owned,rec_state,consent,expected_start,expected_stop in [
+                ('off','on','off',False,False), # foreign recording is never stopped
+                ('off','off','on',True,False),
+                ('on','on','off',False,True),
+                ('on','on','unknown',False,True),
+                ('on','on','unavailable',False,True),
+            ]:
+                state={'input_boolean.demo_sicherheit_freigabe':consent,marker:owned,
+                       f'switch.beispiel_{slug}_aufnahme':rec_state,
+                       'person.beispiel_a':'not_home','person.beispiel_b':'not_home',
+                       'input_boolean.demo_nacht':'off'}
+                render=lambda expr: Environment().from_string(expr).render(
+                    is_state=lambda entity,value: state.get(entity)==value).strip()=='True'
+                self.assertEqual(render(start_branch['conditions']),expected_start,(slug,owned,rec_state,consent,'start'))
+                self.assertEqual(render(owner_branch['conditions']),expected_stop,(slug,owned,rec_state,consent,'stop'))
+            if i>=4:
+                wait_expr=a['actions'][2]['wait_template']
+                self.assertIn("not is_state('input_boolean.demo_sicherheit_freigabe','on')",wait_expr)
+        self.assertNotIn('switch.turn_off',str(A['public_kamera_zone_01']))
 
     def test_physical_and_energy_boundaries(self):
         self.assertNotIn('lock.unlock',TEXT)

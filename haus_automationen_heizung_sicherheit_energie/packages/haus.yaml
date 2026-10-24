@@ -24,6 +24,18 @@ input_boolean:
     name: demo_ladesitzung
   demo_lade_zaehler_gueltig:
     name: demo_lade_zaehler_gueltig
+  demo_aufnahme_ownership_zone_01:
+    name: demo_aufnahme_ownership_zone_01
+  demo_aufnahme_ownership_zone_02:
+    name: demo_aufnahme_ownership_zone_02
+  demo_aufnahme_ownership_zone_03:
+    name: demo_aufnahme_ownership_zone_03
+  demo_aufnahme_ownership_zone_04:
+    name: demo_aufnahme_ownership_zone_04
+  demo_aufnahme_ownership_zone_05:
+    name: demo_aufnahme_ownership_zone_05
+  demo_aufnahme_ownership_zone_06:
+    name: demo_aufnahme_ownership_zone_06
 input_number:
   demo_lade_zaehler:
     name: demo_lade_zaehler
@@ -426,37 +438,235 @@ automation:
     entity_id: person.beispiel_b
   - trigger: state
     entity_id: input_boolean.demo_nacht
+  - trigger: state
+    entity_id: input_boolean.demo_sicherheit_freigabe
   - trigger: homeassistant
     event: start
+  - trigger: event
+    event_type: automation_reloaded
   actions:
-  - condition: state
-    entity_id: input_boolean.demo_sicherheit_freigabe
-    state: 'on'
   - choose:
-    - conditions: '{{ is_state(''person.beispiel_a'',''not_home'') and is_state(''person.beispiel_b'',''not_home'')
-        or is_state(''input_boolean.demo_nacht'',''on'') }}'
+    - conditions: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and (is_state(''person.beispiel_a'',''not_home'')
+        and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')) and is_state(''switch.beispiel_zone_01_aufnahme'',''off'')
+        and is_state(''input_boolean.demo_aufnahme_ownership_zone_01'',''off'') }}'
       sequence:
+      - condition: template
+        value_template: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and (is_state(''person.beispiel_a'',''not_home'')
+          and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')) and
+          is_state(''switch.beispiel_zone_01_aufnahme'',''off'') and is_state(''input_boolean.demo_aufnahme_ownership_zone_01'',''off'')
+          }}'
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.demo_aufnahme_ownership_zone_01
       - action: switch.turn_on
         target:
-          entity_id:
-          - switch.beispiel_zone_01_aufnahme
-          - switch.beispiel_zone_02_aufnahme
-          - switch.beispiel_zone_03_aufnahme
-          - switch.beispiel_zone_04_aufnahme
-          - switch.beispiel_zone_05_aufnahme
-          - switch.beispiel_zone_06_aufnahme
-    - conditions: '{{ (is_state(''person.beispiel_a'',''home'') or is_state(''person.beispiel_b'',''home'')) and
-        is_state(''input_boolean.demo_nacht'',''off'') }}'
+          entity_id: switch.beispiel_zone_01_aufnahme
+    - conditions: '{{ is_state(''input_boolean.demo_aufnahme_ownership_zone_01'',''on'') and not (is_state(''input_boolean.demo_sicherheit_freigabe'',''on'')
+        and (is_state(''person.beispiel_a'',''not_home'') and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')))
+        }}'
       sequence:
-      - action: switch.turn_off
+      - if:
+        - condition: template
+          value_template: '{{ is_state(''switch.beispiel_zone_01_aufnahme'',''on'') }}'
+        then:
+        - action: switch.turn_off
+          target:
+            entity_id: switch.beispiel_zone_01_aufnahme
+        - wait_template: '{{ is_state(''switch.beispiel_zone_01_aufnahme'',''off'') }}'
+          timeout: 00:00:05
+          continue_on_timeout: true
+      - if:
+        - condition: template
+          value_template: '{{ is_state(''switch.beispiel_zone_01_aufnahme'',''off'') }}'
+        then:
+        - action: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.demo_aufnahme_ownership_zone_01
+  - choose:
+    - conditions: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and (is_state(''person.beispiel_a'',''not_home'')
+        and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')) and is_state(''switch.beispiel_zone_02_aufnahme'',''off'')
+        and is_state(''input_boolean.demo_aufnahme_ownership_zone_02'',''off'') }}'
+      sequence:
+      - condition: template
+        value_template: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and (is_state(''person.beispiel_a'',''not_home'')
+          and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')) and
+          is_state(''switch.beispiel_zone_02_aufnahme'',''off'') and is_state(''input_boolean.demo_aufnahme_ownership_zone_02'',''off'')
+          }}'
+      - action: input_boolean.turn_on
         target:
-          entity_id:
-          - switch.beispiel_zone_01_aufnahme
-          - switch.beispiel_zone_02_aufnahme
-          - switch.beispiel_zone_03_aufnahme
-          - switch.beispiel_zone_04_aufnahme
-          - switch.beispiel_zone_05_aufnahme
-          - switch.beispiel_zone_06_aufnahme
+          entity_id: input_boolean.demo_aufnahme_ownership_zone_02
+      - action: switch.turn_on
+        target:
+          entity_id: switch.beispiel_zone_02_aufnahme
+    - conditions: '{{ is_state(''input_boolean.demo_aufnahme_ownership_zone_02'',''on'') and not (is_state(''input_boolean.demo_sicherheit_freigabe'',''on'')
+        and (is_state(''person.beispiel_a'',''not_home'') and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')))
+        }}'
+      sequence:
+      - if:
+        - condition: template
+          value_template: '{{ is_state(''switch.beispiel_zone_02_aufnahme'',''on'') }}'
+        then:
+        - action: switch.turn_off
+          target:
+            entity_id: switch.beispiel_zone_02_aufnahme
+        - wait_template: '{{ is_state(''switch.beispiel_zone_02_aufnahme'',''off'') }}'
+          timeout: 00:00:05
+          continue_on_timeout: true
+      - if:
+        - condition: template
+          value_template: '{{ is_state(''switch.beispiel_zone_02_aufnahme'',''off'') }}'
+        then:
+        - action: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.demo_aufnahme_ownership_zone_02
+  - choose:
+    - conditions: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and (is_state(''person.beispiel_a'',''not_home'')
+        and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')) and is_state(''switch.beispiel_zone_03_aufnahme'',''off'')
+        and is_state(''input_boolean.demo_aufnahme_ownership_zone_03'',''off'') }}'
+      sequence:
+      - condition: template
+        value_template: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and (is_state(''person.beispiel_a'',''not_home'')
+          and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')) and
+          is_state(''switch.beispiel_zone_03_aufnahme'',''off'') and is_state(''input_boolean.demo_aufnahme_ownership_zone_03'',''off'')
+          }}'
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.demo_aufnahme_ownership_zone_03
+      - action: switch.turn_on
+        target:
+          entity_id: switch.beispiel_zone_03_aufnahme
+    - conditions: '{{ is_state(''input_boolean.demo_aufnahme_ownership_zone_03'',''on'') and not (is_state(''input_boolean.demo_sicherheit_freigabe'',''on'')
+        and (is_state(''person.beispiel_a'',''not_home'') and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')))
+        }}'
+      sequence:
+      - if:
+        - condition: template
+          value_template: '{{ is_state(''switch.beispiel_zone_03_aufnahme'',''on'') }}'
+        then:
+        - action: switch.turn_off
+          target:
+            entity_id: switch.beispiel_zone_03_aufnahme
+        - wait_template: '{{ is_state(''switch.beispiel_zone_03_aufnahme'',''off'') }}'
+          timeout: 00:00:05
+          continue_on_timeout: true
+      - if:
+        - condition: template
+          value_template: '{{ is_state(''switch.beispiel_zone_03_aufnahme'',''off'') }}'
+        then:
+        - action: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.demo_aufnahme_ownership_zone_03
+  - choose:
+    - conditions: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and (is_state(''person.beispiel_a'',''not_home'')
+        and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')) and is_state(''switch.beispiel_zone_04_aufnahme'',''off'')
+        and is_state(''input_boolean.demo_aufnahme_ownership_zone_04'',''off'') }}'
+      sequence:
+      - condition: template
+        value_template: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and (is_state(''person.beispiel_a'',''not_home'')
+          and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')) and
+          is_state(''switch.beispiel_zone_04_aufnahme'',''off'') and is_state(''input_boolean.demo_aufnahme_ownership_zone_04'',''off'')
+          }}'
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.demo_aufnahme_ownership_zone_04
+      - action: switch.turn_on
+        target:
+          entity_id: switch.beispiel_zone_04_aufnahme
+    - conditions: '{{ is_state(''input_boolean.demo_aufnahme_ownership_zone_04'',''on'') and not (is_state(''input_boolean.demo_sicherheit_freigabe'',''on'')
+        and (is_state(''person.beispiel_a'',''not_home'') and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')))
+        }}'
+      sequence:
+      - if:
+        - condition: template
+          value_template: '{{ is_state(''switch.beispiel_zone_04_aufnahme'',''on'') }}'
+        then:
+        - action: switch.turn_off
+          target:
+            entity_id: switch.beispiel_zone_04_aufnahme
+        - wait_template: '{{ is_state(''switch.beispiel_zone_04_aufnahme'',''off'') }}'
+          timeout: 00:00:05
+          continue_on_timeout: true
+      - if:
+        - condition: template
+          value_template: '{{ is_state(''switch.beispiel_zone_04_aufnahme'',''off'') }}'
+        then:
+        - action: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.demo_aufnahme_ownership_zone_04
+  - choose:
+    - conditions: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and (is_state(''person.beispiel_a'',''not_home'')
+        and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')) and is_state(''switch.beispiel_zone_05_aufnahme'',''off'')
+        and is_state(''input_boolean.demo_aufnahme_ownership_zone_05'',''off'') }}'
+      sequence:
+      - condition: template
+        value_template: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and (is_state(''person.beispiel_a'',''not_home'')
+          and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')) and
+          is_state(''switch.beispiel_zone_05_aufnahme'',''off'') and is_state(''input_boolean.demo_aufnahme_ownership_zone_05'',''off'')
+          }}'
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.demo_aufnahme_ownership_zone_05
+      - action: switch.turn_on
+        target:
+          entity_id: switch.beispiel_zone_05_aufnahme
+    - conditions: '{{ is_state(''input_boolean.demo_aufnahme_ownership_zone_05'',''on'') and not (is_state(''input_boolean.demo_sicherheit_freigabe'',''on'')
+        and (is_state(''person.beispiel_a'',''not_home'') and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')))
+        }}'
+      sequence:
+      - if:
+        - condition: template
+          value_template: '{{ is_state(''switch.beispiel_zone_05_aufnahme'',''on'') }}'
+        then:
+        - action: switch.turn_off
+          target:
+            entity_id: switch.beispiel_zone_05_aufnahme
+        - wait_template: '{{ is_state(''switch.beispiel_zone_05_aufnahme'',''off'') }}'
+          timeout: 00:00:05
+          continue_on_timeout: true
+      - if:
+        - condition: template
+          value_template: '{{ is_state(''switch.beispiel_zone_05_aufnahme'',''off'') }}'
+        then:
+        - action: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.demo_aufnahme_ownership_zone_05
+  - choose:
+    - conditions: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and (is_state(''person.beispiel_a'',''not_home'')
+        and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')) and is_state(''switch.beispiel_zone_06_aufnahme'',''off'')
+        and is_state(''input_boolean.demo_aufnahme_ownership_zone_06'',''off'') }}'
+      sequence:
+      - condition: template
+        value_template: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and (is_state(''person.beispiel_a'',''not_home'')
+          and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')) and
+          is_state(''switch.beispiel_zone_06_aufnahme'',''off'') and is_state(''input_boolean.demo_aufnahme_ownership_zone_06'',''off'')
+          }}'
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.demo_aufnahme_ownership_zone_06
+      - action: switch.turn_on
+        target:
+          entity_id: switch.beispiel_zone_06_aufnahme
+    - conditions: '{{ is_state(''input_boolean.demo_aufnahme_ownership_zone_06'',''on'') and not (is_state(''input_boolean.demo_sicherheit_freigabe'',''on'')
+        and (is_state(''person.beispiel_a'',''not_home'') and is_state(''person.beispiel_b'',''not_home'') or is_state(''input_boolean.demo_nacht'',''on'')))
+        }}'
+      sequence:
+      - if:
+        - condition: template
+          value_template: '{{ is_state(''switch.beispiel_zone_06_aufnahme'',''on'') }}'
+        then:
+        - action: switch.turn_off
+          target:
+            entity_id: switch.beispiel_zone_06_aufnahme
+        - wait_template: '{{ is_state(''switch.beispiel_zone_06_aufnahme'',''off'') }}'
+          timeout: 00:00:05
+          continue_on_timeout: true
+      - if:
+        - condition: template
+          value_template: '{{ is_state(''switch.beispiel_zone_06_aufnahme'',''off'') }}'
+        then:
+        - action: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.demo_aufnahme_ownership_zone_06
 - id: public_schloss_abwesenheit
   alias: Demo schloss abwesenheit
   mode: single
@@ -563,9 +773,9 @@ automation:
       count: 100
       sequence:
       - choose:
-        - conditions: '{{ is_state(''switch.beispiel_zone_01_aufnahme'',''on'') and (is_state(''binary_sensor.beispiel_zone_01_person'',''on'')
-            or is_state(''binary_sensor.beispiel_zone_01_tier'',''on'')) and states(''camera.beispiel_zone_01'')
-            not in [''unknown'',''unavailable''] }}'
+        - conditions: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and is_state(''switch.beispiel_zone_01_aufnahme'',''on'')
+            and (is_state(''binary_sensor.beispiel_zone_01_person'',''on'') or is_state(''binary_sensor.beispiel_zone_01_tier'',''on''))
+            and states(''camera.beispiel_zone_01'') not in [''unknown'',''unavailable''] }}'
           sequence:
           - action: camera.snapshot
             target:
@@ -577,9 +787,9 @@ automation:
           - delay: 00:00:05
         default:
         - variables:
-            reason: '{{ ''recording_disabled'' if not is_state(''switch.beispiel_zone_01_aufnahme'',''on'') else
-              ''detection_ended'' if not (is_state(''binary_sensor.beispiel_zone_01_person'',''on'') or is_state(''binary_sensor.beispiel_zone_01_tier'',''on''))
-              else ''camera_unavailable'' }}'
+            reason: '{{ ''recording_disabled'' if not is_state(''input_boolean.demo_sicherheit_freigabe'',''on'')
+              or not is_state(''switch.beispiel_zone_01_aufnahme'',''on'') else ''detection_ended'' if not (is_state(''binary_sensor.beispiel_zone_01_person'',''on'')
+              or is_state(''binary_sensor.beispiel_zone_01_tier'',''on'')) else ''camera_unavailable'' }}'
             ended_at: '{{ now().isoformat() }}'
             snapshot_count: '{{ base_index | int + repeat.index - 1 }}'
         - action: rest_command.demo_camera_finished
@@ -592,9 +802,9 @@ automation:
             snapshot_count: '{{ snapshot_count | int }}'
         - stop: Episode abgeschlossen
   - choose:
-    - conditions: '{{ is_state(''switch.beispiel_zone_01_aufnahme'',''on'') and (is_state(''binary_sensor.beispiel_zone_01_person'',''on'')
-        or is_state(''binary_sensor.beispiel_zone_01_tier'',''on'')) and states(''camera.beispiel_zone_01'') not
-        in [''unknown'',''unavailable''] }}'
+    - conditions: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and is_state(''switch.beispiel_zone_01_aufnahme'',''on'')
+        and (is_state(''binary_sensor.beispiel_zone_01_person'',''on'') or is_state(''binary_sensor.beispiel_zone_01_tier'',''on''))
+        and states(''camera.beispiel_zone_01'') not in [''unknown'',''unavailable''] }}'
       sequence:
       - event: demo_camera_continue
         event_data:
@@ -604,9 +814,9 @@ automation:
           next_index: '{{ base_index | int + 100 }}'
     default:
     - variables:
-        reason: '{{ ''recording_disabled'' if not is_state(''switch.beispiel_zone_01_aufnahme'',''on'') else ''detection_ended''
-          if not (is_state(''binary_sensor.beispiel_zone_01_person'',''on'') or is_state(''binary_sensor.beispiel_zone_01_tier'',''on''))
-          else ''camera_unavailable'' }}'
+        reason: '{{ ''recording_disabled'' if not is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') or
+          not is_state(''switch.beispiel_zone_01_aufnahme'',''on'') else ''detection_ended'' if not (is_state(''binary_sensor.beispiel_zone_01_person'',''on'')
+          or is_state(''binary_sensor.beispiel_zone_01_tier'',''on'')) else ''camera_unavailable'' }}'
         ended_at: '{{ now().isoformat() }}'
         snapshot_count: '{{ base_index | int + 100 }}'
     - action: rest_command.demo_camera_finished
@@ -647,9 +857,9 @@ automation:
       count: 100
       sequence:
       - choose:
-        - conditions: '{{ is_state(''switch.beispiel_zone_02_aufnahme'',''on'') and (is_state(''binary_sensor.beispiel_zone_02_person'',''on'')
-            or is_state(''binary_sensor.beispiel_zone_02_tier'',''on'')) and states(''camera.beispiel_zone_02'')
-            not in [''unknown'',''unavailable''] }}'
+        - conditions: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and is_state(''switch.beispiel_zone_02_aufnahme'',''on'')
+            and (is_state(''binary_sensor.beispiel_zone_02_person'',''on'') or is_state(''binary_sensor.beispiel_zone_02_tier'',''on''))
+            and states(''camera.beispiel_zone_02'') not in [''unknown'',''unavailable''] }}'
           sequence:
           - action: camera.snapshot
             target:
@@ -661,9 +871,9 @@ automation:
           - delay: 00:00:05
         default:
         - variables:
-            reason: '{{ ''recording_disabled'' if not is_state(''switch.beispiel_zone_02_aufnahme'',''on'') else
-              ''detection_ended'' if not (is_state(''binary_sensor.beispiel_zone_02_person'',''on'') or is_state(''binary_sensor.beispiel_zone_02_tier'',''on''))
-              else ''camera_unavailable'' }}'
+            reason: '{{ ''recording_disabled'' if not is_state(''input_boolean.demo_sicherheit_freigabe'',''on'')
+              or not is_state(''switch.beispiel_zone_02_aufnahme'',''on'') else ''detection_ended'' if not (is_state(''binary_sensor.beispiel_zone_02_person'',''on'')
+              or is_state(''binary_sensor.beispiel_zone_02_tier'',''on'')) else ''camera_unavailable'' }}'
             ended_at: '{{ now().isoformat() }}'
             snapshot_count: '{{ base_index | int + repeat.index - 1 }}'
         - action: rest_command.demo_camera_finished
@@ -676,9 +886,9 @@ automation:
             snapshot_count: '{{ snapshot_count | int }}'
         - stop: Episode abgeschlossen
   - choose:
-    - conditions: '{{ is_state(''switch.beispiel_zone_02_aufnahme'',''on'') and (is_state(''binary_sensor.beispiel_zone_02_person'',''on'')
-        or is_state(''binary_sensor.beispiel_zone_02_tier'',''on'')) and states(''camera.beispiel_zone_02'') not
-        in [''unknown'',''unavailable''] }}'
+    - conditions: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and is_state(''switch.beispiel_zone_02_aufnahme'',''on'')
+        and (is_state(''binary_sensor.beispiel_zone_02_person'',''on'') or is_state(''binary_sensor.beispiel_zone_02_tier'',''on''))
+        and states(''camera.beispiel_zone_02'') not in [''unknown'',''unavailable''] }}'
       sequence:
       - event: demo_camera_continue
         event_data:
@@ -688,9 +898,9 @@ automation:
           next_index: '{{ base_index | int + 100 }}'
     default:
     - variables:
-        reason: '{{ ''recording_disabled'' if not is_state(''switch.beispiel_zone_02_aufnahme'',''on'') else ''detection_ended''
-          if not (is_state(''binary_sensor.beispiel_zone_02_person'',''on'') or is_state(''binary_sensor.beispiel_zone_02_tier'',''on''))
-          else ''camera_unavailable'' }}'
+        reason: '{{ ''recording_disabled'' if not is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') or
+          not is_state(''switch.beispiel_zone_02_aufnahme'',''on'') else ''detection_ended'' if not (is_state(''binary_sensor.beispiel_zone_02_person'',''on'')
+          or is_state(''binary_sensor.beispiel_zone_02_tier'',''on'')) else ''camera_unavailable'' }}'
         ended_at: '{{ now().isoformat() }}'
         snapshot_count: '{{ base_index | int + 100 }}'
     - action: rest_command.demo_camera_finished
@@ -731,9 +941,9 @@ automation:
       count: 100
       sequence:
       - choose:
-        - conditions: '{{ is_state(''switch.beispiel_zone_03_aufnahme'',''on'') and (is_state(''binary_sensor.beispiel_zone_03_person'',''on'')
-            or is_state(''binary_sensor.beispiel_zone_03_tier'',''on'')) and states(''camera.beispiel_zone_03'')
-            not in [''unknown'',''unavailable''] }}'
+        - conditions: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and is_state(''switch.beispiel_zone_03_aufnahme'',''on'')
+            and (is_state(''binary_sensor.beispiel_zone_03_person'',''on'') or is_state(''binary_sensor.beispiel_zone_03_tier'',''on''))
+            and states(''camera.beispiel_zone_03'') not in [''unknown'',''unavailable''] }}'
           sequence:
           - action: camera.snapshot
             target:
@@ -745,9 +955,9 @@ automation:
           - delay: 00:00:05
         default:
         - variables:
-            reason: '{{ ''recording_disabled'' if not is_state(''switch.beispiel_zone_03_aufnahme'',''on'') else
-              ''detection_ended'' if not (is_state(''binary_sensor.beispiel_zone_03_person'',''on'') or is_state(''binary_sensor.beispiel_zone_03_tier'',''on''))
-              else ''camera_unavailable'' }}'
+            reason: '{{ ''recording_disabled'' if not is_state(''input_boolean.demo_sicherheit_freigabe'',''on'')
+              or not is_state(''switch.beispiel_zone_03_aufnahme'',''on'') else ''detection_ended'' if not (is_state(''binary_sensor.beispiel_zone_03_person'',''on'')
+              or is_state(''binary_sensor.beispiel_zone_03_tier'',''on'')) else ''camera_unavailable'' }}'
             ended_at: '{{ now().isoformat() }}'
             snapshot_count: '{{ base_index | int + repeat.index - 1 }}'
         - action: rest_command.demo_camera_finished
@@ -760,9 +970,9 @@ automation:
             snapshot_count: '{{ snapshot_count | int }}'
         - stop: Episode abgeschlossen
   - choose:
-    - conditions: '{{ is_state(''switch.beispiel_zone_03_aufnahme'',''on'') and (is_state(''binary_sensor.beispiel_zone_03_person'',''on'')
-        or is_state(''binary_sensor.beispiel_zone_03_tier'',''on'')) and states(''camera.beispiel_zone_03'') not
-        in [''unknown'',''unavailable''] }}'
+    - conditions: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and is_state(''switch.beispiel_zone_03_aufnahme'',''on'')
+        and (is_state(''binary_sensor.beispiel_zone_03_person'',''on'') or is_state(''binary_sensor.beispiel_zone_03_tier'',''on''))
+        and states(''camera.beispiel_zone_03'') not in [''unknown'',''unavailable''] }}'
       sequence:
       - event: demo_camera_continue
         event_data:
@@ -772,9 +982,9 @@ automation:
           next_index: '{{ base_index | int + 100 }}'
     default:
     - variables:
-        reason: '{{ ''recording_disabled'' if not is_state(''switch.beispiel_zone_03_aufnahme'',''on'') else ''detection_ended''
-          if not (is_state(''binary_sensor.beispiel_zone_03_person'',''on'') or is_state(''binary_sensor.beispiel_zone_03_tier'',''on''))
-          else ''camera_unavailable'' }}'
+        reason: '{{ ''recording_disabled'' if not is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') or
+          not is_state(''switch.beispiel_zone_03_aufnahme'',''on'') else ''detection_ended'' if not (is_state(''binary_sensor.beispiel_zone_03_person'',''on'')
+          or is_state(''binary_sensor.beispiel_zone_03_tier'',''on'')) else ''camera_unavailable'' }}'
         ended_at: '{{ now().isoformat() }}'
         snapshot_count: '{{ base_index | int + 100 }}'
     - action: rest_command.demo_camera_finished
@@ -811,18 +1021,18 @@ automation:
         == ''demo_camera_continue'' else now().isoformat() }}'
       base_index: '{{ trigger.event.data.next_index | int(0) if trigger.platform == ''event'' and trigger.event.event_type
         == ''demo_camera_continue'' else 0 }}'
-  - wait_template: '{{ states(''camera.beispiel_zone_04'') not in [''unknown'',''unavailable''] or not is_state(''switch.beispiel_zone_04_aufnahme'',''on'')
-      or not (is_state(''binary_sensor.beispiel_zone_04_person'',''on'') or is_state(''binary_sensor.beispiel_zone_04_tier'',''on''))
-      }}'
+  - wait_template: '{{ states(''camera.beispiel_zone_04'') not in [''unknown'',''unavailable''] or not is_state(''input_boolean.demo_sicherheit_freigabe'',''on'')
+      or not is_state(''switch.beispiel_zone_04_aufnahme'',''on'') or not (is_state(''binary_sensor.beispiel_zone_04_person'',''on'')
+      or is_state(''binary_sensor.beispiel_zone_04_tier'',''on'')) }}'
     timeout: 00:00:30
     continue_on_timeout: true
   - repeat:
       count: 100
       sequence:
       - choose:
-        - conditions: '{{ is_state(''switch.beispiel_zone_04_aufnahme'',''on'') and (is_state(''binary_sensor.beispiel_zone_04_person'',''on'')
-            or is_state(''binary_sensor.beispiel_zone_04_tier'',''on'')) and states(''camera.beispiel_zone_04'')
-            not in [''unknown'',''unavailable''] }}'
+        - conditions: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and is_state(''switch.beispiel_zone_04_aufnahme'',''on'')
+            and (is_state(''binary_sensor.beispiel_zone_04_person'',''on'') or is_state(''binary_sensor.beispiel_zone_04_tier'',''on''))
+            and states(''camera.beispiel_zone_04'') not in [''unknown'',''unavailable''] }}'
           sequence:
           - action: camera.snapshot
             target:
@@ -834,9 +1044,9 @@ automation:
           - delay: 00:00:05
         default:
         - variables:
-            reason: '{{ ''recording_disabled'' if not is_state(''switch.beispiel_zone_04_aufnahme'',''on'') else
-              ''detection_ended'' if not (is_state(''binary_sensor.beispiel_zone_04_person'',''on'') or is_state(''binary_sensor.beispiel_zone_04_tier'',''on''))
-              else ''camera_unavailable'' }}'
+            reason: '{{ ''recording_disabled'' if not is_state(''input_boolean.demo_sicherheit_freigabe'',''on'')
+              or not is_state(''switch.beispiel_zone_04_aufnahme'',''on'') else ''detection_ended'' if not (is_state(''binary_sensor.beispiel_zone_04_person'',''on'')
+              or is_state(''binary_sensor.beispiel_zone_04_tier'',''on'')) else ''camera_unavailable'' }}'
             ended_at: '{{ now().isoformat() }}'
             snapshot_count: '{{ base_index | int + repeat.index - 1 }}'
         - action: rest_command.demo_camera_finished
@@ -849,9 +1059,9 @@ automation:
             snapshot_count: '{{ snapshot_count | int }}'
         - stop: Episode abgeschlossen
   - choose:
-    - conditions: '{{ is_state(''switch.beispiel_zone_04_aufnahme'',''on'') and (is_state(''binary_sensor.beispiel_zone_04_person'',''on'')
-        or is_state(''binary_sensor.beispiel_zone_04_tier'',''on'')) and states(''camera.beispiel_zone_04'') not
-        in [''unknown'',''unavailable''] }}'
+    - conditions: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and is_state(''switch.beispiel_zone_04_aufnahme'',''on'')
+        and (is_state(''binary_sensor.beispiel_zone_04_person'',''on'') or is_state(''binary_sensor.beispiel_zone_04_tier'',''on''))
+        and states(''camera.beispiel_zone_04'') not in [''unknown'',''unavailable''] }}'
       sequence:
       - event: demo_camera_continue
         event_data:
@@ -861,9 +1071,9 @@ automation:
           next_index: '{{ base_index | int + 100 }}'
     default:
     - variables:
-        reason: '{{ ''recording_disabled'' if not is_state(''switch.beispiel_zone_04_aufnahme'',''on'') else ''detection_ended''
-          if not (is_state(''binary_sensor.beispiel_zone_04_person'',''on'') or is_state(''binary_sensor.beispiel_zone_04_tier'',''on''))
-          else ''camera_unavailable'' }}'
+        reason: '{{ ''recording_disabled'' if not is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') or
+          not is_state(''switch.beispiel_zone_04_aufnahme'',''on'') else ''detection_ended'' if not (is_state(''binary_sensor.beispiel_zone_04_person'',''on'')
+          or is_state(''binary_sensor.beispiel_zone_04_tier'',''on'')) else ''camera_unavailable'' }}'
         ended_at: '{{ now().isoformat() }}'
         snapshot_count: '{{ base_index | int + 100 }}'
     - action: rest_command.demo_camera_finished
@@ -900,18 +1110,18 @@ automation:
         == ''demo_camera_continue'' else now().isoformat() }}'
       base_index: '{{ trigger.event.data.next_index | int(0) if trigger.platform == ''event'' and trigger.event.event_type
         == ''demo_camera_continue'' else 0 }}'
-  - wait_template: '{{ states(''camera.beispiel_zone_05'') not in [''unknown'',''unavailable''] or not is_state(''switch.beispiel_zone_05_aufnahme'',''on'')
-      or not (is_state(''binary_sensor.beispiel_zone_05_person'',''on'') or is_state(''binary_sensor.beispiel_zone_05_tier'',''on''))
-      }}'
+  - wait_template: '{{ states(''camera.beispiel_zone_05'') not in [''unknown'',''unavailable''] or not is_state(''input_boolean.demo_sicherheit_freigabe'',''on'')
+      or not is_state(''switch.beispiel_zone_05_aufnahme'',''on'') or not (is_state(''binary_sensor.beispiel_zone_05_person'',''on'')
+      or is_state(''binary_sensor.beispiel_zone_05_tier'',''on'')) }}'
     timeout: 00:00:30
     continue_on_timeout: true
   - repeat:
       count: 100
       sequence:
       - choose:
-        - conditions: '{{ is_state(''switch.beispiel_zone_05_aufnahme'',''on'') and (is_state(''binary_sensor.beispiel_zone_05_person'',''on'')
-            or is_state(''binary_sensor.beispiel_zone_05_tier'',''on'')) and states(''camera.beispiel_zone_05'')
-            not in [''unknown'',''unavailable''] }}'
+        - conditions: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and is_state(''switch.beispiel_zone_05_aufnahme'',''on'')
+            and (is_state(''binary_sensor.beispiel_zone_05_person'',''on'') or is_state(''binary_sensor.beispiel_zone_05_tier'',''on''))
+            and states(''camera.beispiel_zone_05'') not in [''unknown'',''unavailable''] }}'
           sequence:
           - action: camera.snapshot
             target:
@@ -923,9 +1133,9 @@ automation:
           - delay: 00:00:05
         default:
         - variables:
-            reason: '{{ ''recording_disabled'' if not is_state(''switch.beispiel_zone_05_aufnahme'',''on'') else
-              ''detection_ended'' if not (is_state(''binary_sensor.beispiel_zone_05_person'',''on'') or is_state(''binary_sensor.beispiel_zone_05_tier'',''on''))
-              else ''camera_unavailable'' }}'
+            reason: '{{ ''recording_disabled'' if not is_state(''input_boolean.demo_sicherheit_freigabe'',''on'')
+              or not is_state(''switch.beispiel_zone_05_aufnahme'',''on'') else ''detection_ended'' if not (is_state(''binary_sensor.beispiel_zone_05_person'',''on'')
+              or is_state(''binary_sensor.beispiel_zone_05_tier'',''on'')) else ''camera_unavailable'' }}'
             ended_at: '{{ now().isoformat() }}'
             snapshot_count: '{{ base_index | int + repeat.index - 1 }}'
         - action: rest_command.demo_camera_finished
@@ -938,9 +1148,9 @@ automation:
             snapshot_count: '{{ snapshot_count | int }}'
         - stop: Episode abgeschlossen
   - choose:
-    - conditions: '{{ is_state(''switch.beispiel_zone_05_aufnahme'',''on'') and (is_state(''binary_sensor.beispiel_zone_05_person'',''on'')
-        or is_state(''binary_sensor.beispiel_zone_05_tier'',''on'')) and states(''camera.beispiel_zone_05'') not
-        in [''unknown'',''unavailable''] }}'
+    - conditions: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and is_state(''switch.beispiel_zone_05_aufnahme'',''on'')
+        and (is_state(''binary_sensor.beispiel_zone_05_person'',''on'') or is_state(''binary_sensor.beispiel_zone_05_tier'',''on''))
+        and states(''camera.beispiel_zone_05'') not in [''unknown'',''unavailable''] }}'
       sequence:
       - event: demo_camera_continue
         event_data:
@@ -950,9 +1160,9 @@ automation:
           next_index: '{{ base_index | int + 100 }}'
     default:
     - variables:
-        reason: '{{ ''recording_disabled'' if not is_state(''switch.beispiel_zone_05_aufnahme'',''on'') else ''detection_ended''
-          if not (is_state(''binary_sensor.beispiel_zone_05_person'',''on'') or is_state(''binary_sensor.beispiel_zone_05_tier'',''on''))
-          else ''camera_unavailable'' }}'
+        reason: '{{ ''recording_disabled'' if not is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') or
+          not is_state(''switch.beispiel_zone_05_aufnahme'',''on'') else ''detection_ended'' if not (is_state(''binary_sensor.beispiel_zone_05_person'',''on'')
+          or is_state(''binary_sensor.beispiel_zone_05_tier'',''on'')) else ''camera_unavailable'' }}'
         ended_at: '{{ now().isoformat() }}'
         snapshot_count: '{{ base_index | int + 100 }}'
     - action: rest_command.demo_camera_finished
@@ -989,18 +1199,18 @@ automation:
         == ''demo_camera_continue'' else now().isoformat() }}'
       base_index: '{{ trigger.event.data.next_index | int(0) if trigger.platform == ''event'' and trigger.event.event_type
         == ''demo_camera_continue'' else 0 }}'
-  - wait_template: '{{ states(''camera.beispiel_zone_06'') not in [''unknown'',''unavailable''] or not is_state(''switch.beispiel_zone_06_aufnahme'',''on'')
-      or not (is_state(''binary_sensor.beispiel_zone_06_person'',''on'') or is_state(''binary_sensor.beispiel_zone_06_tier'',''on''))
-      }}'
+  - wait_template: '{{ states(''camera.beispiel_zone_06'') not in [''unknown'',''unavailable''] or not is_state(''input_boolean.demo_sicherheit_freigabe'',''on'')
+      or not is_state(''switch.beispiel_zone_06_aufnahme'',''on'') or not (is_state(''binary_sensor.beispiel_zone_06_person'',''on'')
+      or is_state(''binary_sensor.beispiel_zone_06_tier'',''on'')) }}'
     timeout: 00:00:30
     continue_on_timeout: true
   - repeat:
       count: 100
       sequence:
       - choose:
-        - conditions: '{{ is_state(''switch.beispiel_zone_06_aufnahme'',''on'') and (is_state(''binary_sensor.beispiel_zone_06_person'',''on'')
-            or is_state(''binary_sensor.beispiel_zone_06_tier'',''on'')) and states(''camera.beispiel_zone_06'')
-            not in [''unknown'',''unavailable''] }}'
+        - conditions: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and is_state(''switch.beispiel_zone_06_aufnahme'',''on'')
+            and (is_state(''binary_sensor.beispiel_zone_06_person'',''on'') or is_state(''binary_sensor.beispiel_zone_06_tier'',''on''))
+            and states(''camera.beispiel_zone_06'') not in [''unknown'',''unavailable''] }}'
           sequence:
           - action: camera.snapshot
             target:
@@ -1012,9 +1222,9 @@ automation:
           - delay: 00:00:05
         default:
         - variables:
-            reason: '{{ ''recording_disabled'' if not is_state(''switch.beispiel_zone_06_aufnahme'',''on'') else
-              ''detection_ended'' if not (is_state(''binary_sensor.beispiel_zone_06_person'',''on'') or is_state(''binary_sensor.beispiel_zone_06_tier'',''on''))
-              else ''camera_unavailable'' }}'
+            reason: '{{ ''recording_disabled'' if not is_state(''input_boolean.demo_sicherheit_freigabe'',''on'')
+              or not is_state(''switch.beispiel_zone_06_aufnahme'',''on'') else ''detection_ended'' if not (is_state(''binary_sensor.beispiel_zone_06_person'',''on'')
+              or is_state(''binary_sensor.beispiel_zone_06_tier'',''on'')) else ''camera_unavailable'' }}'
             ended_at: '{{ now().isoformat() }}'
             snapshot_count: '{{ base_index | int + repeat.index - 1 }}'
         - action: rest_command.demo_camera_finished
@@ -1027,9 +1237,9 @@ automation:
             snapshot_count: '{{ snapshot_count | int }}'
         - stop: Episode abgeschlossen
   - choose:
-    - conditions: '{{ is_state(''switch.beispiel_zone_06_aufnahme'',''on'') and (is_state(''binary_sensor.beispiel_zone_06_person'',''on'')
-        or is_state(''binary_sensor.beispiel_zone_06_tier'',''on'')) and states(''camera.beispiel_zone_06'') not
-        in [''unknown'',''unavailable''] }}'
+    - conditions: '{{ is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') and is_state(''switch.beispiel_zone_06_aufnahme'',''on'')
+        and (is_state(''binary_sensor.beispiel_zone_06_person'',''on'') or is_state(''binary_sensor.beispiel_zone_06_tier'',''on''))
+        and states(''camera.beispiel_zone_06'') not in [''unknown'',''unavailable''] }}'
       sequence:
       - event: demo_camera_continue
         event_data:
@@ -1039,9 +1249,9 @@ automation:
           next_index: '{{ base_index | int + 100 }}'
     default:
     - variables:
-        reason: '{{ ''recording_disabled'' if not is_state(''switch.beispiel_zone_06_aufnahme'',''on'') else ''detection_ended''
-          if not (is_state(''binary_sensor.beispiel_zone_06_person'',''on'') or is_state(''binary_sensor.beispiel_zone_06_tier'',''on''))
-          else ''camera_unavailable'' }}'
+        reason: '{{ ''recording_disabled'' if not is_state(''input_boolean.demo_sicherheit_freigabe'',''on'') or
+          not is_state(''switch.beispiel_zone_06_aufnahme'',''on'') else ''detection_ended'' if not (is_state(''binary_sensor.beispiel_zone_06_person'',''on'')
+          or is_state(''binary_sensor.beispiel_zone_06_tier'',''on'')) else ''camera_unavailable'' }}'
         ended_at: '{{ now().isoformat() }}'
         snapshot_count: '{{ base_index | int + 100 }}'
     - action: rest_command.demo_camera_finished
