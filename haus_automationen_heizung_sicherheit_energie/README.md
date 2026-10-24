@@ -16,8 +16,9 @@ Jeder Link auf diesen Themenseiten führt unmittelbar zu einer eigenen `.yaml`-D
 2. [Heizung: gewichteter Shadow und Kalender](docs/heizung.md) – getrennte Zuständigkeiten, Aktoren und Ownership.
 3. [Sicherheit, Abwesenheit und Kameras](docs/sicherheit-kameras.md) – Schutzschalter, Frames und fehlender AI-Transport.
 4. [Energie, Tibber und Wallbox](docs/energie.md) – Telemetrie, Tarife und Kostenmodell.
-5. [Voraussetzungen und isolierte Einrichtung](docs/setup.md) – Integrationen vs. Add-ons vs. HACS, Entitäten, Secrets, Prüfpfad.
-6. [Datenschutz, Betriebsgrenzen und fehlende Funktionen](docs/grenzen.md) – kein Sicherheits- oder Vollständigkeitsversprechen.
-7. [Codekarte aller 16 Automationen und übriger Artefakte](docs/codekarte.md) – von Funktion zu konkreter Datei.
+5. [Integrationen und direkt anklickbare Repositories](docs/integrationen.md) – notwendige, austauschbare und optionale HACS-Bausteine, Frontend-Karten sowie Core-Links.
+6. [Voraussetzungen und isolierte Einrichtung](docs/setup.md) – Entitäten, Secrets und Prüfpfad.
+7. [Datenschutz, Betriebsgrenzen und fehlende Funktionen](docs/grenzen.md) – kein Sicherheits- oder Vollständigkeitsversprechen.
+8. [Codekarte aller 16 Automationen und übriger Artefakte](docs/codekarte.md) – von Funktion zu konkreter Datei.
 
 Die ältere Sammlung `haus_automationen_2026/` ist unabhängig; deren Ausschlüsse, Tests und Kompatibilitätsaussagen beziehen sich nicht auf dieses Paket. Lizenz nur für diesen Unterordner: [LICENSE](LICENSE). Keine privaten Credentials, Alarmo-UI-Konfiguration oder Hermes-Gateway-Installation werden mitgeliefert. **Vor jeder echten Aktorfreigabe die Grenzen und den Integrationsvertrag lesen.**

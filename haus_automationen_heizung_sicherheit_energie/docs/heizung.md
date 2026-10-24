@@ -1,6 +1,6 @@
 # Heizung: Shadow und Kalender sind verschieden
 
-[← Übersicht](../README.md) · [Integrationsvertrag](setup.md) · [Grenzen](grenzen.md)
+[← Übersicht](../README.md) · [Integrationsvertrag](setup.md) · [HACS/Core-Links](integrationen.md) · [Grenzen](grenzen.md)
 
 ## Bedarfs-Shadow (keine physische Wolf-Schaltung)
 

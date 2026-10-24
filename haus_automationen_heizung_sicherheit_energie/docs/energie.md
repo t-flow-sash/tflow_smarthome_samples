@@ -1,6 +1,6 @@
 # Energie, Tibber-Preis und Wallbox
 
-[← Übersicht](../README.md) · [Adapter und Einrichtung](setup.md) · [Grenzen](grenzen.md)
+[← Übersicht](../README.md) · [Adapter und Einrichtung](setup.md) · [HACS/Core-Links](integrationen.md) · [Grenzen](grenzen.md)
 
 Die EcoFlow-Anbindung liefert ausschließlich einen **extern bereitgestellten** signierten Batterie-Leistungssensor: positive Watt = Ladung, negative = Entladung. Templates trennen Lade-/Entladeleistung; HA-Integrationssensoren summieren die Energie. Kein Speichersteuerbefehl, keine Netzladung und keine Manipulation der EcoFlow-Konfiguration.
 
