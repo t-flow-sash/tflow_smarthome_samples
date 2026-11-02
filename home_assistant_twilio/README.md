@@ -45,7 +45,7 @@ Der externe Producer ist **nicht Teil dieses Repositories**. Er muss das Event e
 | `camera` | String aus der festen Allowlist `camera_01` bis `camera_08` |
 | `episode_id` | String aus exakt 32 kleingeschriebenen Hex-Zeichen |
 | `summary` | Nichtleere vollständige Zusammenfassung; wird validiert, aber nicht per SMS gesendet |
-| `sms_summary` | Eigene nichtleere Kurzfassung, nach Trim höchstens 140 Zeichen, ohne Steuerzeichen oder Zeilenumbrüche |
+| `sms_summary` | Eigene Kurzfassung: roh und nach Trim jeweils höchstens 140 Zeichen, nach Trim nichtleer und ohne C0-/DEL-Steuerzeichen (einschließlich CR/LF) |
 
 `summary` und `sms_summary` sind absichtlich getrennt. Die Automation schneidet den Volltext nicht ab und verwendet ihn nicht als Fallback. Zusätzliche Eventfelder bestimmen weder Ziel noch Nachricht.
 

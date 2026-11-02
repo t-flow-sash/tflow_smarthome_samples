@@ -217,6 +217,7 @@ class TwilioSampleContract(unittest.TestCase):
             "summary_not_string": {"summary": None},
             "sms_blank": {"sms_summary": "   "},
             "sms_too_long": {"sms_summary": "x" * 141},
+            "sms_nul": {"sms_summary": "Text\x00Text"},
             "sms_newline": {"sms_summary": "Zeile 1\nZeile 2"},
             "sms_carriage_return": {"sms_summary": "Zeile 1\rZeile 2"},
             "sms_tab": {"sms_summary": "Text\tText"},
