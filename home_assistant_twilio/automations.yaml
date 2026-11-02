@@ -1,0 +1,44 @@
+# =============================================================================
+# Zweck: Finale Kamera-AI-Zusammenfassungen als kurze Twilio-SMS weitergeben.
+# Nutzen: Nur ein bereits finalisiertes externes Ergebnis wird nach strikter
+#         Schema-, Kamera-, Längen- und Replay-Prüfung an ein festes Ziel gesendet.
+# Wann: Beim extern erzeugten Event camera_ai_summary_ready nach Abschluss der
+#       Kameraanalyse; Producer- und Snapshot-Automationen sind nicht enthalten.
+# Einbau: Als Liste via automation: !include automations.yaml laden oder diesen
+#         einen Listeneintrag in die vorhandene automations.yaml übernehmen.
+# Abhängigkeiten: notify.twilio_wichtige_sms, acht input_text-Helfer aus
+#                 configuration.yaml und ein externer Producer gemäß README.
+# Anpassen: Kamera-Allowlist, passende Helper und den festen E.164-Platzhalter
+#           gemeinsam ändern; das Ziel nie aus Eventdaten übernehmen.
+# Sicherheitsgrenze: 140 Zeichen begrenzen weder SMS-Segmente noch Kosten.
+#                    Replay-Schutz und Übergabe an Twilio sind nur Best Effort.
+# =============================================================================
+
+- id: camera_ai_summary_ready_sms
+  alias: Kamera-AI fertige Zusammenfassung per SMS
+  description: >-
+    Sendet ausschließlich die separate finale SMS-Kurzfassung; pro Kamera wird
+    die letzte Episoden-ID als Best-Effort-Replay-Marker gespeichert.
+  triggers:
+    - trigger: event
+      event_type: camera_ai_summary_ready
+  conditions:
+    - condition: template
+      value_template: "{{ trigger.event.data.camera is string and trigger.event.data.camera in ['camera_01', 'camera_02', 'camera_03', 'camera_04', 'camera_05', 'camera_06', 'camera_07', 'camera_08'] and trigger.event.data.episode_id is string and trigger.event.data.episode_id | regex_match('^[0-9a-f]{32}$') and trigger.event.data.summary is string and trigger.event.data.summary | trim | length > 0 and trigger.event.data.sms_summary is string and trigger.event.data.sms_summary | trim | length > 0 and trigger.event.data.sms_summary | trim | length <= 140 and trigger.event.data.sms_summary | regex_match('^[^\\x00-\\x1f\\x7f\\r\\n]{1,140}\\\\Z') }}"
+  actions:
+    - variables:
+        camera_sms_last_helper: "{{ 'input_text.camera_ai_sms_last_' ~ trigger.event.data.camera }}"
+        camera_sms_episode: "{{ trigger.event.data.episode_id }}"
+    - condition: template
+      value_template: "{{ states[camera_sms_last_helper] is not none and states(camera_sms_last_helper) != 'unavailable' and states(camera_sms_last_helper) != camera_sms_episode }}"
+    - action: notify.twilio_wichtige_sms
+      data:
+        target: "+491234567890"
+        message: "{{ trigger.event.data.sms_summary | trim }}"
+    - action: input_text.set_value
+      target:
+        entity_id: "{{ camera_sms_last_helper }}"
+      data:
+        value: "{{ camera_sms_episode }}"
+  mode: queued
+  max: 20

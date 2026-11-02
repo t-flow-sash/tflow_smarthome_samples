@@ -1,0 +1,52 @@
+# =============================================================================
+# Zweck: Twilio-Basis, generischen SMS-Notifier und Replay-Helfer bereitstellen.
+# Nutzen: Eine finale Kamera-Kurzfassung kann kontrolliert als SMS versendet
+#         werden, ohne Empfänger oder automatischen Versand global festzulegen.
+# Einbau: Diese Blöcke in die vorhandene configuration.yaml zusammenführen;
+#         bestehende Top-Level-Keys nicht duplizieren oder komplett ersetzen.
+# Abhängigkeiten: Home-Assistant-Core-Integrationen twilio, twilio_sms,
+#                 input_text und automation sowie eine private secrets.yaml.
+# Anpassen: Acht Beispielkamera-IDs, Anzeigenamen und alphanumerische Sender-ID
+#           an die eigene Installation und die Twilio-Länderregeln anpassen.
+# Sicherheitsgrenze: Kein Empfänger und kein Versand in diesem Basisblock.
+#                    Secrets bleiben lokal; Restore/Replay ist nur Best Effort.
+# =============================================================================
+
+twilio:
+  account_sid: !secret twilio_account_sid
+  auth_token: !secret twilio_auth_token
+
+notify:
+  - platform: twilio_sms
+    name: twilio_wichtige_sms
+    from_number: HomeAlert
+
+input_text:
+  # Kein `initial:`: Home Assistant darf den letzten Marker wiederherstellen.
+  camera_ai_sms_last_camera_01:
+    name: Kamera-AI SMS letzte Episode Kamera 01
+    max: 32
+  camera_ai_sms_last_camera_02:
+    name: Kamera-AI SMS letzte Episode Kamera 02
+    max: 32
+  camera_ai_sms_last_camera_03:
+    name: Kamera-AI SMS letzte Episode Kamera 03
+    max: 32
+  camera_ai_sms_last_camera_04:
+    name: Kamera-AI SMS letzte Episode Kamera 04
+    max: 32
+  camera_ai_sms_last_camera_05:
+    name: Kamera-AI SMS letzte Episode Kamera 05
+    max: 32
+  camera_ai_sms_last_camera_06:
+    name: Kamera-AI SMS letzte Episode Kamera 06
+    max: 32
+  camera_ai_sms_last_camera_07:
+    name: Kamera-AI SMS letzte Episode Kamera 07
+    max: 32
+  camera_ai_sms_last_camera_08:
+    name: Kamera-AI SMS letzte Episode Kamera 08
+    max: 32
+
+# Nur übernehmen, wenn die eigene Installation diesen Include noch nicht hat.
+automation: !include automations.yaml
