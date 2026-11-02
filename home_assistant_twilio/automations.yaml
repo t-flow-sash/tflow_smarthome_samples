@@ -1,81 +1,44 @@
 # =============================================================================
-# Zweck: Eingehende Twilio-SMS als gefilterte Home-Assistant-Flows behandeln.
-# Nutzen: Zeigt erlaubte SMS lokal an und beantwortet den harmlosen STATUS-Befehl.
-# Einbau: Als komplette Liste via automation: !include automations.yaml laden
-#         oder die einzelnen Listeneinträge in die vorhandene Datei kopieren.
-# Abhängigkeiten: UI-Config-Entry „Twilio Webhook“, Event
-#                 twilio_data_received, scripts.yaml und die genannten Secrets.
-# Anpassen: Erlaubte Quell-/Zielnummern nur in secrets.yaml ändern; für weitere
-#           Befehle eigene, eng gefilterte Automationen mit Kostenlimit anlegen.
-# Sicherheitsgrenze: Eine Rufnummer ist keine starke Authentifizierung. Keine
-#                    Schlösser, Tore oder Alarmfunktionen allein per SMS steuern.
+# Zweck: Finale Kamera-AI-Zusammenfassungen als kurze Twilio-SMS weitergeben.
+# Nutzen: Nur ein bereits finalisiertes externes Ergebnis wird nach strikter
+#         Schema-, Kamera-, Längen- und Replay-Prüfung an ein festes Ziel gesendet.
+# Wann: Beim extern erzeugten Event camera_ai_summary_ready nach Abschluss der
+#       Kameraanalyse; Producer- und Snapshot-Automationen sind nicht enthalten.
+# Einbau: Als Liste via automation: !include automations.yaml laden oder diesen
+#         einen Listeneintrag in die vorhandene automations.yaml übernehmen.
+# Abhängigkeiten: notify.twilio_wichtige_sms, acht input_text-Helfer aus
+#                 configuration.yaml und ein externer Producer gemäß README.
+# Anpassen: Kamera-Allowlist, passende Helper und den festen E.164-Platzhalter
+#           gemeinsam ändern; das Ziel nie aus Eventdaten übernehmen.
+# Sicherheitsgrenze: 140 Zeichen begrenzen weder SMS-Segmente noch Kosten.
+#                    Replay-Schutz und Übergabe an Twilio sind nur Best Effort.
 # =============================================================================
 
-# -----------------------------------------------------------------------------
-# Zweck: Inhalt einer erlaubten eingehenden Twilio-SMS in HA sichtbar machen.
-# Nutzen: Nachvollziehbarer Empfang ohne ungefilterte Absender zu akzeptieren.
-# Wann: Beim Event twilio_data_received mit passendem From, To und SMS-Body.
-# Einbau: Listeneintrag in die aktive automations.yaml übernehmen.
-# Abhängigkeiten: Twilio-Webhook-Config-Entry, persistent_notification sowie
-#                 twilio_contact_number und twilio_sms_from_number.
-# Anpassen: Titel/Text datenschutzgerecht halten; From/To niemals entfernen.
-# Sicherheitsgrenze: Nachrichtentext erscheint in HA und kann protokolliert
-#                    werden; keine Event-Gesamtdaten oder Secrets anzeigen.
-# -----------------------------------------------------------------------------
-- id: public_twilio_eingehende_sms_anzeigen
-  alias: "Twilio: erlaubte eingehende SMS anzeigen"
+- id: camera_ai_summary_ready_sms
+  alias: Kamera-AI fertige Zusammenfassung per SMS
   description: >-
-    Zeigt ausschließlich nichtleere SMS der freigegebenen Quellnummer an die
-    eigene Twilio-Nummer als persistente Home-Assistant-Benachrichtigung an.
+    Sendet ausschließlich die separate finale SMS-Kurzfassung; pro Kamera wird
+    die letzte Episoden-ID als Best-Effort-Replay-Marker gespeichert.
   triggers:
     - trigger: event
-      event_type: twilio_data_received
-      event_data:
-        From: !secret twilio_contact_number
-        To: !secret twilio_sms_from_number
+      event_type: camera_ai_summary_ready
   conditions:
     - condition: template
-      value_template: >-
-        {{ trigger.event.data.get('Body') is string
-           and (trigger.event.data.get('Body') | trim | length) > 0 }}
+      value_template: "{{ trigger.event.data.camera is string and trigger.event.data.camera in ['camera_01', 'camera_02', 'camera_03', 'camera_04', 'camera_05', 'camera_06', 'camera_07', 'camera_08'] and trigger.event.data.episode_id is string and trigger.event.data.episode_id | regex_match('^[0-9a-f]{32}$') and trigger.event.data.summary is string and trigger.event.data.summary | trim | length > 0 and trigger.event.data.sms_summary is string and trigger.event.data.sms_summary | trim | length > 0 and trigger.event.data.sms_summary | trim | length <= 140 and trigger.event.data.sms_summary | regex_match('^[^\\x00-\\x1f\\x7f\\r\\n]{1,140}\\\\Z') }}"
   actions:
-    - action: notify.persistent_notification
+    - variables:
+        camera_sms_last_helper: "{{ 'input_text.camera_ai_sms_last_' ~ trigger.event.data.camera }}"
+        camera_sms_episode: "{{ trigger.event.data.episode_id }}"
+    - condition: template
+      value_template: "{{ states[camera_sms_last_helper] is not none and states(camera_sms_last_helper) != 'unavailable' and states(camera_sms_last_helper) != camera_sms_episode }}"
+    - action: notify.twilio_wichtige_sms
       data:
-        title: "Twilio-SMS empfangen"
-        message: >-
-          {{ trigger.event.data.get('Body', '') | trim }}
+        target: "+491234567890"
+        message: "{{ trigger.event.data.sms_summary | trim }}"
+    - action: input_text.set_value
+      target:
+        entity_id: "{{ camera_sms_last_helper }}"
+      data:
+        value: "{{ camera_sms_episode }}"
   mode: queued
-  max: 5
-
-# -----------------------------------------------------------------------------
-# Zweck: Einen exakt erlaubten SMS-Statusbefehl beantworten.
-# Nutzen: Demonstriert einen eingehenden Twilio→HA→Twilio-Rundweg ohne Aktorik.
-# Wann: Bei einer allowlist-gefilterten SMS, deren Body exakt STATUS entspricht.
-# Einbau: Listeneintrag übernehmen und das Script aus scripts.yaml mitladen.
-# Abhängigkeiten: Gleicher Twilio-Webhook und Secrets wie oben sowie
-#                 script.twilio_sms_sicher_senden und notify.twilio_sms.
-# Anpassen: Antwort kurz halten; neue Befehle separat und fail-closed umsetzen.
-# Sicherheitsgrenze: Jede Antwort kann Kosten erzeugen. Kein dynamischer
-#                    Empfänger und keine sicherheitskritische Aktion erlaubt.
-# -----------------------------------------------------------------------------
-- id: public_twilio_status_sms_beantworten
-  alias: "Twilio: STATUS-SMS beantworten"
-  description: >-
-    Antwortet der fest freigegebenen Nummer auf das normalisierte Kommando
-    STATUS mit einer kurzen, statischen Erreichbarkeitsmeldung.
-  triggers:
-    - trigger: event
-      event_type: twilio_data_received
-      event_data:
-        From: !secret twilio_contact_number
-        To: !secret twilio_sms_from_number
-  conditions:
-    - condition: template
-      value_template: >-
-        {{ trigger.event.data.get('Body') is string
-           and trigger.event.data.get('Body') | trim | upper == 'STATUS' }}
-  actions:
-    - action: script.twilio_sms_sicher_senden
-      data:
-        message: "Home Assistant ist erreichbar."
-  mode: single
+  max: 20

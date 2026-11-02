@@ -131,7 +131,7 @@ def main() -> int:
     if diff_result:
         return diff_result
 
-    print("\nPASS: YAML, Verträge, Links, IDs, Platzhalter/Secrets und alle drei git diff --check-Gates")
+    print("\nPASS: exakter Kamera-AI→Twilio-SMS-Vertrag, Scope-Abwesenheit und alle drei git diff --check-Gates")
     return 0
 
 

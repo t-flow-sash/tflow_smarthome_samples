@@ -1,16 +1,15 @@
 # =============================================================================
-# Zweck: Minimale Home-Assistant-Hauptkonfiguration für Twilio SMS und Anrufe.
-# Nutzen: Erstellt den Twilio-API-Client, notify.twilio_sms, notify.twilio_call
-#         und bindet die getrennten Twilio-Beispieldateien ein.
-# Einbau: Blöcke in die vorhandene configuration.yaml ZUSAMMENFÜHREN; eine
-#         bestehende Datei niemals komplett durch dieses Beispiel ersetzen.
+# Zweck: Twilio-Basis, generischen SMS-Notifier und Replay-Helfer bereitstellen.
+# Nutzen: Eine finale Kamera-Kurzfassung kann kontrolliert als SMS versendet
+#         werden, ohne Empfänger oder automatischen Versand global festzulegen.
+# Einbau: Diese Blöcke in die vorhandene configuration.yaml zusammenführen;
+#         bestehende Top-Level-Keys nicht duplizieren oder komplett ersetzen.
 # Abhängigkeiten: Home-Assistant-Core-Integrationen twilio, twilio_sms,
-#                 twilio_call, notify, automation, script und template sowie
-#                 private secrets.yaml.
-# Anpassen: Secret-Werte privat setzen; Include-Pfade und Notifier-Namen nur
-#           ändern, wenn alle Verweise im Paket entsprechend angepasst werden.
-# Sicherheitsgrenze: Account SID, Auth Token, Rufnummern und Webhook-URL gehören
-#                    nie ins Git. from_number ist Konfiguration, kein Action-Key.
+#                 input_text und automation sowie eine private secrets.yaml.
+# Anpassen: Acht Beispielkamera-IDs, Anzeigenamen und alphanumerische Sender-ID
+#           an die eigene Installation und die Twilio-Länderregeln anpassen.
+# Sicherheitsgrenze: Kein Empfänger und kein Versand in diesem Basisblock.
+#                    Secrets bleiben lokal; Restore/Replay ist nur Best Effort.
 # =============================================================================
 
 twilio:
@@ -19,13 +18,35 @@ twilio:
 
 notify:
   - platform: twilio_sms
-    name: twilio_sms
-    from_number: !secret twilio_sms_from_number
-  - platform: twilio_call
-    name: twilio_call
-    from_number: !secret twilio_call_from_number
+    name: twilio_wichtige_sms
+    from_number: HomeAlert
 
-# Nur übernehmen, wenn diese Top-Level-Keys nicht bereits existieren.
+input_text:
+  # Kein `initial:`: Home Assistant darf den letzten Marker wiederherstellen.
+  camera_ai_sms_last_camera_01:
+    name: Kamera-AI SMS letzte Episode Kamera 01
+    max: 32
+  camera_ai_sms_last_camera_02:
+    name: Kamera-AI SMS letzte Episode Kamera 02
+    max: 32
+  camera_ai_sms_last_camera_03:
+    name: Kamera-AI SMS letzte Episode Kamera 03
+    max: 32
+  camera_ai_sms_last_camera_04:
+    name: Kamera-AI SMS letzte Episode Kamera 04
+    max: 32
+  camera_ai_sms_last_camera_05:
+    name: Kamera-AI SMS letzte Episode Kamera 05
+    max: 32
+  camera_ai_sms_last_camera_06:
+    name: Kamera-AI SMS letzte Episode Kamera 06
+    max: 32
+  camera_ai_sms_last_camera_07:
+    name: Kamera-AI SMS letzte Episode Kamera 07
+    max: 32
+  camera_ai_sms_last_camera_08:
+    name: Kamera-AI SMS letzte Episode Kamera 08
+    max: 32
+
+# Nur übernehmen, wenn die eigene Installation diesen Include noch nicht hat.
 automation: !include automations.yaml
-script: !include scripts.yaml
-template: !include templates.yaml
