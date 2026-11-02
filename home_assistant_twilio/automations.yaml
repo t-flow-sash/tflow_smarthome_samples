@@ -17,7 +17,7 @@
 # Wann: Beim Event twilio_data_received mit passendem From, To und SMS-Body.
 # Einbau: Listeneintrag in die aktive automations.yaml übernehmen.
 # Abhängigkeiten: Twilio-Webhook-Config-Entry, persistent_notification sowie
-#                 twilio_allowed_sender_number und twilio_from_number.
+#                 twilio_contact_number und twilio_sms_from_number.
 # Anpassen: Titel/Text datenschutzgerecht halten; From/To niemals entfernen.
 # Sicherheitsgrenze: Nachrichtentext erscheint in HA und kann protokolliert
 #                    werden; keine Event-Gesamtdaten oder Secrets anzeigen.
@@ -31,8 +31,8 @@
     - trigger: event
       event_type: twilio_data_received
       event_data:
-        From: !secret twilio_allowed_sender_number
-        To: !secret twilio_from_number
+        From: !secret twilio_contact_number
+        To: !secret twilio_sms_from_number
   conditions:
     - condition: template
       value_template: >-
@@ -67,8 +67,8 @@
     - trigger: event
       event_type: twilio_data_received
       event_data:
-        From: !secret twilio_allowed_sender_number
-        To: !secret twilio_from_number
+        From: !secret twilio_contact_number
+        To: !secret twilio_sms_from_number
   conditions:
     - condition: template
       value_template: >-

@@ -1,12 +1,13 @@
 # =============================================================================
-# Zweck: Minimale Home-Assistant-Hauptkonfiguration für Twilio SMS.
-# Nutzen: Erstellt den Twilio-API-Client, notify.twilio_sms und bindet die
-#         getrennten Twilio-Beispieldateien ein.
+# Zweck: Minimale Home-Assistant-Hauptkonfiguration für Twilio SMS und Anrufe.
+# Nutzen: Erstellt den Twilio-API-Client, notify.twilio_sms, notify.twilio_call
+#         und bindet die getrennten Twilio-Beispieldateien ein.
 # Einbau: Blöcke in die vorhandene configuration.yaml ZUSAMMENFÜHREN; eine
 #         bestehende Datei niemals komplett durch dieses Beispiel ersetzen.
-# Abhängigkeiten: Home-Assistant-Core-Integrationen twilio, twilio_sms, notify,
-#                 automation, script und template sowie private secrets.yaml.
-# Anpassen: Secret-Werte privat setzen; Include-Pfade und Notifier-Name nur
+# Abhängigkeiten: Home-Assistant-Core-Integrationen twilio, twilio_sms,
+#                 twilio_call, notify, automation, script und template sowie
+#                 private secrets.yaml.
+# Anpassen: Secret-Werte privat setzen; Include-Pfade und Notifier-Namen nur
 #           ändern, wenn alle Verweise im Paket entsprechend angepasst werden.
 # Sicherheitsgrenze: Account SID, Auth Token, Rufnummern und Webhook-URL gehören
 #                    nie ins Git. from_number ist Konfiguration, kein Action-Key.
@@ -19,7 +20,10 @@ twilio:
 notify:
   - platform: twilio_sms
     name: twilio_sms
-    from_number: !secret twilio_from_number
+    from_number: !secret twilio_sms_from_number
+  - platform: twilio_call
+    name: twilio_call
+    from_number: !secret twilio_call_from_number
 
 # Nur übernehmen, wenn diese Top-Level-Keys nicht bereits existieren.
 automation: !include automations.yaml

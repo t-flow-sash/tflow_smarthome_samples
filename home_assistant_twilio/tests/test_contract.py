@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import re
+import importlib.util
+import subprocess
+import tempfile
 import unittest
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
@@ -22,9 +25,9 @@ EXPECTED_YAML = {
 EXPECTED_SECRETS = {
     "twilio_account_sid",
     "twilio_auth_token",
-    "twilio_from_number",
-    "twilio_recipient_number",
-    "twilio_allowed_sender_number",
+    "twilio_sms_from_number",
+    "twilio_call_from_number",
+    "twilio_contact_number",
 }
 
 
@@ -87,16 +90,18 @@ class TwilioSampleContract(unittest.TestCase):
                 "auth_token": "!secret twilio_auth_token",
             },
         )
-        self.assertEqual(
-            config["notify"],
-            [
-                {
-                    "platform": "twilio_sms",
-                    "name": "twilio_sms",
-                    "from_number": "!secret twilio_from_number",
-                }
-            ],
-        )
+        self.assertEqual(config["notify"], [
+            {
+                "platform": "twilio_sms",
+                "name": "twilio_sms",
+                "from_number": "!secret twilio_sms_from_number",
+            },
+            {
+                "platform": "twilio_call",
+                "name": "twilio_call",
+                "from_number": "!secret twilio_call_from_number",
+            },
+        ])
         self.assertEqual(config["automation"], "!include automations.yaml")
         self.assertEqual(config["script"], "!include scripts.yaml")
         self.assertEqual(config["template"], "!include templates.yaml")
@@ -130,8 +135,8 @@ class TwilioSampleContract(unittest.TestCase):
             self.assertEqual(
                 trigger["event_data"],
                 {
-                    "From": "!secret twilio_allowed_sender_number",
-                    "To": "!secret twilio_from_number",
+                    "From": "!secret twilio_contact_number",
+                    "To": "!secret twilio_sms_from_number",
                 },
             )
             template = entry["conditions"][0]["value_template"]
@@ -149,25 +154,50 @@ class TwilioSampleContract(unittest.TestCase):
                     self.assertLessEqual(set(payload), allowed_payload)
                     self.assertNotIn("from", payload)
                     self.assertNotIn("from_number", payload)
-        twilio_actions = [item for item in notify_actions if item["action"] == "notify.twilio_sms"]
-        self.assertEqual(len(twilio_actions), 1)
-        self.assertEqual(set(twilio_actions[0]["data"]), {"message", "target"})
+        for service in ("notify.twilio_sms", "notify.twilio_call"):
+            twilio_actions = [item for item in notify_actions if item["action"] == service]
+            self.assertEqual(len(twilio_actions), 1)
+            self.assertEqual(set(twilio_actions[0]["data"]), {"message", "target"})
 
     def test_outbound_script_has_fixed_target_and_length_gate(self):
         scripts = load("scripts.yaml")
-        self.assertEqual(set(scripts), {"twilio_sms_sicher_senden"})
+        self.assertEqual(set(scripts), {"twilio_sms_sicher_senden", "twilio_anruf_sicher_starten"})
         script = scripts["twilio_sms_sicher_senden"]
         self.assertEqual(script["mode"], "queued")
         self.assertEqual(script["max"], 3)
         condition = next(step for step in script["sequence"] if step.get("condition") == "template")
         self.assertIn("<= 320", condition["value_template"])
         action = next(step for step in script["sequence"] if step.get("action") == "notify.twilio_sms")
-        self.assertEqual(action["data"]["target"], ["!secret twilio_recipient_number"])
+        self.assertEqual(action["data"]["target"], ["!secret twilio_contact_number"])
+
+        call = scripts["twilio_anruf_sicher_starten"]
+        self.assertEqual(call["mode"], "single")
+        self.assertNotIn("max", call)
+        call_conditions = [step["value_template"] for step in call["sequence"] if step.get("condition") == "template"]
+        self.assertTrue(any("<= 240" in item for item in call_conditions))
+        self.assertTrue(any("http://" in item and "https://" in item for item in call_conditions))
+        call_action = next(step for step in call["sequence"] if step.get("action") == "notify.twilio_call")
+        self.assertEqual(call_action["data"]["target"], ["!secret twilio_contact_number"])
+
+    def test_status_sender_and_every_example_target_share_one_secret_identity(self):
+        status = next(item for item in load("automations.yaml") if item["id"] == "public_twilio_status_sms_beantworten")
+        allowed_sender = status["triggers"][0]["event_data"]["From"]
+        self.assertEqual(allowed_sender, "!secret twilio_contact_number")
+        for script in load("scripts.yaml").values():
+            action = next(step for step in script["sequence"] if str(step.get("action", "")).startswith("notify.twilio_"))
+            self.assertEqual(action["data"]["target"], [allowed_sender])
 
     def test_template_sensor_is_data_minimal(self):
         blocks = load("templates.yaml")
         self.assertEqual(len(blocks), 1)
-        sensor = blocks[0]["sensor"][0]
+        block = blocks[0]
+        trigger = block["triggers"][0]
+        self.assertEqual(trigger["event_data"], {
+            "From": "!secret twilio_contact_number",
+            "To": "!secret twilio_sms_from_number",
+        })
+        self.assertIn("Body", block["conditions"][0]["value_template"])
+        sensor = block["sensor"][0]
         self.assertEqual(sensor["default_entity_id"], "sensor.twilio_letzter_sms_eingang")
         self.assertEqual(sensor["unique_id"], "public_twilio_letzter_sms_eingang")
         serialized = yaml.safe_dump(sensor, allow_unicode=True)
@@ -176,6 +206,14 @@ class TwilioSampleContract(unittest.TestCase):
         self.assertNotIn("MessageSid", serialized)
         self.assertNotIn("trigger.event.data.get('Body', '') | trim", serialized)
         self.assertEqual(set(sensor["attributes"]), {"richtung", "zeichenanzahl"})
+
+    def test_scoped_mit_license_and_readme_notice(self):
+        license_text = (ROOT / "LICENSE").read_text(encoding="utf-8")
+        self.assertIn("MIT License", license_text)
+        self.assertIn("Permission is hereby granted, free of charge", license_text)
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        self.assertIn("](LICENSE)", readme)
+        self.assertIn("ausschließlich", readme)
 
     def test_readme_links_every_yaml_and_relative_links_resolve(self):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
@@ -213,6 +251,66 @@ class TwilioSampleContract(unittest.TestCase):
                 self.assertIsNone(re.search(pattern, text), label)
         self.assertNotIn("github" + "_pat_", text)
         self.assertNotIn("gh" + "p_", text)
+
+
+VALIDATOR_SPEC = importlib.util.spec_from_file_location(
+    "twilio_validate", ROOT / "scripts" / "validate.py"
+)
+assert VALIDATOR_SPEC and VALIDATOR_SPEC.loader
+VALIDATOR = importlib.util.module_from_spec(VALIDATOR_SPEC)
+VALIDATOR_SPEC.loader.exec_module(VALIDATOR)
+
+
+class ValidatorGitDiffContract(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.repo = Path(self.temp.name)
+        self.run_git("init", "-q", "-b", "main")
+        self.run_git("config", "user.name", "Twilio Test")
+        self.run_git("config", "user.email", "twilio-test@example.invalid")
+        (self.repo / "sample").mkdir()
+        (self.repo / "sample" / "file.txt").write_text("sauber\n", encoding="utf-8")
+        self.run_git("add", "sample/file.txt")
+        self.run_git("commit", "-q", "-m", "base")
+        self.base = self.run_git("rev-parse", "HEAD").stdout.strip()
+
+    def tearDown(self):
+        self.temp.cleanup()
+
+    def run_git(self, *args: str, check: bool = True):
+        return subprocess.run(
+            ["git", *args], cwd=self.repo, text=True, capture_output=True, check=check
+        )
+
+    def diff_result(self) -> int:
+        head = self.run_git("rev-parse", "HEAD").stdout.strip()
+        return VALIDATOR.run_diff_checks(self.repo, "sample", self.base, head)
+
+    def test_committed_candidate_whitespace_fails_with_clean_worktree(self):
+        (self.repo / "sample" / "file.txt").write_text("fehler   \n", encoding="utf-8")
+        self.run_git("add", "sample/file.txt")
+        self.run_git("commit", "-q", "-m", "candidate")
+        self.assertEqual(self.run_git("status", "--porcelain").stdout, "")
+        self.assertNotEqual(self.diff_result(), 0)
+
+    def test_staged_whitespace_fails(self):
+        (self.repo / "sample" / "file.txt").write_text("fehler   \n", encoding="utf-8")
+        self.run_git("add", "sample/file.txt")
+        self.assertNotEqual(self.diff_result(), 0)
+
+    def test_unstaged_whitespace_fails(self):
+        (self.repo / "sample" / "file.txt").write_text("fehler   \n", encoding="utf-8")
+        self.assertNotEqual(self.diff_result(), 0)
+
+    def test_clean_candidate_passes(self):
+        (self.repo / "sample" / "file.txt").write_text("weiter sauber\n", encoding="utf-8")
+        self.run_git("add", "sample/file.txt")
+        self.run_git("commit", "-q", "-m", "candidate")
+        self.assertEqual(self.diff_result(), 0)
+
+    def test_invalid_base_fails_closed(self):
+        with self.assertRaises(VALIDATOR.ValidationError):
+            VALIDATOR.resolve_candidate(self.repo, "keine-solche-base", "HEAD")
 
 
 if __name__ == "__main__":

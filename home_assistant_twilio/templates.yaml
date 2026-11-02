@@ -4,17 +4,20 @@
 #         oder Telefonnummer dauerhaft in der Entity abzulegen.
 # Einbau: Als Liste über template: !include templates.yaml laden oder diesen
 #         Block unter einen vorhandenen template:-Schlüssel übernehmen.
-# Abhängigkeiten: Twilio-Webhook-Config-Entry und Event twilio_data_received;
-#                 aktuelle trigger-basierte Template-Syntax von Home Assistant.
+# Abhängigkeiten: Twilio-Webhook-Config-Entry, Event twilio_data_received sowie
+#                 twilio_contact_number und twilio_sms_from_number.
 # Anpassen: default_entity_id/Name dürfen geändert werden; keine vertraulichen
 #           Event-Felder als Attribute ergänzen.
-# Sicherheitsgrenze: Der Sensor authentifiziert keine Quelle und beweist weder
-#                    Automationserfolg noch SMS-Antwort oder Zustellung.
+# Sicherheitsgrenze: Der Sensor übernimmt exakt dieselbe From-/To-Allowlist wie
+#                    die Automationen, ist aber keine starke Authentifizierung.
 # =============================================================================
 
 - triggers:
     - trigger: event
       event_type: twilio_data_received
+      event_data:
+        From: !secret twilio_contact_number
+        To: !secret twilio_sms_from_number
   conditions:
     - condition: template
       value_template: >-
