@@ -1,0 +1,31 @@
+# =============================================================================
+# Zweck: Datensparsamer Diagnose-Sensor für eingehende Twilio-SMS-Events.
+# Nutzen: Zeigt letzten Empfangszeitpunkt, Richtung und Textlänge, ohne Inhalt
+#         oder Telefonnummer dauerhaft in der Entity abzulegen.
+# Einbau: Als Liste über template: !include templates.yaml laden oder diesen
+#         Block unter einen vorhandenen template:-Schlüssel übernehmen.
+# Abhängigkeiten: Twilio-Webhook-Config-Entry und Event twilio_data_received;
+#                 aktuelle trigger-basierte Template-Syntax von Home Assistant.
+# Anpassen: default_entity_id/Name dürfen geändert werden; keine vertraulichen
+#           Event-Felder als Attribute ergänzen.
+# Sicherheitsgrenze: Der Sensor authentifiziert keine Quelle und beweist weder
+#                    Automationserfolg noch SMS-Antwort oder Zustellung.
+# =============================================================================
+
+- triggers:
+    - trigger: event
+      event_type: twilio_data_received
+  conditions:
+    - condition: template
+      value_template: >-
+        {{ trigger.event.data.get('Body') is string
+           and (trigger.event.data.get('Body') | trim | length) > 0 }}
+  sensor:
+    - name: "Twilio letzter SMS-Eingang"
+      default_entity_id: sensor.twilio_letzter_sms_eingang
+      unique_id: public_twilio_letzter_sms_eingang
+      device_class: timestamp
+      state: "{{ now().isoformat() }}"
+      attributes:
+        richtung: "{{ trigger.event.data.get('Direction', 'unbekannt') }}"
+        zeichenanzahl: "{{ trigger.event.data.get('Body', '') | string | length }}"

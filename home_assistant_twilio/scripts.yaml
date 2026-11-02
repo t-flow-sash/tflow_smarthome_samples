@@ -1,0 +1,38 @@
+# =============================================================================
+# Zweck: Zentraler, begrenzter Versandweg für ausgehende Twilio-SMS.
+# Nutzen: Hält Empfänger, Längenprüfung und Notify-Action an einer Stelle.
+# Einbau: Als Mapping via script: !include scripts.yaml laden oder den Schlüssel
+#         unter den vorhandenen script:-Block übernehmen.
+# Abhängigkeiten: notify.twilio_sms aus configuration.yaml und privates Secret
+#                 twilio_recipient_number.
+# Anpassen: Maximallänge/Kurztext bewusst wählen; Notifier-Name bei Umbenennung
+#           konsistent in configuration.yaml und hier ändern.
+# Sicherheitsgrenze: 320 Zeichen garantieren kein einzelnes SMS-Segment. Das
+#                    Script verhindert weder Missbrauch noch Providerkosten.
+# =============================================================================
+
+twilio_sms_sicher_senden:
+  alias: "Twilio: begrenzte SMS senden"
+  description: >-
+    Sendet 1 bis 320 Zeichen ausschließlich an den fest konfigurierten
+    Empfänger. Die Absendernummer stammt aus der Notify-Konfiguration.
+  mode: queued
+  max: 3
+  fields:
+    message:
+      name: Nachricht
+      description: "Zu sendender SMS-Text (1 bis 320 Zeichen)."
+      required: true
+      selector:
+        text:
+          multiline: true
+  sequence:
+    - variables:
+        sms_text: "{{ message | string | trim }}"
+    - condition: template
+      value_template: "{{ 0 < sms_text | length <= 320 }}"
+    - action: notify.twilio_sms
+      data:
+        message: "{{ sms_text }}"
+        target:
+          - !secret twilio_recipient_number

@@ -1,0 +1,27 @@
+# =============================================================================
+# Zweck: Minimale Home-Assistant-Hauptkonfiguration für Twilio SMS.
+# Nutzen: Erstellt den Twilio-API-Client, notify.twilio_sms und bindet die
+#         getrennten Twilio-Beispieldateien ein.
+# Einbau: Blöcke in die vorhandene configuration.yaml ZUSAMMENFÜHREN; eine
+#         bestehende Datei niemals komplett durch dieses Beispiel ersetzen.
+# Abhängigkeiten: Home-Assistant-Core-Integrationen twilio, twilio_sms, notify,
+#                 automation, script und template sowie private secrets.yaml.
+# Anpassen: Secret-Werte privat setzen; Include-Pfade und Notifier-Name nur
+#           ändern, wenn alle Verweise im Paket entsprechend angepasst werden.
+# Sicherheitsgrenze: Account SID, Auth Token, Rufnummern und Webhook-URL gehören
+#                    nie ins Git. from_number ist Konfiguration, kein Action-Key.
+# =============================================================================
+
+twilio:
+  account_sid: !secret twilio_account_sid
+  auth_token: !secret twilio_auth_token
+
+notify:
+  - platform: twilio_sms
+    name: twilio_sms
+    from_number: !secret twilio_from_number
+
+# Nur übernehmen, wenn diese Top-Level-Keys nicht bereits existieren.
+automation: !include automations.yaml
+script: !include scripts.yaml
+template: !include templates.yaml
